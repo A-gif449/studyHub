@@ -756,7 +756,7 @@ function uploadToCloudinary(file, onProgress){
     fd.append('file', file);
     fd.append('upload_preset', cfg.uploadPreset);
     fd.append('resource_type', 'raw');
-    fd.append('access_mode', 'public');
+    // fd.append('access_mode', 'public');
 
     const xhr = new XMLHttpRequest();
     xhr.upload.addEventListener('progress', e => {
