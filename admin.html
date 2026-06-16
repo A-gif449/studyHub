@@ -755,7 +755,7 @@ function uploadToCloudinary(file, onProgress){
     const fd = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', cfg.uploadPreset);
-    fd.append('resource_type', 'raw');
+    fd.append('resource_type', 'auto');
 
     const xhr = new XMLHttpRequest();
     xhr.upload.addEventListener('progress', e => {
@@ -773,7 +773,8 @@ function uploadToCloudinary(file, onProgress){
       }
     });
     xhr.addEventListener('error', ()=> reject(new Error('Network error during Cloudinary upload')));
-    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/raw/upload`);
+    // xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/raw/upload`);
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/auto/upload`);
     xhr.send(fd);
   });
 }
