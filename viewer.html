@@ -157,6 +157,18 @@
 <body>
 
 <script>
+
+function recordView(pdfId) {
+  if (!currentUser) return;
+  db.collection('views').add({
+    pdfId: pdfId,
+    userId: currentUser.uid,
+    userEmail: currentUser.email,
+    userName: currentUser.displayName || currentUser.email,
+    viewedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
   window.FIREBASE_CONFIG = {
     apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
     authDomain: "studyx-fd90c.firebaseapp.com",
@@ -321,7 +333,22 @@ auth.onAuthStateChanged(user => {
   if (!docId) { showState('notFoundState'); return; }
   if (!user)  { showState('gateState'); return; }
   if (!pdfLoaded) { showState('loadingState'); loadDoc(); }
-  else { showState('viewerUI'); }
+  else { showState('viewerUI');
+ 
+  function loadDoc(){
+  db.collection('pdfs').doc(docId).get().then(snap=>{
+    if(!snap.exists){ showState('notFoundState'); return; }
+    renderDoc({id:snap.id,...snap.data()});
+    pdfLoaded = true;
+    showState('viewerUI');
+    recordView(docId); // ← ADD THIS LINE
+  }).catch(err=>{
+    showToast('Error loading material: '+err.message,'error');
+    showState('notFoundState');
+  });
+}
+
+   }
 });
 
 function showState(id){

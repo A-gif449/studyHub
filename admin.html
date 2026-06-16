@@ -427,6 +427,15 @@
       </div>
     </div>
   </div>
+   
+    <!-- VIEWS PANEL -->
+    <div class="panel" style="margin-top:24px">
+      <div class="panel-title"><i class="ti ti-eye"></i> Recent Views</div>
+      <div id="viewsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
+        <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- EDIT MODAL -->
@@ -509,6 +518,34 @@ function showNotAdminGate(email){
   document.getElementById('adminUI').style.display = 'none';
 }
 
+function loadViews(){
+  db.collection('views').orderBy('viewedAt','desc').limit(50).onSnapshot(snap => {
+    const el = document.getElementById('viewsList');
+    if(!snap.docs.length){
+      el.innerHTML = `<div class="empty-list"><i class="ti ti-eye-off"></i><p>No views yet.</p></div>`;
+      return;
+    }
+    el.innerHTML = snap.docs.map(d => {
+      const v = d.data();
+      const time = v.viewedAt ? new Date(v.viewedAt.seconds * 1000).toLocaleString() : 'Just now';
+      const pdf = allPdfs.find(p => p.id === v.pdfId);
+      const pdfTitle = pdf ? pdf.title : 'Unknown PDF';
+      return `
+        <div class="pdf-item">
+          <div class="pdf-emoji">👁️</div>
+          <div class="pdf-info">
+            <div class="pdf-title">${escHtml(pdfTitle)}</div>
+            <div class="pdf-meta">
+              <span class="tag">${escHtml(v.userName)}</span>
+              <span>${escHtml(v.userEmail)}</span>
+              <span>· ${time}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  });
+}
+
 function showAdmin(user){
   document.getElementById('accessGate').style.display = 'none';
   document.getElementById('adminUI').style.display = 'block';
@@ -516,6 +553,7 @@ function showAdmin(user){
   document.getElementById('adminInitials').textContent = initials;
   document.getElementById('adminName').textContent = user.displayName || user.email;
   loadPdfs();
+  loadViews();
 }
 
 // ── Gate Login ──
@@ -774,7 +812,7 @@ function uploadToCloudinary(file, onProgress){
       }
     });
     xhr.addEventListener('error', ()=> reject(new Error('Network error during Cloudinary upload')));
-    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/raw/upload`);
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`);
     xhr.send(fd);
   });
 }
