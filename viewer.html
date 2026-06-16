@@ -360,10 +360,16 @@ function updateNav(user){
 function toggleDropdown(){ document.getElementById('userDropdown')?.classList.toggle('open'); }
 document.addEventListener('click', e=>{ if(!e.target.closest('#userDropdown')) document.getElementById('userDropdown')?.classList.remove('open'); });
 
+function fixCloudinaryUrl(u) {
+  if (!u) return '';
+  // Convert image/upload to raw/upload for PDF serving
+  return u.replace('/image/upload/', '/raw/upload/');
+}
+
 function buildDownloadUrl(u){
   if(!u) return '#';
+  u = fixCloudinaryUrl(u);
   if(u.includes('/raw/upload/')) return u.replace('/raw/upload/','/raw/upload/fl_attachment/');
-  if(u.includes('/upload/')) return u.replace('/upload/','/upload/fl_attachment/');
   return u;
 }
 
@@ -406,7 +412,7 @@ function renderDoc(pdf){
     ${pdf.readTime ? ` &nbsp;·&nbsp; ${pdf.readTime} read` : ''}
   `;
 
-  const url = pdf.cloudinaryUrl || '';
+  const url = fixCloudinaryUrl(pdf.cloudinaryUrl || '');
   document.getElementById('openNewTabBtn').href  = url;
   document.getElementById('fallbackOpenBtn').href = url;
   document.getElementById('downloadBtn').href    = buildDownloadUrl(url);
