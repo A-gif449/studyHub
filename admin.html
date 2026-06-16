@@ -773,8 +773,8 @@ function uploadToCloudinary(file, onProgress){
       }
     });
     xhr.addEventListener('error', ()=> reject(new Error('Network error during Cloudinary upload')));
-    // xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/raw/upload`);
-    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/auto/upload`);
+    // xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/auto/upload`);
+   xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/auto/upload`);
     xhr.send(fd);
   });
 }
