@@ -348,7 +348,7 @@
 
         <!-- DROP ZONE -->
         <div class="drop-zone" id="dropZone">
-          <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(this)"/>
+          <input type="file" id="pdfFile" accept="image/*" onchange="handleFileSelect(this)"/>
           <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
           <h4>Drop PDF here or click to browse</h4>
           <p>Maximum file size: 50 MB</p>
@@ -656,7 +656,7 @@ let selectedFile = null;
 function handleFileSelect(input){
   const file = input.files[0];
   if(!file) return;
-  if(file.type !== 'application/pdf'){ showUploadError('Only PDF files are allowed.'); input.value=''; return; }
+  if(!file.type.startsWith('image/')){ showUploadError('Only PDF files are allowed.'); input.value=''; return; }
   if(file.size > 52428800){ showUploadError('File exceeds 50 MB limit.'); input.value=''; return; }
   selectedFile = file;
   const dz = document.getElementById('dropZone');
@@ -755,7 +755,7 @@ function uploadToCloudinary(file, onProgress){
     const fd = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', cfg.uploadPreset);
-    fd.append('resource_type', 'raw');
+    // fd.append('resource_type', 'raw');
     // fd.append('access_mode', 'public');
 
     const xhr = new XMLHttpRequest();

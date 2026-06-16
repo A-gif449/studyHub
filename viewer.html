@@ -417,16 +417,28 @@ function renderDoc(pdf){
     ${pdf.readTime ? ` &nbsp;·&nbsp; ${pdf.readTime} read` : ''}
   `;
 
-  const url = pdf.cloudinaryUrl || '';
-  document.getElementById('openNewTabBtn').href  = url;
-  document.getElementById('fallbackOpenBtn').href = url;
-  document.getElementById('downloadBtn').href    = buildDownloadUrl(url);
+//   const url = pdf.cloudinaryUrl || '';
+//   document.getElementById('openNewTabBtn').href  = url;
+//   document.getElementById('fallbackOpenBtn').href = url;
+//   document.getElementById('downloadBtn').href    = buildDownloadUrl(url);
 
-  if(!url){
-    document.getElementById('pdfLoading').style.display = 'none';
-    document.getElementById('frameFallback').classList.add('show');
-    return;
-  }
+//   if(!url){
+//     document.getElementById('pdfLoading').style.display = 'none';
+//     document.getElementById('frameFallback').classList.add('show');
+//     return;
+//   }
+const url = pdf.cloudinaryUrl || '';
+document.getElementById('openNewTabBtn').href = url;
+document.getElementById('fallbackOpenBtn').href = url;
+document.getElementById('downloadBtn').href = url;
+
+document.getElementById('pdfLoading').style.display = 'none';
+const container = document.getElementById('pdfContainer');
+container.innerHTML = `
+  <img src="${url}" 
+    style="width:100%;border-radius:8px;display:block;margin:0 auto" 
+    onerror="document.getElementById('frameFallback').classList.add('show')"
+  />`;
 
   // ── Render with PDF.js ──
   pdfjsLib.GlobalWorkerOptions.workerSrc =
