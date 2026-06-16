@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Loading… – StudyHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0A0A12;--bg2:#0F0F1C;--bg3:#13131F;--card:#14141F;--card2:#1A1A2E;
+    --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+    --accent:#6C63FF;--accent2:#A78BFA;--accent3:#38BDF8;--accent4:#F472B6;
+    --gold:#FBBF24;--green:#34D399;--red:#F87171;
+    --text:#F0EFF8;--text2:#A09DC0;--text3:#6B6880;
+    --r:14px;--r2:20px;--r3:28px;
+  }
+  html,body{height:100%}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:var(--bg2)}
+  ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:99px}
+  .orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+  .orb1{width:500px;height:500px;top:-150px;left:-100px;background:rgba(108,99,255,0.12)}
+  .orb2{width:400px;height:400px;bottom:10%;right:-100px;background:rgba(56,189,248,0.08)}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,18,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--text);text-decoration:none}
+  .nav-logo .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
+  .back-link{display:flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;padding:7px 14px;border-radius:9px;border:1px solid var(--border2);transition:all .2s}
+  .back-link:hover{color:var(--text);border-color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.04)}
+  .nav-right{display:flex;align-items:center;gap:10px}
+  .btn-ghost{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);color:var(--text2);background:transparent;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
+  .btn-primary{padding:8px 18px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;box-shadow:0 0 20px rgba(108,99,255,0.3)}
+  .btn-primary:hover{transform:translateY(-1px)}
+  .user-pill{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:99px;background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.25);cursor:pointer}
+  .user-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+  .user-name{font-size:12px;font-weight:500;color:var(--text2)}
+  .dropdown{position:relative}
+  .dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:6px;min-width:180px;z-index:200;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+  .dropdown.open .dropdown-menu{display:block}
+  .dropdown-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;text-decoration:none;border:none;background:none;width:100%;font-family:inherit}
+  .dropdown-item:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+  .dropdown-item.danger:hover{background:rgba(248,113,113,0.1);color:var(--red)}
+  .dropdown-divider{height:1px;background:var(--border);margin:5px 0}
+
+  .viewer-page{position:relative;z-index:1;padding-top:64px;height:100vh;display:flex;flex-direction:column}
+
+  .viewer-toolbar{flex-shrink:0;padding:16px 5%;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+  .doc-heading{display:flex;align-items:flex-start;gap:14px;min-width:0}
+  .doc-emoji{width:44px;height:44px;border-radius:12px;background:rgba(108,99,255,0.12);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+  .doc-title-block{min-width:0}
+  .doc-title-block h1{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;line-height:1.3;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
+  .doc-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text3)}
+  .tag{padding:3px 10px;border-radius:99px;background:rgba(108,99,255,0.1);color:var(--accent2);font-size:11px;font-weight:600}
+  .tag.level-a{background:rgba(244,114,182,0.1);color:var(--accent4)}
+  .tag.level-i{background:rgba(251,191,36,0.1);color:var(--gold)}
+  .tag.level-b{background:rgba(52,211,153,0.1);color:var(--green)}
+  .doc-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .icon-btn{width:36px;height:36px;border-radius:9px;border:1px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:15px;cursor:pointer;transition:all .2s;text-decoration:none}
+  .icon-btn:hover{border-color:rgba(255,255,255,0.22);color:var(--text)}
+
+  .details-panel{flex-shrink:0;padding:0 5%;max-height:0;overflow:hidden;transition:max-height .25s ease}
+  .details-panel.open{max-height:200px;padding:0 5% 16px}
+  .details-inner{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text2);line-height:1.7}
+  .details-inner strong{color:var(--text)}
+
+  .viewer-stage{flex:1;min-height:0;padding:0 5% 20px}
+  .pdf-frame-wrap{height:100%;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);background:#fff;position:relative}
+  .pdf-frame-wrap iframe{width:100%;height:100%;border:none;display:block}
+  .frame-fallback{position:absolute;inset:0;background:var(--card);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:30px;color:var(--text2)}
+  .frame-fallback.show{display:flex}
+  .frame-fallback i{font-size:34px;color:var(--accent2)}
+
+  .state-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:2}
+  .state-card{max-width:420px;width:100%;text-align:center}
+  .state-card i.big{font-size:46px;color:var(--accent2);margin-bottom:18px;display:inline-block}
+  .state-card h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:10px}
+  .state-card p{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:22px}
+  .spin{animation:spin 1s linear infinite}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  .gate-card{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:36px;max-width:420px;width:100%;text-align:left}
+  .gate-icon-row{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .gate-icon-row .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff}
+  .gate-card h2{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;margin-bottom:6px}
+  .gate-card .gate-sub{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6}
+  .modal-tabs{display:flex;gap:0;background:var(--bg2);border-radius:10px;padding:3px;margin-bottom:22px}
+  .modal-tab{flex:1;padding:9px;text-align:center;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2);background:transparent;border:none;font-family:inherit}
+  .modal-tab.active{background:var(--accent);color:#fff}
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px}
+  .form-group input{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+  .form-group input:focus{border-color:var(--accent)}
+  .form-group input::placeholder{color:var(--text3)}
+  .form-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;transition:all .2s}
+  .form-submit:disabled{opacity:.6;cursor:not-allowed}
+  .modal-divider{display:flex;align-items:center;gap:10px;margin:16px 0}
+  .modal-divider span{font-size:11px;color:var(--text3);white-space:nowrap}
+  .modal-divider::before,.modal-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+  .auth-error{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:12px;display:none}
+  .auth-error.show{display:block}
+  .gate-back{display:block;text-align:center;margin-top:18px;font-size:12px;color:var(--text3);text-decoration:none}
+  .gate-back:hover{color:var(--text2)}
+
+  .toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:14px 20px;border-radius:12px;background:var(--card2);border:1px solid var(--border2);font-size:14px;color:var(--text);box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;pointer-events:none}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{border-color:rgba(52,211,153,.3)}
+  .toast.error{border-color:rgba(248,113,113,.3)}
+
+  @media(max-width:640px){
+    nav{padding:0 16px}
+    .viewer-toolbar{padding:14px 16px}
+    .details-panel,.viewer-stage{padding-left:16px;padding-right:16px}
+    .doc-title-block h1{max-width:48vw;font-size:16px}
+    .back-link span{display:none}
+    .gate-card{padding:26px}
+  }
+</style>
+</head>
+<body>
+
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+
+  window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
+
+  window.CLOUDINARY_CONFIG = {
+    cloudName:    "dwmvn4kj3",
+    uploadPreset: "preupload"
+  };
+</script>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="back-link"><i class="ti ti-arrow-left"></i> <span>Back to Library</span></a>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon"><i class="ti ti-atom"></i></div>
+    StudyHub
+  </a>
+  <div class="nav-right" id="navRight"></div>
+</nav>
+
+<!-- LOADING STATE -->
+<div class="state-screen" id="loadingState">
+  <div class="state-card">
+    <i class="ti ti-loader big spin"></i>
+    <h2>Loading material…</h2>
+    <p>Just a moment while we fetch your document.</p>
+  </div>
+</div>
+
+<!-- NOT FOUND STATE -->
+<div class="state-screen" id="notFoundState" style="display:none">
+  <div class="state-card">
+    <i class="ti ti-file-off big"></i>
+    <h2>Material not found</h2>
+    <p>This PDF may have been removed or the link is incorrect.</p>
+    <a href="index.html#materials" class="btn-primary" style="justify-content:center"><i class="ti ti-arrow-left"></i> Back to Library</a>
+  </div>
+</div>
+
+<!-- ACCESS GATE (sign in required) -->
+<div class="state-screen" id="gateState" style="display:none">
+  <div class="gate-card">
+    <div class="gate-icon-row">
+      <div class="logo-icon"><i class="ti ti-lock"></i></div>
+      <div>
+        <h2 style="margin-bottom:2px">Sign in to continue</h2>
+      </div>
+    </div>
+    <p class="gate-sub">This material is for registered members only. Sign in or create a free account to view it.</p>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      <button class="modal-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+
+    <div id="formLogin">
+      <div class="form-group"><label>Email address</label><input type="email" id="loginEmail" placeholder="you@example.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="Enter your password"/></div>
+      <button class="form-submit" id="loginBtn" onclick="handleLogin()">Sign In</button>
+      <div class="modal-divider"><span>or continue with</span></div>
+      <button class="btn-ghost" onclick="handleGoogleLogin()" style="width:100%;justify-content:center;padding:11px">
+        <i class="ti ti-brand-google"></i> Google
+      </button>
+    </div>
+    <div id="formSignup" style="display:none">
+      <div class="form-group"><label>Full Name</label><input type="text" id="signupName" placeholder="Your name"/></div>
+      <div class="form-group"><label>Email address</label><input type="email" id="signupEmail" placeholder="you@example.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="signupPass" placeholder="Create a password (min 6 chars)"/></div>
+      <button class="form-submit" id="signupBtn" onclick="handleSignup()">Create Free Account</button>
+      <div class="modal-divider"><span>or continue with</span></div>
+      <button class="btn-ghost" onclick="handleGoogleLogin()" style="width:100%;justify-content:center;padding:11px">
+        <i class="ti ti-brand-google"></i> Google
+      </button>
+    </div>
+    <a href="index.html" class="gate-back">← Back to homepage</a>
+  </div>
+</div>
+
+<!-- MAIN VIEWER UI -->
+<div class="viewer-page" id="viewerUI" style="display:none">
+  <div class="viewer-toolbar">
+    <div class="doc-heading">
+      <div class="doc-emoji" id="docEmoji">📄</div>
+      <div class="doc-title-block">
+        <h1 id="docTitle">—</h1>
+        <div class="doc-meta">
+          <span class="tag" id="docSubjectTag">—</span>
+          <span class="tag" id="docLevelTag">—</span>
+          <span id="docPages"></span>
+          <span id="docReadTime"></span>
+        </div>
+      </div>
+    </div>
+    <div class="doc-actions">
+      <button class="icon-btn" id="detailsBtn" title="Details" onclick="toggleDetails()"><i class="ti ti-info-circle"></i></button>
+      <a class="icon-btn" id="openNewTabBtn" title="Open in new tab" target="_blank" rel="noopener"><i class="ti ti-external-link"></i></a>
+      <a class="icon-btn" id="downloadBtn" title="Download" target="_blank" rel="noopener"><i class="ti ti-download"></i></a>
+    </div>
+  </div>
+
+  <div class="details-panel" id="detailsPanel">
+    <div class="details-inner" id="detailsContent"></div>
+  </div>
+
+  <div class="viewer-stage">
+    <div class="pdf-frame-wrap">
+      <iframe id="pdfFrame" title="PDF document"></iframe>
+      <div class="frame-fallback" id="frameFallback">
+        <i class="ti ti-file-type-pdf"></i>
+        <div>
+          <div style="font-weight:600;color:var(--text);margin-bottom:6px">Can't display the PDF here</div>
+          <div style="font-size:13px">Your browser blocked the inline preview. Open it directly instead.</div>
+        </div>
+        <a class="btn-primary" id="fallbackOpenBtn" target="_blank" rel="noopener"><i class="ti ti-external-link"></i> Open PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
+
+<script>
+// ── Init Firebase ──
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+const docId = new URLSearchParams(location.search).get('id');
+
+const subjectEmoji = {
+  'Mathematics':'🧮','Physics':'⚛️','Chemistry':'⚗️','Biology':'🧬',
+  'CS & Tech':'💻','Economics':'📈','Literature':'📚','History':'📜',
+  'Psychology':'🧠','Engineering':'⚙️','Default':'📄'
+};
+
+let currentUser = null;
+let pdfLoaded   = false;
+
+// ── Auth guard ──
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  updateNav(user);
+
+  if (!docId) { showState('notFoundState'); return; }
+
+  if (!user) {
+    showState('gateState');
+    return;
+  }
+  if (!pdfLoaded) {
+    showState('loadingState');
+    loadDoc();
+  } else {
+    showState('viewerUI');
+  }
+});
+
+function showState(id){
+  ['loadingState','notFoundState','gateState','viewerUI'].forEach(s=>{
+    document.getElementById(s).style.display = (s===id) ? 'flex' : 'none';
+  });
+}
+
+// ── Nav ──
+function isAdmin(user){ return user && window.ADMIN_EMAILS.includes(user.email); }
+function updateNav(user){
+  const nr = document.getElementById('navRight');
+  if (user) {
+    const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const adminLink = isAdmin(user)
+      ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>`
+      : '';
+    nr.innerHTML = `
+      <div class="dropdown" id="userDropdown">
+        <div class="user-pill" onclick="toggleDropdown()">
+          <div class="user-av">${initials}</div>
+          <span class="user-name">${user.displayName || user.email.split('@')[0]}</span>
+          <i class="ti ti-chevron-down" style="font-size:11px;color:var(--text3)"></i>
+        </div>
+        <div class="dropdown-menu">
+          <div style="padding:8px 12px 4px;font-size:12px;color:var(--text3)">${escHtml(user.email)}</div>
+          <div class="dropdown-divider"></div>
+          ${adminLink}
+          <button class="dropdown-item danger" onclick="handleLogout()"><i class="ti ti-logout"></i> Sign Out</button>
+        </div>
+      </div>`;
+  } else {
+    nr.innerHTML = `<a href="index.html" class="btn-ghost"><i class="ti ti-home"></i> Home</a>`;
+  }
+}
+function toggleDropdown(){ document.getElementById('userDropdown')?.classList.toggle('open'); }
+document.addEventListener('click', e=>{ if(!e.target.closest('#userDropdown')) document.getElementById('userDropdown')?.classList.remove('open'); });
+
+function getViewableUrl(u) {
+  if (!u) return '';
+  // Use Google Docs Viewer to render the PDF inline
+  return 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(u);
+}
+
+
+function buildDownloadUrl(u) {
+  if (!u) return '#';
+  // Use original raw URL with fl_attachment for proper download
+  if (u.includes('/raw/upload/')) return u.replace('/raw/upload/', '/raw/upload/fl_attachment/');
+  if (u.includes('/upload/')) return u.replace('/upload/', '/upload/fl_attachment/');
+  return u;
+}
+
+// ── Load PDF doc ──
+function loadDoc(){
+  db.collection('pdfs').doc(docId).get().then(snap=>{
+    if(!snap.exists){ showState('notFoundState'); return; }
+    renderDoc({id:snap.id, ...snap.data()});
+    pdfLoaded = true;
+    showState('viewerUI');
+  }).catch(err=>{
+    showToast('Error loading material: '+err.message, 'error');
+    showState('notFoundState');
+  });
+}
+
+function renderDoc(pdf){
+  document.title = pdf.title + ' – StudyHub';
+  document.getElementById('docEmoji').textContent = subjectEmoji[pdf.subject] || subjectEmoji['Default'];
+  document.getElementById('docTitle').textContent = pdf.title || 'Untitled';
+  document.getElementById('docTitle').title = pdf.title || '';
+
+  const subjTag = document.getElementById('docSubjectTag');
+  subjTag.textContent = pdf.subject || 'General';
+  subjTag.className = 'tag';
+
+  const lvlTag = document.getElementById('docLevelTag');
+  lvlTag.textContent = pdf.level || 'All levels';
+  lvlTag.className = 'tag ' + (pdf.level === 'Advanced' ? 'level-a' : pdf.level === 'Intermediate' ? 'level-i' : 'level-b');
+
+  document.getElementById('docPages').textContent    = pdf.pages ? `· ${pdf.pages} pages` : '';
+  document.getElementById('docReadTime').textContent = pdf.readTime ? `· ${pdf.readTime} read` : '';
+
+  document.getElementById('detailsContent').innerHTML = `
+    <strong>${escHtml(pdf.title||'')}</strong><br/>
+    ${pdf.description ? escHtml(pdf.description) + '<br/><br/>' : ''}
+    Subject: <strong>${escHtml(pdf.subject||'General')}</strong> &nbsp;·&nbsp;
+    Level: <strong>${escHtml(pdf.level||'All levels')}</strong>
+    ${pdf.pages ? ` &nbsp;·&nbsp; ${pdf.pages} pages` : ''}
+    ${pdf.readTime ? ` &nbsp;·&nbsp; ${pdf.readTime} read` : ''}
+  `;
+
+  const url = pdf.cloudinaryUrl || '';
+  const viewableUrl = getViewableUrl(url);
+
+  const frame = document.getElementById('pdfFrame');
+  frame.src = viewableUrl;
+  document.getElementById('openNewTabBtn').href = viewableUrl;
+  document.getElementById('fallbackOpenBtn').href = viewableUrl;
+  document.getElementById('downloadBtn').href = buildDownloadUrl(url);
+
+  // Show fallback if iframe fails to load after 4 seconds
+  let loadedOk = false;
+  frame.addEventListener('load', () => { loadedOk = true; });
+  setTimeout(() => {
+    if (!loadedOk || !url) document.getElementById('frameFallback').classList.add('show');
+  }, 12000);
+}
+
+function toggleDetails(){
+  document.getElementById('detailsPanel').classList.toggle('open');
+}
+
+// ── Auth (embedded gate) ──
+async function handleLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  if(!email || !pass){ showAuthError('Please fill in all fields.'); return; }
+  setLoading('loginBtn', true);
+  try{
+    await auth.signInWithEmailAndPassword(email, pass);
+    showToast('Welcome back! 🎉','success');
+  } catch(e){ showAuthError(friendlyError(e.code)); }
+  setLoading('loginBtn', false);
+}
+async function handleSignup(){
+  const name  = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass  = document.getElementById('signupPass').value;
+  if(!name || !email || !pass){ showAuthError('Please fill in all fields.'); return; }
+  if(pass.length < 6){ showAuthError('Password must be at least 6 characters.'); return; }
+  setLoading('signupBtn', true);
+  try{
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await cred.user.updateProfile({displayName:name});
+    showToast('Account created! Welcome to StudyHub 🚀','success');
+  } catch(e){ showAuthError(friendlyError(e.code)); }
+  setLoading('signupBtn', false);
+}
+async function handleGoogleLogin(){
+  try{
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
+    showToast('Signed in with Google! 🎉','success');
+  } catch(e){ showAuthError(friendlyError(e.code)); }
+}
+async function handleLogout(){
+  await auth.signOut();
+  showToast('Signed out. See you soon!','success');
+}
+function switchTab(tab){
+  const isLogin = tab === 'login';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+  document.getElementById('formLogin').style.display  = isLogin ? 'block' : 'none';
+  document.getElementById('formSignup').style.display = isLogin ? 'none'  : 'block';
+  clearAuthError();
+}
+function friendlyError(code){
+  const map = {
+    'auth/user-not-found':'No account found with this email.',
+    'auth/wrong-password':'Incorrect password.',
+    'auth/email-already-in-use':'An account with this email already exists.',
+    'auth/invalid-email':'Invalid email address.',
+    'auth/weak-password':'Password is too weak.',
+    'auth/popup-closed-by-user':'Sign-in popup was closed.',
+    'auth/network-request-failed':'Network error. Check your connection.',
+    'auth/invalid-credential':'Incorrect email or password.',
+  };
+  return map[code] || 'Something went wrong. Please try again.';
+}
+function showAuthError(msg){ const el = document.getElementById('authError'); el.textContent = msg; el.classList.add('show'); }
+function clearAuthError(){ document.getElementById('authError').classList.remove('show'); }
+function setLoading(id, v){ const b = document.getElementById(id); if(b) b.disabled = v; }
+
+// ── Helpers ──
+function escHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg, type='success'){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').className = type==='success' ? 'ti ti-check' : 'ti ti-alert-circle';
+  t.className = `toast ${type} show`;
+  setTimeout(()=> t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>

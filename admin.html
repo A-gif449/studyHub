@@ -1,0 +1,876 @@
+//admin.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Panel – StudyHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0A0A12;--bg2:#0F0F1C;--bg3:#13131F;--card:#14141F;--card2:#1A1A2E;
+    --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+    --accent:#6C63FF;--accent2:#A78BFA;--accent3:#38BDF8;--accent4:#F472B6;
+    --gold:#FBBF24;--green:#34D399;--red:#F87171;
+    --text:#F0EFF8;--text2:#A09DC0;--text3:#6B6880;
+    --r:14px;--r2:20px;--r3:28px;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:var(--bg2)}
+  ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:99px}
+  .orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+  .orb1{width:500px;height:500px;top:-150px;left:-100px;background:rgba(108,99,255,0.12)}
+  .orb2{width:400px;height:400px;bottom:10%;right:-100px;background:rgba(56,189,248,0.08)}
+
+  /* ── NAV ── */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,18,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);text-decoration:none}
+  .nav-logo .logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--red),var(--accent4));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff}
+  .admin-badge{padding:4px 12px;border-radius:99px;background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:var(--red);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:5px}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .btn-ghost{padding:8px 18px;border-radius:9px;border:1px solid var(--border2);color:var(--text2);background:transparent;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
+  .btn-primary{padding:8px 20px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;box-shadow:0 0 20px rgba(108,99,255,0.3)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 30px rgba(108,99,255,0.45)}
+  .btn-danger{padding:8px 18px;border-radius:9px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+  .btn-danger:hover{background:rgba(248,113,113,0.18)}
+  .user-info{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)}
+  .user-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--accent4));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+  /* ── LAYOUT ── */
+  .page-wrap{padding:88px 5% 60px;position:relative;z-index:1}
+  .page-header{margin-bottom:36px}
+  .page-header h1{font-family:'Syne',sans-serif;font-size:clamp(24px,3.5vw,36px);font-weight:800;margin-bottom:6px}
+  .page-header p{font-size:14px;color:var(--text2)}
+
+  /* ── CONFIG BANNER ── */
+  .config-banner{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);border-radius:var(--r2);padding:20px 24px;margin-bottom:28px;display:flex;align-items:flex-start;gap:14px}
+  .config-banner i{font-size:20px;color:var(--gold);flex-shrink:0;margin-top:1px}
+  .config-banner h4{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:4px}
+  .config-banner p{font-size:13px;color:var(--text2);line-height:1.6}
+  .config-banner code{background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;font-size:12px;font-family:monospace;color:var(--accent2)}
+
+  /* ── STATS ROW ── */
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:28px}
+  .stat-card{padding:20px 22px;border-radius:var(--r2);background:var(--card);border:1px solid var(--border)}
+  .stat-card .s-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px}
+  .stat-card .s-lbl{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+
+  /* ── UPLOAD PANEL ── */
+  .grid-2{display:grid;grid-template-columns:420px 1fr;gap:24px;align-items:start}
+  @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:28px}
+  .panel-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+  .panel-title i{color:var(--accent2)}
+
+  .form-group{margin-bottom:15px}
+  .form-group label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:7px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;-webkit-appearance:none}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+  .form-group input::placeholder,.form-group textarea::placeholder{color:var(--text3)}
+  .form-group textarea{resize:vertical;min-height:80px;line-height:1.5}
+  .form-group select option{background:var(--card2)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  /* ── DROP ZONE ── */
+  .drop-zone{border:2px dashed rgba(108,99,255,0.3);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .25s;background:rgba(108,99,255,0.03);position:relative;margin-bottom:15px}
+  .drop-zone:hover,.drop-zone.dragging{border-color:rgba(108,99,255,0.6);background:rgba(108,99,255,0.07)}
+  .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .drop-icon{font-size:36px;color:var(--accent2);margin-bottom:10px}
+  .drop-zone h4{font-size:14px;font-weight:600;margin-bottom:4px}
+  .drop-zone p{font-size:12px;color:var(--text3)}
+  .file-chosen{background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.3)!important;display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 20px!important}
+  .file-chosen i{color:var(--green);font-size:22px}
+  .file-chosen span{font-size:13px;color:var(--green);font-weight:600}
+
+  /* ── PROGRESS ── */
+  .progress-wrap{margin-bottom:15px;display:none}
+  .progress-bar{height:6px;border-radius:99px;background:var(--bg2);overflow:hidden}
+  .progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent3));width:0%;transition:width .3s}
+  .progress-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:flex;justify-content:space-between}
+
+  .form-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 0 24px rgba(108,99,255,0.3);display:flex;align-items:center;justify-content:center;gap:8px}
+  .form-submit:hover{transform:translateY(-1px);box-shadow:0 4px 36px rgba(108,99,255,0.45)}
+  .form-submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  .upload-error{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:12px;display:none}
+  .upload-error.show{display:block}
+  .upload-success{background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:12px;display:none;align-items:center;gap:8px}
+  .upload-success.show{display:flex}
+
+  /* ── PDF LIST ── */
+  .search-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .search-bar input{flex:1;padding:10px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:13px;font-family:inherit;outline:none}
+  .search-bar input:focus{border-color:var(--accent)}
+  .search-bar input::placeholder{color:var(--text3)}
+
+  .pdf-list{display:flex;flex-direction:column;gap:10px;max-height:620px;overflow-y:auto;padding-right:4px}
+  .pdf-item{padding:14px 16px;border-radius:var(--r);background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;gap:14px;transition:border-color .2s}
+  .pdf-item:hover{border-color:var(--border2)}
+  .pdf-emoji{width:40px;height:40px;border-radius:10px;background:rgba(108,99,255,0.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .pdf-info{flex:1;min-width:0}
+  .pdf-info .pdf-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+  .pdf-info .pdf-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pdf-meta .tag{padding:2px 8px;border-radius:99px;background:rgba(108,99,255,0.1);color:var(--accent2);font-size:10px;font-weight:600}
+  .pdf-meta .tag.level-a{background:rgba(244,114,182,0.1);color:var(--accent4)}
+  .pdf-meta .tag.level-i{background:rgba(251,191,36,0.1);color:var(--gold)}
+  .pdf-meta .tag.level-b{background:rgba(52,211,153,0.1);color:var(--green)}
+  .pdf-actions{display:flex;gap:6px;flex-shrink:0}
+  .icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:15px;cursor:pointer;transition:all .2s}
+  .icon-btn:hover{border-color:var(--border2);color:var(--text)}
+  .icon-btn.del:hover{border-color:rgba(248,113,113,0.4);color:var(--red);background:rgba(248,113,113,0.08)}
+  .empty-list{padding:40px 20px;text-align:center;color:var(--text3)}
+  .empty-list i{font-size:36px;margin-bottom:10px;display:block}
+  .empty-list p{font-size:13px}
+
+  /* ── ACCESS GATE ── */
+  #accessGate{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    flex-direction:column;
+    gap:0;
+    text-align:center;
+    padding:40px;
+    position:relative;
+    z-index:1;
+  }
+  .gate-card{
+    background:var(--card2);
+    border:1px solid var(--border2);
+    border-radius:var(--r3);
+    padding:40px;
+    width:100%;
+    max-width:420px;
+    text-align:left;
+    animation:gateIn .3s ease;
+  }
+  @keyframes gateIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .gate-logo-row{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+  .gate-logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--red),var(--accent4));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
+  .gate-logo-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text)}
+  .gate-logo-badge{padding:3px 10px;border-radius:99px;background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:var(--red);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-left:4px}
+  .gate-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;color:var(--text)}
+  .gate-sub{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6}
+  .gate-form-group{margin-bottom:14px}
+  .gate-form-group label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:7px}
+  .gate-form-group input{width:100%;padding:12px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+  .gate-form-group input:focus{border-color:var(--accent)}
+  .gate-form-group input::placeholder{color:var(--text3)}
+  .gate-error{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;display:none}
+  .gate-error.show{display:block}
+  .gate-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 0 24px rgba(108,99,255,0.3);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
+  .gate-submit:hover{transform:translateY(-1px);box-shadow:0 4px 36px rgba(108,99,255,0.45)}
+  .gate-submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  .gate-divider{display:flex;align-items:center;gap:10px;margin:18px 0}
+  .gate-divider span{font-size:12px;color:var(--text3);white-space:nowrap}
+  .gate-divider::before,.gate-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+  .gate-google{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .gate-google:hover{color:var(--text);border-color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.04)}
+  .gate-back{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;font-size:13px;color:var(--text3);text-decoration:none;transition:color .2s}
+  .gate-back:hover{color:var(--text2)}
+  .gate-not-admin{display:none;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:var(--r2);padding:24px;width:100%;max-width:420px;text-align:center;margin-top:16px;animation:gateIn .3s ease}
+  .gate-not-admin i{font-size:32px;color:var(--red);margin-bottom:10px;display:block}
+  .gate-not-admin h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:6px;color:var(--text)}
+  .gate-not-admin p{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6}
+
+  /* ── TOAST ── */
+  .toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:14px 20px;border-radius:12px;background:var(--card2);border:1px solid var(--border2);font-size:14px;color:var(--text);box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;pointer-events:none}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{border-color:rgba(52,211,153,.3)}
+  .toast.error{border-color:rgba(248,113,113,.3)}
+
+  /* ── MODAL (edit) ── */
+  .modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(5,5,12,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center}
+  .modal-backdrop.show{display:flex}
+  .modal{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:36px;width:100%;max-width:480px;position:relative;animation:modalIn .25s ease}
+  @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .modal-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+  .modal-close:hover{border-color:var(--border2);color:var(--text)}
+  .modal h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:20px}
+
+  @media(max-width:640px){.page-wrap{padding:78px 20px 50px}.form-row{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.gate-card{padding:28px}}
+</style>
+</head>
+<body>
+
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+
+  window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
+
+  window.CLOUDINARY_CONFIG = {
+    cloudName:    "dwmvn4kj3",
+    uploadPreset: "preupload"
+  };
+</script>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ACCESS GATE — shown when not signed in or not admin
+     ══════════════════════════════════════════════════════════ -->
+<div id="accessGate">
+
+  <!-- Login Card -->
+  <div class="gate-card" id="gateLoginCard">
+    <div class="gate-logo-row">
+      <div class="gate-logo-icon"><i class="ti ti-shield-check"></i></div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="gate-logo-text">StudyHub</span>
+          <span class="gate-logo-badge">Admin</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="gate-title">Welcome back, Admin</h2>
+    <p class="gate-sub">Sign in with your admin credentials to manage the PDF library.</p>
+
+    <div class="gate-error" id="gateError"></div>
+
+    <div class="gate-form-group">
+      <label>Email Address</label>
+      <input type="email" id="gateEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')gateLogin()"/>
+    </div>
+    <div class="gate-form-group">
+      <label>Password</label>
+      <input type="password" id="gatePass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')gateLogin()"/>
+    </div>
+
+    <button class="gate-submit" id="gateLoginBtn" onclick="gateLogin()">
+      <i class="ti ti-login"></i> Sign In to Admin Panel
+    </button>
+
+    <div class="gate-divider"><span>or continue with</span></div>
+
+    <button class="gate-google" onclick="gateGoogleLogin()">
+      <i class="ti ti-brand-google"></i> Sign in with Google
+    </button>
+
+    <a href="index.html" class="gate-back">
+      <i class="ti ti-arrow-left" style="font-size:13px"></i> Back to StudyHub
+    </a>
+  </div>
+
+  <!-- Not-admin warning (shown when signed in but not admin) -->
+  <div class="gate-not-admin" id="gateNotAdmin">
+    <i class="ti ti-shield-x"></i>
+    <h3>Access Denied</h3>
+    <p>Your account <span id="gateUserEmail" style="color:var(--text);font-weight:600"></span> does not have admin privileges.</p>
+    <button class="btn-danger" onclick="auth.signOut()" style="margin:0 auto;display:inline-flex">
+      <i class="ti ti-logout"></i> Sign out & try another account
+    </button>
+    <br/>
+    <a href="index.html" class="gate-back" style="margin-top:12px">
+      <i class="ti ti-arrow-left" style="font-size:13px"></i> Back to StudyHub
+    </a>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN ADMIN UI — hidden until verified
+     ══════════════════════════════════════════════════════════ -->
+<div id="adminUI" style="display:none">
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <!-- Admin gets a different red/pink logo icon -->
+      <div class="logo-icon" style="background:linear-gradient(135deg,var(--red),var(--accent4));width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff">
+        <i class="ti ti-shield-check"></i>
+      </div>
+      StudyHub
+    </a>
+    <div class="admin-badge"><i class="ti ti-shield" style="font-size:10px"></i> Admin Panel</div>
+    <div class="nav-right">
+      <div class="user-info">
+        <div class="user-av" id="adminInitials">A</div>
+        <span id="adminName" style="font-size:13px;color:var(--text2)">Admin</span>
+      </div>
+      <a href="index.html" class="btn-ghost"><i class="ti ti-home"></i> Home</a>
+      <button class="btn-danger" onclick="handleLogout()"><i class="ti ti-logout"></i> Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>📚 PDF Management</h1>
+      <p>Upload study materials to Cloudinary and publish them to the library.</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card">
+        <div class="s-val" id="statTotal">—</div>
+        <div class="s-lbl">Total PDFs</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-val" id="statBeginner">—</div>
+        <div class="s-lbl">Beginner</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-val" id="statIntermediate">—</div>
+        <div class="s-lbl">Intermediate</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-val" id="statAdvanced">—</div>
+        <div class="s-lbl">Advanced</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- ── UPLOAD FORM ── -->
+      <div class="panel">
+        <div class="panel-title"><i class="ti ti-cloud-upload"></i> Upload New PDF</div>
+
+        <div class="upload-error" id="uploadError"></div>
+        <div class="upload-success" id="uploadSuccess"><i class="ti ti-circle-check"></i><span id="uploadSuccessMsg"></span></div>
+
+        <!-- DROP ZONE -->
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(this)"/>
+          <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
+          <h4>Drop PDF here or click to browse</h4>
+          <p>Maximum file size: 50 MB</p>
+        </div>
+
+        <!-- UPLOAD PROGRESS -->
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-label">
+            <span id="progressText">Uploading to Cloudinary…</span>
+            <span id="progressPct">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="pdfTitle" placeholder="e.g. Calculus Vol. III – Integration Techniques"/>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="pdfDesc" placeholder="Brief description of the content (shown on cards)…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Subject *</label>
+            <select id="pdfSubject">
+              <option value="">Select subject…</option>
+              <option>Mathematics</option>
+              <option>Physics</option>
+              <option>Chemistry</option>
+              <option>Biology</option>
+              <option>CS & Tech</option>
+              <option>Economics</option>
+              <option>Literature</option>
+              <option>History</option>
+              <option>Psychology</option>
+              <option>Engineering</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Level *</label>
+            <select id="pdfLevel">
+              <option value="">Select level…</option>
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Pages</label>
+            <input type="number" id="pdfPages" placeholder="e.g. 48" min="1"/>
+          </div>
+          <div class="form-group">
+            <label>Read Time</label>
+            <input type="text" id="pdfReadTime" placeholder="e.g. 2h 30m"/>
+          </div>
+        </div>
+
+        <button class="form-submit" id="uploadBtn" onclick="handleUpload()">
+          <i class="ti ti-upload"></i> Upload & Publish PDF
+        </button>
+      </div>
+
+      <!-- ── PDF LIST ── -->
+      <div class="panel">
+        <div class="panel-title"><i class="ti ti-list"></i> Published PDFs</div>
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="Search by title, subject…" oninput="filterList()"/>
+          <button class="btn-ghost" onclick="document.getElementById('searchInput').value='';filterList()"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="pdf-list" id="pdfList">
+          <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeEditModal()"><i class="ti ti-x"></i></button>
+    <h3>✏️ Edit PDF Details</h3>
+    <input type="hidden" id="editId"/>
+    <div class="form-group"><label>Title</label><input type="text" id="editTitle"/></div>
+    <div class="form-group"><label>Description</label><textarea id="editDesc"></textarea></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Subject</label>
+        <select id="editSubject">
+          <option>Mathematics</option><option>Physics</option><option>Chemistry</option>
+          <option>Biology</option><option>CS & Tech</option><option>Economics</option>
+          <option>Literature</option><option>History</option><option>Psychology</option><option>Engineering</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Level</label>
+        <select id="editLevel">
+          <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Pages</label><input type="number" id="editPages"/></div>
+      <div class="form-group"><label>Read Time</label><input type="text" id="editReadTime"/></div>
+    </div>
+    <button class="form-submit" onclick="saveEdit()"><i class="ti ti-device-floppy"></i> Save Changes</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
+
+<script>
+// ── Init Firebase ──
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+let allPdfs = [];
+
+const subjectEmoji = {
+  'Mathematics':'🧮','Physics':'⚛️','Chemistry':'⚗️','Biology':'🧬',
+  'CS & Tech':'💻','Economics':'📈','Literature':'📚','History':'📜',
+  'Psychology':'🧠','Engineering':'⚙️','Default':'📄'
+};
+
+// ── Auth Guard ──
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    // Not signed in — show login form
+    showLoginGate();
+    return;
+  }
+  if (!window.ADMIN_EMAILS.includes(user.email)) {
+    // Signed in but not admin — show not-admin message
+    showNotAdminGate(user.email);
+    return;
+  }
+  // All good — show admin panel
+  showAdmin(user);
+});
+
+function showLoginGate(){
+  document.getElementById('accessGate').style.display = 'flex';
+  document.getElementById('gateLoginCard').style.display = 'block';
+  document.getElementById('gateNotAdmin').style.display = 'none';
+  document.getElementById('adminUI').style.display = 'none';
+}
+
+function showNotAdminGate(email){
+  document.getElementById('accessGate').style.display = 'flex';
+  document.getElementById('gateLoginCard').style.display = 'none';
+  document.getElementById('gateNotAdmin').style.display = 'block';
+  document.getElementById('gateUserEmail').textContent = email;
+  document.getElementById('adminUI').style.display = 'none';
+}
+
+function showAdmin(user){
+  document.getElementById('accessGate').style.display = 'none';
+  document.getElementById('adminUI').style.display = 'block';
+  const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('adminInitials').textContent = initials;
+  document.getElementById('adminName').textContent = user.displayName || user.email;
+  loadPdfs();
+}
+
+// ── Gate Login ──
+async function gateLogin(){
+  const email  = document.getElementById('gateEmail').value.trim();
+  const pass   = document.getElementById('gatePass').value;
+  const errEl  = document.getElementById('gateError');
+  errEl.classList.remove('show');
+
+  if(!email || !pass){
+    errEl.textContent = 'Please fill in both fields.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const btn = document.getElementById('gateLoginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Signing in…';
+
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    // onAuthStateChanged fires and routes correctly
+  } catch(e) {
+    errEl.textContent = friendlyError(e.code);
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-login"></i> Sign In to Admin Panel';
+  }
+}
+
+async function gateGoogleLogin(){
+  const errEl = document.getElementById('gateError');
+  errEl.classList.remove('show');
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
+    // onAuthStateChanged fires and routes correctly
+  } catch(e) {
+    errEl.textContent = friendlyError(e.code);
+    errEl.classList.add('show');
+  }
+}
+
+async function handleLogout(){
+  await auth.signOut();
+  window.location.href = 'index.html';
+}
+
+function friendlyError(code){
+  const map = {
+    'auth/user-not-found':'No account found with this email.',
+    'auth/wrong-password':'Incorrect password.',
+    'auth/invalid-email':'Invalid email address.',
+    'auth/popup-closed-by-user':'Google sign-in was closed.',
+    'auth/network-request-failed':'Network error. Check your connection.',
+    'auth/invalid-credential':'Incorrect email or password.',
+    'auth/too-many-requests':'Too many attempts. Try again later.',
+  };
+  return map[code] || 'Something went wrong. Please try again.';
+}
+
+// ── Load PDFs ──
+function loadPdfs(){
+  db.collection('pdfs').orderBy('uploadedAt','desc').onSnapshot(snap => {
+    allPdfs = snap.docs.map(d => ({id:d.id,...d.data()}));
+    updateStats();
+    renderList(allPdfs);
+  }, err => {
+    showToast('Firestore error: '+err.message, 'error');
+  });
+}
+
+function updateStats(){
+  document.getElementById('statTotal').textContent = allPdfs.length;
+  document.getElementById('statBeginner').textContent = allPdfs.filter(p=>p.level==='Beginner').length;
+  document.getElementById('statIntermediate').textContent = allPdfs.filter(p=>p.level==='Intermediate').length;
+  document.getElementById('statAdvanced').textContent = allPdfs.filter(p=>p.level==='Advanced').length;
+}
+
+function filterList(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  renderList(allPdfs.filter(p => (p.title||'').toLowerCase().includes(q) || (p.subject||'').toLowerCase().includes(q)));
+}
+
+function renderList(pdfs){
+  const el = document.getElementById('pdfList');
+  if(!pdfs.length){
+    el.innerHTML = `<div class="empty-list"><i class="ti ti-file-off"></i><p>No PDFs uploaded yet.<br/>Use the form to upload your first one!</p></div>`;
+    return;
+  }
+  el.innerHTML = pdfs.map(pdf => {
+    const emoji = subjectEmoji[pdf.subject] || subjectEmoji['Default'];
+    const lvlClass = pdf.level === 'Advanced' ? 'level-a' : pdf.level === 'Intermediate' ? 'level-i' : 'level-b';
+    return `
+      <div class="pdf-item">
+        <div class="pdf-emoji">${emoji}</div>
+        <div class="pdf-info">
+          <div class="pdf-title">${escHtml(pdf.title)}</div>
+          <div class="pdf-meta">
+            <span class="tag">${escHtml(pdf.subject||'General')}</span>
+            <span class="tag ${lvlClass}">${escHtml(pdf.level||'All')}</span>
+            ${pdf.pages ? `<span>${pdf.pages} pages</span>` : ''}
+            ${pdf.readTime ? `<span>· ${pdf.readTime}</span>` : ''}
+          </div>
+        </div>
+        <div class="pdf-actions">
+          <button class="icon-btn" title="Preview" onclick="window.open('viewer.html?id=${pdf.id}','_blank')"><i class="ti ti-eye"></i></button>
+          <button class="icon-btn" title="Edit" onclick="openEditModal('${pdf.id}')"><i class="ti ti-pencil"></i></button>
+          <button class="icon-btn del" title="Delete" onclick="deletePdf('${pdf.id}','${escHtml(pdf.title)}')"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── File select ──
+// let selectedFile = null;
+// function handleFileSelect(input){
+//   const file = input.files[0];
+//   if(!file) return;
+//   if(file.type !== 'application/pdf'){ showUploadError('Only PDF files are allowed.'); input.value=''; return; }
+//   if(file.size > 52428800){ showUploadError('File exceeds 50 MB limit.'); input.value=''; return; }
+//   selectedFile = file;
+//   const dz = document.getElementById('dropZone');
+//     dz.classList.remove('file-chosen');
+//     dz.innerHTML = `
+//   <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(this)"/>
+//   <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
+//   <h4>Drop PDF here or click to browse</h4>
+//   <p>Maximum file size: 50 MB</p>`;
+// //   dz.classList.add('file-chosen');
+// //   dz.innerHTML = `<i class="ti ti-circle-check" style="color:var(--green);font-size:28px"></i><span style="color:var(--green);font-size:13px;font-weight:600">${escHtml(file.name)} (${(file.size/1048576).toFixed(1)} MB)</span>`;
+// //   clearUploadMessagesconst dz = document.getElementById('dropZone');();
+// }
+
+// ── File select ──
+// ── File select ──
+let selectedFile = null;
+function handleFileSelect(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.type !== 'application/pdf'){ showUploadError('Only PDF files are allowed.'); input.value=''; return; }
+  if(file.size > 52428800){ showUploadError('File exceeds 50 MB limit.'); input.value=''; return; }
+  selectedFile = file;
+  const dz = document.getElementById('dropZone');
+  dz.classList.add('file-chosen');
+  dz.innerHTML = `<i class="ti ti-circle-check" style="color:var(--green);font-size:28px"></i><span style="color:var(--green);font-size:13px;font-weight:600">${escHtml(file.name)} (${(file.size/1048576).toFixed(1)} MB)</span>`;
+  clearUploadMessages();
+}
+
+// Drag and drop
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('dragging'); });
+dz.addEventListener('dragleave', ()=> dz.classList.remove('dragging'));
+dz.addEventListener('drop', e=>{
+  e.preventDefault(); dz.classList.remove('dragging');
+  const file = e.dataTransfer.files[0];
+  if(file){ const inp = document.getElementById('pdfFile'); inp.files = e.dataTransfer.files; handleFileSelect(inp); }
+});
+
+// ── Upload ──
+async function handleUpload(){
+  clearUploadMessages();
+  const title   = document.getElementById('pdfTitle').value.trim();
+  const subject = document.getElementById('pdfSubject').value;
+  const level   = document.getElementById('pdfLevel').value;
+  const desc    = document.getElementById('pdfDesc').value.trim();
+  const pages   = document.getElementById('pdfPages').value.trim();
+  const readTime= document.getElementById('pdfReadTime').value.trim();
+
+  if(!selectedFile){ showUploadError('Please select a PDF file.'); return; }
+  if(!title){ showUploadError('Title is required.'); return; }
+  if(!subject){ showUploadError('Please select a subject.'); return; }
+  if(!level){ showUploadError('Please select a level.'); return; }
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Uploading…';
+
+  const pw = document.getElementById('progressWrap');
+  pw.style.display = 'block';
+  setProgress(0, 'Uploading to Cloudinary…');
+
+  try {
+    const cloudUrl = await uploadToCloudinary(selectedFile, pct => setProgress(pct * 0.85, 'Uploading to Cloudinary…'));
+    setProgress(90, 'Saving to database…');
+
+    await db.collection('pdfs').add({
+      title, subject, level,
+      description: desc,
+      pages: pages ? parseInt(pages) : null,
+      readTime: readTime || null,
+      cloudinaryUrl: cloudUrl,
+      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uploadedBy: auth.currentUser.email
+    });
+
+    setProgress(100, 'Done!');
+    setTimeout(()=>{ pw.style.display='none'; setProgress(0,''); }, 1200);
+
+    // resetForm();
+    // document.getElementById('uploadSuccessMsg').textContent = `"${title}" published successfully!`;
+    // document.getElementById('uploadSuccess').classList.add('show');
+    // setTimeout(()=> document.getElementById('uploadSuccess').classList.remove('show'), 4000);
+    // showToast('PDF published! 🎉', 'success')
+    function resetForm(){
+  selectedFile = null;
+  const oldInput = document.getElementById('pdfFile');
+  if(oldInput) oldInput.value = '';
+  document.getElementById('pdfTitle').value = '';
+  document.getElementById('pdfDesc').value = '';
+  document.getElementById('pdfSubject').value = '';
+  document.getElementById('pdfLevel').value = '';
+  document.getElementById('pdfPages').value = '';
+  document.getElementById('pdfReadTime').value = '';
+  const dz = document.getElementById('dropZone');
+  dz.classList.remove('file-chosen');
+  dz.innerHTML = `
+    <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(this)"/>
+    <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
+    <h4>Drop PDF here or click to browse</h4>
+    <p>Maximum file size: 50 MB</p>`;
+}
+
+  } catch(err){
+    pw.style.display = 'none';
+    showUploadError('Upload failed: ' + err.message);
+    showToast('Upload failed', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-upload"></i> Upload & Publish PDF';
+}
+
+function uploadToCloudinary(file, onProgress){
+  return new Promise((resolve, reject) => {
+    const cfg = window.CLOUDINARY_CONFIG;
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', cfg.uploadPreset);
+    fd.append('resource_type', 'raw');
+
+    const xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener('progress', e => {
+      if(e.lengthComputable) onProgress(e.loaded / e.total);
+    });
+    xhr.addEventListener('load', () => {
+      if(xhr.status >= 200 && xhr.status < 300){
+        const data = JSON.parse(xhr.responseText);
+        resolve(data.secure_url);
+      } else {
+        try {
+          const err = JSON.parse(xhr.responseText);
+          reject(new Error(err.error?.message || 'Cloudinary upload failed'));
+        } catch { reject(new Error('Cloudinary upload failed (status ' + xhr.status + ')')); }
+      }
+    });
+    xhr.addEventListener('error', ()=> reject(new Error('Network error during Cloudinary upload')));
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/raw/upload`);
+    xhr.send(fd);
+  });
+}
+
+function setProgress(pct, label){
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent  = Math.round(pct) + '%';
+  document.getElementById('progressText').textContent = label;
+}
+
+function resetForm(){
+  selectedFile = null;
+  document.getElementById('pdfFile').value = '';
+  document.getElementById('pdfTitle').value = '';
+  document.getElementById('pdfDesc').value = '';
+  document.getElementById('pdfSubject').value = '';
+  document.getElementById('pdfLevel').value = '';
+  document.getElementById('pdfPages').value = '';
+  document.getElementById('pdfReadTime').value = '';
+  const dz = document.getElementById('dropZone');
+  dz.classList.remove('file-chosen');
+  dz.innerHTML = `
+    <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(this)"/>
+    <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
+    <h4>Drop PDF here or click to browse</h4>
+    <p>Maximum file size: 50 MB</p>`;
+}
+
+// ── Edit ──
+function openEditModal(id){
+  const pdf = allPdfs.find(p=>p.id===id);
+  if(!pdf) return;
+  document.getElementById('editId').value = id;
+  document.getElementById('editTitle').value = pdf.title || '';
+  document.getElementById('editDesc').value = pdf.description || '';
+  document.getElementById('editSubject').value = pdf.subject || 'Mathematics';
+  document.getElementById('editLevel').value = pdf.level || 'Beginner';
+  document.getElementById('editPages').value = pdf.pages || '';
+  document.getElementById('editReadTime').value = pdf.readTime || '';
+  document.getElementById('editModal').classList.add('show');
+}
+function closeEditModal(){ document.getElementById('editModal').classList.remove('show'); }
+
+async function saveEdit(){
+  const id = document.getElementById('editId').value;
+  const data = {
+    title:      document.getElementById('editTitle').value.trim(),
+    description:document.getElementById('editDesc').value.trim(),
+    subject:    document.getElementById('editSubject').value,
+    level:      document.getElementById('editLevel').value,
+    pages:      parseInt(document.getElementById('editPages').value)||null,
+    readTime:   document.getElementById('editReadTime').value.trim()||null,
+  };
+  if(!data.title){ showToast('Title cannot be empty.','error'); return; }
+  try {
+    await db.collection('pdfs').doc(id).update(data);
+    closeEditModal();
+    showToast('PDF updated!','success');
+  } catch(e){ showToast('Error: '+e.message,'error'); }
+}
+
+// ── Delete ──
+async function deletePdf(id, title){
+  if(!confirm(`Delete "${title}"?\n\nThis removes it from the library. The Cloudinary file remains (delete manually in Cloudinary if needed).`)) return;
+  try {
+    await db.collection('pdfs').doc(id).delete();
+    showToast('PDF deleted.','success');
+  } catch(e){ showToast('Error: '+e.message,'error'); }
+}
+
+// ── Helpers ──
+function showUploadError(msg){
+  const el = document.getElementById('uploadError');
+  el.textContent = msg; el.classList.add('show');
+}
+function clearUploadMessages(){
+  document.getElementById('uploadError').classList.remove('show');
+  document.getElementById('uploadSuccess').classList.remove('show');
+}
+function escHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg, type='success'){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').className = type==='success' ? 'ti ti-check' : 'ti ti-alert-circle';
+  t.className = `toast ${type} show`;
+  setTimeout(()=> t.classList.remove('show'), 3500);
+}
+
+document.getElementById('editModal').addEventListener('click', e=>{
+  if(e.target === document.getElementById('editModal')) closeEditModal();
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeEditModal(); });
+
+// Spinner CSS
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>
