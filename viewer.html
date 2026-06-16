@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<!-- PDF.js MUST be loaded in <head> before body scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
@@ -69,10 +71,40 @@
   .details-inner{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text2);line-height:1.7}
   .details-inner strong{color:var(--text)}
 
-  .viewer-stage{flex:1;min-height:0;padding:0 5% 20px}
-  .pdf-frame-wrap{height:100%;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);background:#fff;position:relative}
-  .pdf-frame-wrap iframe{width:100%;height:100%;border:none;display:block}
-  .frame-fallback{position:absolute;inset:0;background:var(--card);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:30px;color:var(--text2)}
+  .viewer-stage{flex:1;min-height:0;padding:0 5% 20px;overflow:hidden}
+
+  /* PDF container — scrollable, dark bg */
+  .pdf-frame-wrap{
+    height:100%;
+    border-radius:var(--r2);
+    border:1px solid var(--border);
+    background:var(--card2);
+    position:relative;
+    overflow-y:auto;
+    padding:20px;
+  }
+
+  /* Loading overlay inside pdf-frame-wrap */
+  #pdfLoading{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:12px;
+    color:var(--text2);
+    background:var(--card2);
+    border-radius:var(--r2);
+    z-index:2;
+  }
+
+  /* Fallback message */
+  .frame-fallback{
+    display:none;flex-direction:column;align-items:center;
+    justify-content:center;gap:14px;text-align:center;
+    padding:30px;color:var(--text2);
+    position:absolute;inset:0;
+    background:var(--card2);
+    border-radius:var(--r2);
+    z-index:3;
+  }
   .frame-fallback.show{display:flex}
   .frame-fallback i{font-size:34px;color:var(--accent2)}
 
@@ -133,16 +165,13 @@
     messagingSenderId: "520877226051",
     appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
   };
-
   window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
-
   window.CLOUDINARY_CONFIG = {
-    cloudName:    "dwmvn4kj3",
+    cloudName: "dwmvn4kj3",
     uploadPreset: "preupload"
   };
 </script>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -175,27 +204,25 @@
     <i class="ti ti-file-off big"></i>
     <h2>Material not found</h2>
     <p>This PDF may have been removed or the link is incorrect.</p>
-    <a href="index.html#materials" class="btn-primary" style="justify-content:center"><i class="ti ti-arrow-left"></i> Back to Library</a>
+    <a href="index.html#materials" class="btn-primary" style="justify-content:center">
+      <i class="ti ti-arrow-left"></i> Back to Library
+    </a>
   </div>
 </div>
 
-<!-- ACCESS GATE (sign in required) -->
+<!-- ACCESS GATE -->
 <div class="state-screen" id="gateState" style="display:none">
   <div class="gate-card">
     <div class="gate-icon-row">
       <div class="logo-icon"><i class="ti ti-lock"></i></div>
-      <div>
-        <h2 style="margin-bottom:2px">Sign in to continue</h2>
-      </div>
+      <div><h2 style="margin-bottom:2px">Sign in to continue</h2></div>
     </div>
     <p class="gate-sub">This material is for registered members only. Sign in or create a free account to view it.</p>
-
     <div class="modal-tabs">
       <button class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
       <button class="modal-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
     </div>
     <div class="auth-error" id="authError"></div>
-
     <div id="formLogin">
       <div class="form-group"><label>Email address</label><input type="email" id="loginEmail" placeholder="you@example.com"/></div>
       <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="Enter your password"/></div>
@@ -235,7 +262,7 @@
       </div>
     </div>
     <div class="doc-actions">
-      <button class="icon-btn" id="detailsBtn" title="Details" onclick="toggleDetails()"><i class="ti ti-info-circle"></i></button>
+      <button class="icon-btn" title="Details" onclick="toggleDetails()"><i class="ti ti-info-circle"></i></button>
       <a class="icon-btn" id="openNewTabBtn" title="Open in new tab" target="_blank" rel="noopener"><i class="ti ti-external-link"></i></a>
       <a class="icon-btn" id="downloadBtn" title="Download" target="_blank" rel="noopener"><i class="ti ti-download"></i></a>
     </div>
@@ -246,15 +273,22 @@
   </div>
 
   <div class="viewer-stage">
-    <div class="pdf-frame-wrap">
-      <iframe id="pdfFrame" title="PDF document"></iframe>
+    <div class="pdf-frame-wrap" id="pdfContainer">
+      <!-- Loading spinner -->
+      <div id="pdfLoading">
+        <i class="ti ti-loader spin" style="font-size:32px;color:var(--accent2)"></i>
+        <span style="font-size:14px;color:var(--text2)">Rendering PDF…</span>
+      </div>
+      <!-- Fallback if PDF.js fails -->
       <div class="frame-fallback" id="frameFallback">
         <i class="ti ti-file-type-pdf"></i>
         <div>
           <div style="font-weight:600;color:var(--text);margin-bottom:6px">Can't display the PDF here</div>
-          <div style="font-size:13px">Your browser blocked the inline preview. Open it directly instead.</div>
+          <div style="font-size:13px">Open it directly instead.</div>
         </div>
-        <a class="btn-primary" id="fallbackOpenBtn" target="_blank" rel="noopener"><i class="ti ti-external-link"></i> Open PDF</a>
+        <a class="btn-primary" id="fallbackOpenBtn" target="_blank" rel="noopener">
+          <i class="ti ti-external-link"></i> Open PDF
+        </a>
       </div>
     </div>
   </div>
@@ -284,19 +318,10 @@ let pdfLoaded   = false;
 auth.onAuthStateChanged(user => {
   currentUser = user;
   updateNav(user);
-
   if (!docId) { showState('notFoundState'); return; }
-
-  if (!user) {
-    showState('gateState');
-    return;
-  }
-  if (!pdfLoaded) {
-    showState('loadingState');
-    loadDoc();
-  } else {
-    showState('viewerUI');
-  }
+  if (!user)  { showState('gateState'); return; }
+  if (!pdfLoaded) { showState('loadingState'); loadDoc(); }
+  else { showState('viewerUI'); }
 });
 
 function showState(id){
@@ -309,8 +334,8 @@ function showState(id){
 function isAdmin(user){ return user && window.ADMIN_EMAILS.includes(user.email); }
 function updateNav(user){
   const nr = document.getElementById('navRight');
-  if (user) {
-    const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  if(user){
+    const initials = (user.displayName||user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     const adminLink = isAdmin(user)
       ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>`
       : '';
@@ -318,7 +343,7 @@ function updateNav(user){
       <div class="dropdown" id="userDropdown">
         <div class="user-pill" onclick="toggleDropdown()">
           <div class="user-av">${initials}</div>
-          <span class="user-name">${user.displayName || user.email.split('@')[0]}</span>
+          <span class="user-name">${user.displayName||user.email.split('@')[0]}</span>
           <i class="ti ti-chevron-down" style="font-size:11px;color:var(--text3)"></i>
         </div>
         <div class="dropdown-menu">
@@ -335,18 +360,10 @@ function updateNav(user){
 function toggleDropdown(){ document.getElementById('userDropdown')?.classList.toggle('open'); }
 document.addEventListener('click', e=>{ if(!e.target.closest('#userDropdown')) document.getElementById('userDropdown')?.classList.remove('open'); });
 
-function getViewableUrl(u) {
-  if (!u) return '';
-  // Use Google Docs Viewer to render the PDF inline
-  return 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(u);
-}
-
-
-function buildDownloadUrl(u) {
-  if (!u) return '#';
-  // Use original raw URL with fl_attachment for proper download
-  if (u.includes('/raw/upload/')) return u.replace('/raw/upload/', '/raw/upload/fl_attachment/');
-  if (u.includes('/upload/')) return u.replace('/upload/', '/upload/fl_attachment/');
+function buildDownloadUrl(u){
+  if(!u) return '#';
+  if(u.includes('/raw/upload/')) return u.replace('/raw/upload/','/raw/upload/fl_attachment/');
+  if(u.includes('/upload/')) return u.replace('/upload/','/upload/fl_attachment/');
   return u;
 }
 
@@ -354,35 +371,35 @@ function buildDownloadUrl(u) {
 function loadDoc(){
   db.collection('pdfs').doc(docId).get().then(snap=>{
     if(!snap.exists){ showState('notFoundState'); return; }
-    renderDoc({id:snap.id, ...snap.data()});
+    renderDoc({id:snap.id,...snap.data()});
     pdfLoaded = true;
     showState('viewerUI');
   }).catch(err=>{
-    showToast('Error loading material: '+err.message, 'error');
+    showToast('Error loading material: '+err.message,'error');
     showState('notFoundState');
   });
 }
 
 function renderDoc(pdf){
-  document.title = pdf.title + ' – StudyHub';
-  document.getElementById('docEmoji').textContent = subjectEmoji[pdf.subject] || subjectEmoji['Default'];
-  document.getElementById('docTitle').textContent = pdf.title || 'Untitled';
-  document.getElementById('docTitle').title = pdf.title || '';
+  document.title = (pdf.title||'Document')+' – StudyHub';
+  document.getElementById('docEmoji').textContent = subjectEmoji[pdf.subject]||subjectEmoji['Default'];
+  document.getElementById('docTitle').textContent = pdf.title||'Untitled';
+  document.getElementById('docTitle').title = pdf.title||'';
 
   const subjTag = document.getElementById('docSubjectTag');
-  subjTag.textContent = pdf.subject || 'General';
+  subjTag.textContent = pdf.subject||'General';
   subjTag.className = 'tag';
 
   const lvlTag = document.getElementById('docLevelTag');
-  lvlTag.textContent = pdf.level || 'All levels';
-  lvlTag.className = 'tag ' + (pdf.level === 'Advanced' ? 'level-a' : pdf.level === 'Intermediate' ? 'level-i' : 'level-b');
+  lvlTag.textContent = pdf.level||'All levels';
+  lvlTag.className = 'tag '+(pdf.level==='Advanced'?'level-a':pdf.level==='Intermediate'?'level-i':'level-b');
 
   document.getElementById('docPages').textContent    = pdf.pages ? `· ${pdf.pages} pages` : '';
   document.getElementById('docReadTime').textContent = pdf.readTime ? `· ${pdf.readTime} read` : '';
 
   document.getElementById('detailsContent').innerHTML = `
     <strong>${escHtml(pdf.title||'')}</strong><br/>
-    ${pdf.description ? escHtml(pdf.description) + '<br/><br/>' : ''}
+    ${pdf.description ? escHtml(pdf.description)+'<br/><br/>' : ''}
     Subject: <strong>${escHtml(pdf.subject||'General')}</strong> &nbsp;·&nbsp;
     Level: <strong>${escHtml(pdf.level||'All levels')}</strong>
     ${pdf.pages ? ` &nbsp;·&nbsp; ${pdf.pages} pages` : ''}
@@ -390,51 +407,94 @@ function renderDoc(pdf){
   `;
 
   const url = pdf.cloudinaryUrl || '';
-  const viewableUrl = getViewableUrl(url);
+  document.getElementById('openNewTabBtn').href  = url;
+  document.getElementById('fallbackOpenBtn').href = url;
+  document.getElementById('downloadBtn').href    = buildDownloadUrl(url);
 
-  const frame = document.getElementById('pdfFrame');
-  frame.src = viewableUrl;
-  document.getElementById('openNewTabBtn').href = viewableUrl;
-  document.getElementById('fallbackOpenBtn').href = viewableUrl;
-  document.getElementById('downloadBtn').href = buildDownloadUrl(url);
+  if(!url){
+    document.getElementById('pdfLoading').style.display = 'none';
+    document.getElementById('frameFallback').classList.add('show');
+    return;
+  }
 
-  // Show fallback if iframe fails to load after 4 seconds
-  let loadedOk = false;
-  frame.addEventListener('load', () => { loadedOk = true; });
-  setTimeout(() => {
-    if (!loadedOk || !url) document.getElementById('frameFallback').classList.add('show');
-  }, 12000);
+  // ── Render with PDF.js ──
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  pdfjsLib.getDocument({
+    url: url,
+    withCredentials: false
+  }).promise.then(function(pdfDoc){
+
+    // Hide spinner
+    document.getElementById('pdfLoading').style.display = 'none';
+
+    const container = document.getElementById('pdfContainer');
+
+    // Render each page sequentially
+    const renderPage = (pageNum) => {
+      pdfDoc.getPage(pageNum).then(function(page){
+        const containerWidth = container.clientWidth - 40; // account for padding
+        const unscaledViewport = page.getViewport({scale: 1});
+        const scale = containerWidth / unscaledViewport.width;
+        const viewport = page.getViewport({scale});
+
+        const canvas = document.createElement('canvas');
+        canvas.width  = viewport.width;
+        canvas.height = viewport.height;
+        canvas.style.display    = 'block';
+        canvas.style.margin     = '0 auto 12px auto';
+        canvas.style.borderRadius = '6px';
+        canvas.style.maxWidth   = '100%';
+        canvas.style.boxShadow  = '0 2px 12px rgba(0,0,0,0.4)';
+        container.appendChild(canvas);
+
+        page.render({
+          canvasContext: canvas.getContext('2d'),
+          viewport
+        }).promise.then(()=>{
+          // Render next page after current one finishes
+          if(pageNum < pdfDoc.numPages) renderPage(pageNum + 1);
+        });
+      });
+    };
+
+    renderPage(1); // start from page 1
+
+  }).catch(function(err){
+    console.error('PDF.js error:', err);
+    document.getElementById('pdfLoading').style.display = 'none';
+    document.getElementById('frameFallback').classList.add('show');
+  });
 }
 
 function toggleDetails(){
   document.getElementById('detailsPanel').classList.toggle('open');
 }
 
-// ── Auth (embedded gate) ──
+// ── Auth ──
 async function handleLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass  = document.getElementById('loginPass').value;
-  if(!email || !pass){ showAuthError('Please fill in all fields.'); return; }
-  setLoading('loginBtn', true);
-  try{
-    await auth.signInWithEmailAndPassword(email, pass);
-    showToast('Welcome back! 🎉','success');
-  } catch(e){ showAuthError(friendlyError(e.code)); }
-  setLoading('loginBtn', false);
+  if(!email||!pass){ showAuthError('Please fill in all fields.'); return; }
+  setLoading('loginBtn',true);
+  try{ await auth.signInWithEmailAndPassword(email,pass); showToast('Welcome back! 🎉','success'); }
+  catch(e){ showAuthError(friendlyError(e.code)); }
+  setLoading('loginBtn',false);
 }
 async function handleSignup(){
   const name  = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
   const pass  = document.getElementById('signupPass').value;
-  if(!name || !email || !pass){ showAuthError('Please fill in all fields.'); return; }
-  if(pass.length < 6){ showAuthError('Password must be at least 6 characters.'); return; }
-  setLoading('signupBtn', true);
+  if(!name||!email||!pass){ showAuthError('Please fill in all fields.'); return; }
+  if(pass.length<6){ showAuthError('Password must be at least 6 characters.'); return; }
+  setLoading('signupBtn',true);
   try{
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    const cred = await auth.createUserWithEmailAndPassword(email,pass);
     await cred.user.updateProfile({displayName:name});
     showToast('Account created! Welcome to StudyHub 🚀','success');
   } catch(e){ showAuthError(friendlyError(e.code)); }
-  setLoading('signupBtn', false);
+  setLoading('signupBtn',false);
 }
 async function handleGoogleLogin(){
   try{
@@ -448,15 +508,15 @@ async function handleLogout(){
   showToast('Signed out. See you soon!','success');
 }
 function switchTab(tab){
-  const isLogin = tab === 'login';
-  document.getElementById('tabLogin').classList.toggle('active', isLogin);
-  document.getElementById('tabSignup').classList.toggle('active', !isLogin);
-  document.getElementById('formLogin').style.display  = isLogin ? 'block' : 'none';
-  document.getElementById('formSignup').style.display = isLogin ? 'none'  : 'block';
+  const isLogin = tab==='login';
+  document.getElementById('tabLogin').classList.toggle('active',isLogin);
+  document.getElementById('tabSignup').classList.toggle('active',!isLogin);
+  document.getElementById('formLogin').style.display  = isLogin?'block':'none';
+  document.getElementById('formSignup').style.display = isLogin?'none':'block';
   clearAuthError();
 }
 function friendlyError(code){
-  const map = {
+  const map={
     'auth/user-not-found':'No account found with this email.',
     'auth/wrong-password':'Incorrect password.',
     'auth/email-already-in-use':'An account with this email already exists.',
@@ -466,20 +526,18 @@ function friendlyError(code){
     'auth/network-request-failed':'Network error. Check your connection.',
     'auth/invalid-credential':'Incorrect email or password.',
   };
-  return map[code] || 'Something went wrong. Please try again.';
+  return map[code]||'Something went wrong. Please try again.';
 }
-function showAuthError(msg){ const el = document.getElementById('authError'); el.textContent = msg; el.classList.add('show'); }
+function showAuthError(msg){ const el=document.getElementById('authError'); el.textContent=msg; el.classList.add('show'); }
 function clearAuthError(){ document.getElementById('authError').classList.remove('show'); }
-function setLoading(id, v){ const b = document.getElementById(id); if(b) b.disabled = v; }
-
-// ── Helpers ──
+function setLoading(id,v){ const b=document.getElementById(id); if(b) b.disabled=v; }
 function escHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function showToast(msg, type='success'){
-  const t = document.getElementById('toast');
-  document.getElementById('toastMsg').textContent = msg;
-  document.getElementById('toastIcon').className = type==='success' ? 'ti ti-check' : 'ti ti-alert-circle';
-  t.className = `toast ${type} show`;
-  setTimeout(()=> t.classList.remove('show'), 3500);
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastIcon').className=type==='success'?'ti ti-check':'ti ti-alert-circle';
+  t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3500);
 }
 </script>
 </body>
