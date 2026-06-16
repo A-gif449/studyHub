@@ -670,27 +670,6 @@ function renderList(pdfs){
 }
 
 // ── File select ──
-// let selectedFile = null;
-// function handleFileSelect(input){
-//   const file = input.files[0];
-//   if(!file) return;
-//   if(file.type !== 'application/pdf'){ showUploadError('Only PDF files are allowed.'); input.value=''; return; }
-//   if(file.size > 52428800){ showUploadError('File exceeds 50 MB limit.'); input.value=''; return; }
-//   selectedFile = file;
-//   const dz = document.getElementById('dropZone');
-//     dz.classList.remove('file-chosen');
-//     dz.innerHTML = `
-//   <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(this)"/>
-//   <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
-//   <h4>Drop PDF here or click to browse</h4>
-//   <p>Maximum file size: 50 MB</p>`;
-// //   dz.classList.add('file-chosen');
-// //   dz.innerHTML = `<i class="ti ti-circle-check" style="color:var(--green);font-size:28px"></i><span style="color:var(--green);font-size:13px;font-weight:600">${escHtml(file.name)} (${(file.size/1048576).toFixed(1)} MB)</span>`;
-// //   clearUploadMessagesconst dz = document.getElementById('dropZone');();
-// }
-
-// ── File select ──
-// ── File select ──
 let selectedFile = null;
 function handleFileSelect(input){
   const file = input.files[0];
@@ -754,29 +733,11 @@ async function handleUpload(){
     setProgress(100, 'Done!');
     setTimeout(()=>{ pw.style.display='none'; setProgress(0,''); }, 1200);
 
-    // resetForm();
-    // document.getElementById('uploadSuccessMsg').textContent = `"${title}" published successfully!`;
-    // document.getElementById('uploadSuccess').classList.add('show');
-    // setTimeout(()=> document.getElementById('uploadSuccess').classList.remove('show'), 4000);
-    // showToast('PDF published! 🎉', 'success')
-    function resetForm(){
-  selectedFile = null;
-  const oldInput = document.getElementById('pdfFile');
-  if(oldInput) oldInput.value = '';
-  document.getElementById('pdfTitle').value = '';
-  document.getElementById('pdfDesc').value = '';
-  document.getElementById('pdfSubject').value = '';
-  document.getElementById('pdfLevel').value = '';
-  document.getElementById('pdfPages').value = '';
-  document.getElementById('pdfReadTime').value = '';
-  const dz = document.getElementById('dropZone');
-  dz.classList.remove('file-chosen');
-  dz.innerHTML = `
-    <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(this)"/>
-    <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
-    <h4>Drop PDF here or click to browse</h4>
-    <p>Maximum file size: 50 MB</p>`;
-}
+    resetForm();
+    document.getElementById('uploadSuccessMsg').textContent = `"${title}" published successfully!`;
+    document.getElementById('uploadSuccess').classList.add('show');
+    setTimeout(()=> document.getElementById('uploadSuccess').classList.remove('show'), 4000);
+    showToast('PDF published! 🎉', 'success')
 
   } catch(err){
     pw.style.display = 'none';
@@ -794,8 +755,6 @@ function uploadToCloudinary(file, onProgress){
     const fd = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', cfg.uploadPreset);
-    // fd.append('resource_type', 'raw');
-    // fd.append('access_mode', 'public');
 
     const xhr = new XMLHttpRequest();
     xhr.upload.addEventListener('progress', e => {
@@ -836,7 +795,7 @@ function resetForm(){
   const dz = document.getElementById('dropZone');
   dz.classList.remove('file-chosen');
   dz.innerHTML = `
-    <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(this)"/>
+    <input type="file" id="pdfFile" accept="image/*" onchange="handleFileSelect(this)"/>
     <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
     <h4>Drop PDF here or click to browse</h4>
     <p>Maximum file size: 50 MB</p>`;

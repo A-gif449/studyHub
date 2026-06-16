@@ -8,8 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
-<!-- PDF.js MUST be loaded in <head> before body scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
@@ -320,23 +318,12 @@ auth.onAuthStateChanged(user => {
   updateNav(user);
   if (!docId) { showState('notFoundState'); return; }
   if (!user)  { showState('gateState'); return; }
-  if (!pdfLoaded) { showState('loadingState'); loadDoc(); }
-  else { showState('viewerUI');
- 
-  function loadDoc(){
-  db.collection('pdfs').doc(docId).get().then(snap=>{
-    if(!snap.exists){ showState('notFoundState'); return; }
-    renderDoc({id:snap.id,...snap.data()});
-    pdfLoaded = true;
+  if (!pdfLoaded) {
+    showState('loadingState');
+    loadDoc();
+  } else {
     showState('viewerUI');
-    recordView(docId); // ← ADD THIS LINE
-  }).catch(err=>{
-    showToast('Error loading material: '+err.message,'error');
-    showState('notFoundState');
-  });
-}
-
-   }
+  }
 });
 
 function showState(id){
@@ -375,24 +362,6 @@ function updateNav(user){
 function toggleDropdown(){ document.getElementById('userDropdown')?.classList.toggle('open'); }
 document.addEventListener('click', e=>{ if(!e.target.closest('#userDropdown')) document.getElementById('userDropdown')?.classList.remove('open'); });
 
-// function fixCloudinaryUrl(u) {
-//   if (!u) return '';
-//   // Convert image/upload to raw/upload for PDF serving
-//   return u.replace('/image/upload/', '/raw/upload/');
-// }
-function fixCloudinaryUrl(u) {
-  if (!u) return '';
-  return u.replace('/image/upload/', '/raw/upload/');
-}
-const url = fixCloudinaryUrl(pdf.cloudinaryUrl || '');
-
-function buildDownloadUrl(u){
-  if(!u) return '#';
-  if(u.includes('/raw/upload/')) return u.replace('/raw/upload/','/raw/upload/fl_attachment/');
-  if(u.includes('/upload/')) return u.replace('/upload/','/upload/fl_attachment/');
-  return u;
-}
-
 // ── Load PDF doc ──
 function loadDoc(){
   db.collection('pdfs').doc(docId).get().then(snap=>{
@@ -400,6 +369,7 @@ function loadDoc(){
     renderDoc({id:snap.id,...snap.data()});
     pdfLoaded = true;
     showState('viewerUI');
+    recordView(docId);
   }).catch(err=>{
     showToast('Error loading material: '+err.message,'error');
     showState('notFoundState');
@@ -432,78 +402,24 @@ function renderDoc(pdf){
     ${pdf.readTime ? ` &nbsp;·&nbsp; ${pdf.readTime} read` : ''}
   `;
 
-//   const url = pdf.cloudinaryUrl || '';
-//   document.getElementById('openNewTabBtn').href  = url;
-//   document.getElementById('fallbackOpenBtn').href = url;
-//   document.getElementById('downloadBtn').href    = buildDownloadUrl(url);
+  const url = pdf.cloudinaryUrl || '';
+  document.getElementById('openNewTabBtn').href = url;
+  document.getElementById('fallbackOpenBtn').href = url;
+  document.getElementById('downloadBtn').href = url;
 
-//   if(!url){
-//     document.getElementById('pdfLoading').style.display = 'none';
-//     document.getElementById('frameFallback').classList.add('show');
-//     return;
-//   }
-const url = pdf.cloudinaryUrl || '';
-document.getElementById('openNewTabBtn').href = url;
-document.getElementById('fallbackOpenBtn').href = url;
-document.getElementById('downloadBtn').href = url;
+  document.getElementById('pdfLoading').style.display = 'none';
 
-document.getElementById('pdfLoading').style.display = 'none';
-const container = document.getElementById('pdfContainer');
-container.innerHTML = `
-  <img src="${url}" 
-    style="width:100%;border-radius:8px;display:block;margin:0 auto" 
-    onerror="document.getElementById('frameFallback').classList.add('show')"
-  />`;
-
-  // ── Render with PDF.js ──
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-  pdfjsLib.getDocument({
-    url: url,
-    withCredentials: false
-  }).promise.then(function(pdfDoc){
-
-    // Hide spinner
-    document.getElementById('pdfLoading').style.display = 'none';
-
-    const container = document.getElementById('pdfContainer');
-
-    // Render each page sequentially
-    const renderPage = (pageNum) => {
-      pdfDoc.getPage(pageNum).then(function(page){
-        const containerWidth = container.clientWidth - 40; // account for padding
-        const unscaledViewport = page.getViewport({scale: 1});
-        const scale = containerWidth / unscaledViewport.width;
-        const viewport = page.getViewport({scale});
-
-        const canvas = document.createElement('canvas');
-        canvas.width  = viewport.width;
-        canvas.height = viewport.height;
-        canvas.style.display    = 'block';
-        canvas.style.margin     = '0 auto 12px auto';
-        canvas.style.borderRadius = '6px';
-        canvas.style.maxWidth   = '100%';
-        canvas.style.boxShadow  = '0 2px 12px rgba(0,0,0,0.4)';
-        container.appendChild(canvas);
-
-        page.render({
-          canvasContext: canvas.getContext('2d'),
-          viewport
-        }).promise.then(()=>{
-          // Render next page after current one finishes
-          if(pageNum < pdfDoc.numPages) renderPage(pageNum + 1);
-        });
-      });
-    };
-
-    renderPage(1); // start from page 1
-
-  }).catch(function(err){
-    console.error('PDF.js error:', err);
-    document.getElementById('pdfLoading').style.display = 'none';
+  if(!url){
     document.getElementById('frameFallback').classList.add('show');
-  });
+    return;
+  }
+
+  const container = document.getElementById('pdfContainer');
+  container.innerHTML = `
+    <img src="${url}"
+      style="width:100%;border-radius:8px;display:block;margin:0 auto"
+      onerror="document.getElementById('frameFallback').classList.add('show')"
+    />`;
 }
 
 function toggleDetails(){
