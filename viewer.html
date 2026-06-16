@@ -365,6 +365,11 @@ document.addEventListener('click', e=>{ if(!e.target.closest('#userDropdown')) d
 //   // Convert image/upload to raw/upload for PDF serving
 //   return u.replace('/image/upload/', '/raw/upload/');
 // }
+function fixCloudinaryUrl(u) {
+  if (!u) return '';
+  return u.replace('/image/upload/', '/raw/upload/');
+}
+const url = fixCloudinaryUrl(pdf.cloudinaryUrl || '');
 
 function buildDownloadUrl(u){
   if(!u) return '#';
