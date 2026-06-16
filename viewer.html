@@ -157,18 +157,6 @@
 <body>
 
 <script>
-
-function recordView(pdfId) {
-  if (!currentUser) return;
-  db.collection('views').add({
-    pdfId: pdfId,
-    userId: currentUser.uid,
-    userEmail: currentUser.email,
-    userName: currentUser.displayName || currentUser.email,
-    viewedAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-}
-
   window.FIREBASE_CONFIG = {
     apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
     authDomain: "studyx-fd90c.firebaseapp.com",
@@ -589,6 +577,17 @@ function showToast(msg,type='success'){
   t.className=`toast ${type} show`;
   setTimeout(()=>t.classList.remove('show'),3500);
 }
+function recordView(pdfId) {
+  if (!currentUser) return;
+  db.collection('views').add({
+    pdfId: pdfId,
+    userId: currentUser.uid,
+    userEmail: currentUser.email,
+    userName: currentUser.displayName || currentUser.email,
+    viewedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
 </script>
 </body>
 </html>
