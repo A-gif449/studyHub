@@ -579,8 +579,11 @@ function updateNav(user) {
       <button class="btn-primary" onclick="openModal('signup')">Get Started</button>`;
   }
 
-  // Re-attach notification bell if notifications.js already injected it
-  if (window._shReattach) window._shReattach();
+  // Re-attach notification bell BEFORE the dropdown/buttons
+  const bell = document.getElementById('sh-notif-wrap');
+  if (bell && nr && !nr.contains(bell)) {
+    nr.insertBefore(bell, nr.firstChild);
+  }
 }
 
 function toggleDropdown() {
