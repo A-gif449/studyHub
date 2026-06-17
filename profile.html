@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Profile – StudyHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0A0A12;--bg2:#0F0F1C;--bg3:#13131F;--card:#14141F;--card2:#1A1A2E;
+    --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+    --accent:#6C63FF;--accent2:#A78BFA;--accent3:#38BDF8;--accent4:#F472B6;
+    --gold:#FBBF24;--green:#34D399;--red:#F87171;
+    --text:#F0EFF8;--text2:#A09DC0;--text3:#6B6880;
+    --r:14px;--r2:20px;--r3:28px;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:var(--bg2)}
+  ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:99px}
+
+  /* ── ORBS ── */
+  .orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+  .orb1{width:600px;height:600px;top:-200px;left:-150px;background:rgba(108,99,255,0.13)}
+  .orb2{width:450px;height:450px;bottom:5%;right:-120px;background:rgba(56,189,248,0.09)}
+  .orb3{width:350px;height:350px;top:50%;left:40%;background:rgba(244,114,182,0.06)}
+
+  /* ── NAV ── */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,18,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);text-decoration:none}
+  .nav-logo .logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
+  .back-link{display:flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;padding:7px 14px;border-radius:9px;border:1px solid var(--border2);transition:all .2s}
+  .back-link:hover{color:var(--text);border-color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.04)}
+  .nav-right{display:flex;align-items:center;gap:10px}
+  .btn-ghost{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);color:var(--text2);background:transparent;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
+  .dropdown{position:relative}
+  .dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:6px;min-width:180px;z-index:200;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+  .dropdown.open .dropdown-menu{display:block}
+  .dropdown-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;text-decoration:none;border:none;background:none;width:100%;font-family:inherit}
+  .dropdown-item:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+  .dropdown-item.danger:hover{background:rgba(248,113,113,0.1);color:var(--red)}
+  .dropdown-divider{height:1px;background:var(--border);margin:5px 0}
+  .user-pill{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:99px;background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.25);cursor:pointer}
+  .user-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+  .user-name{font-size:12px;font-weight:500;color:var(--text2)}
+
+  /* ── PAGE WRAP ── */
+  .page{padding:100px 5% 70px;position:relative;z-index:1;max-width:1200px;margin:0 auto}
+
+  /* ── PROFILE HERO ── */
+  .profile-hero{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:flex-start;
+    gap:32px;
+    padding:38px 42px;
+    border-radius:var(--r3);
+    background:linear-gradient(135deg,rgba(20,20,31,0.95),rgba(26,26,46,0.9));
+    border:1px solid var(--border2);
+    position:relative;
+    overflow:hidden;
+    margin-bottom:28px;
+  }
+  .profile-hero::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 80% 50%,rgba(108,99,255,0.08) 0%,transparent 65%);
+    pointer-events:none;
+  }
+  /* animated top accent bar */
+  .profile-hero::after{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--accent3),var(--accent4));
+  }
+
+  /* avatar */
+  .profile-avatar-wrap{position:relative;flex-shrink:0}
+  .profile-avatar{
+    width:110px;height:110px;border-radius:28px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:#fff;
+    border:3px solid rgba(108,99,255,0.4);
+    box-shadow:0 0 40px rgba(108,99,255,0.3);
+    position:relative;z-index:1;
+  }
+  .avatar-online-ring{
+    position:absolute;inset:-5px;border-radius:33px;
+    border:2px solid transparent;
+    background:linear-gradient(var(--bg2),var(--bg2)) padding-box,
+               linear-gradient(135deg,var(--accent),var(--accent3)) border-box;
+    animation:ringPulse 3s ease-in-out infinite;
+  }
+  @keyframes ringPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.02)}}
+  .avatar-badge{
+    position:absolute;bottom:-8px;right:-8px;
+    width:30px;height:30px;border-radius:8px;
+    background:linear-gradient(135deg,var(--green),#059669);
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--bg2);
+    font-size:13px;
+  }
+
+  /* identity */
+  .profile-identity{min-width:0;padding-top:4px}
+  .profile-role-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 12px;border-radius:99px;
+    background:rgba(108,99,255,0.12);border:1px solid rgba(108,99,255,0.3);
+    font-size:11px;font-weight:700;color:var(--accent2);
+    text-transform:uppercase;letter-spacing:1px;
+    margin-bottom:12px;
+  }
+  .profile-name{
+    font-family:'Syne',sans-serif;font-size:30px;font-weight:800;
+    line-height:1.1;margin-bottom:8px;
+    word-break:break-word;
+  }
+  .profile-email{font-size:13px;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+  .profile-email i{font-size:14px;color:var(--text3)}
+  .profile-bio{
+    font-size:14px;color:var(--text2);line-height:1.7;
+    max-width:520px;margin-bottom:18px;
+  }
+  .profile-tags{display:flex;flex-wrap:wrap;gap:8px}
+  .profile-tag{
+    padding:5px 13px;border-radius:99px;
+    background:rgba(255,255,255,0.04);border:1px solid var(--border2);
+    font-size:12px;color:var(--text2);font-weight:500;
+    display:flex;align-items:center;gap:5px;
+  }
+  .profile-tag i{font-size:13px;color:var(--accent2)}
+
+  /* actions */
+  .profile-actions{display:flex;flex-direction:column;align-items:flex-end;gap:12px;padding-top:4px}
+  .btn-follow{
+    padding:11px 28px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),#8B5CF6);
+    color:#fff;border:none;font-size:14px;font-weight:700;
+    cursor:pointer;font-family:inherit;transition:all .25s;
+    display:inline-flex;align-items:center;gap:8px;
+    box-shadow:0 0 24px rgba(108,99,255,0.35);
+    white-space:nowrap;
+  }
+  .btn-follow:hover{transform:translateY(-2px);box-shadow:0 6px 32px rgba(108,99,255,0.5)}
+  .btn-follow.following{
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--border2);
+    color:var(--text2);
+    box-shadow:none;
+  }
+  .btn-follow.following:hover{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.3);color:var(--red)}
+  .btn-message{
+    padding:11px 22px;border-radius:12px;border:1px solid var(--border2);
+    background:rgba(255,255,255,0.04);color:var(--text2);
+    font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;
+    transition:all .2s;display:inline-flex;align-items:center;gap:7px;
+    white-space:nowrap;
+  }
+  .btn-message:hover{color:var(--text);border-color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.07)}
+  .profile-joined{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px;margin-top:4px}
+  .profile-joined i{font-size:12px}
+
+  /* ── STATS STRIP ── */
+  .stats-strip{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+    margin-bottom:28px;
+  }
+  .stat-tile{
+    padding:22px 24px;border-radius:var(--r2);
+    background:var(--card);border:1px solid var(--border);
+    text-align:center;transition:all .3s;position:relative;overflow:hidden;
+  }
+  .stat-tile::before{
+    content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+    opacity:0;transition:opacity .3s;
+  }
+  .stat-tile:hover{border-color:var(--border2);transform:translateY(-3px)}
+  .stat-tile:hover::before{opacity:1}
+  .stat-tile:nth-child(1)::before{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .stat-tile:nth-child(2)::before{background:linear-gradient(90deg,var(--accent3),#06B6D4)}
+  .stat-tile:nth-child(3)::before{background:linear-gradient(90deg,var(--green),#059669)}
+  .stat-tile:nth-child(4)::before{background:linear-gradient(90deg,var(--gold),#F59E0B)}
+  .stat-tile .tile-icon{
+    width:42px;height:42px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:19px;margin:0 auto 12px;
+  }
+  .stat-tile .tile-val{
+    font-family:'Syne',sans-serif;font-size:26px;font-weight:800;
+    margin-bottom:4px;line-height:1;
+  }
+  .stat-tile .tile-lbl{font-size:12px;color:var(--text3)}
+
+  /* ── MAIN GRID ── */
+  .profile-grid{display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start}
+
+  /* ── SIDEBAR CARDS ── */
+  .sidebar-card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:var(--r2);padding:22px;margin-bottom:16px;
+  }
+  .sidebar-card:last-child{margin-bottom:0}
+  .card-heading{
+    font-family:'Syne',sans-serif;font-size:14px;font-weight:800;
+    margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--text);
+  }
+  .card-heading i{color:var(--accent2);font-size:16px}
+
+  /* about list */
+  .about-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .about-row:last-child{border-bottom:none;padding-bottom:0}
+  .about-row:first-child{padding-top:0}
+  .about-row-icon{
+    width:34px;height:34px;border-radius:9px;
+    background:rgba(108,99,255,0.1);
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;color:var(--accent2);flex-shrink:0;
+  }
+  .about-row-body .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+  .about-row-body .val{font-size:13px;color:var(--text);font-weight:500}
+
+  /* subjects */
+  .subject-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .subject-chip{
+    padding:6px 14px;border-radius:99px;font-size:12px;font-weight:600;
+    display:flex;align-items:center;gap:5px;
+    background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.2);
+    color:var(--accent2);
+  }
+
+  /* followers row */
+  .followers-row{display:flex;align-items:center;justify-content:space-between}
+  .follower-avatars{display:flex}
+  .follower-av{
+    width:30px;height:30px;border-radius:50%;
+    border:2px solid var(--card);
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:700;color:#fff;
+    margin-left:-8px;
+    flex-shrink:0;
+  }
+  .follower-av:first-child{margin-left:0}
+  .followers-count{font-size:13px;color:var(--text2)}
+  .followers-count strong{color:var(--text);font-weight:700}
+
+  /* ── ACTIVITY FEED ── */
+  .activity-section .sec-label{
+    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+    color:var(--accent2);display:flex;align-items:center;gap:6px;margin-bottom:18px;
+  }
+  .activity-section .sec-label::before{content:'';width:14px;height:2px;background:var(--accent2);border-radius:99px}
+
+  .activity-item{
+    display:flex;align-items:flex-start;gap:16px;
+    padding:16px 20px;border-radius:var(--r);
+    background:var(--card);border:1px solid var(--border);
+    margin-bottom:10px;transition:all .25s;position:relative;overflow:hidden;
+    cursor:pointer;text-decoration:none;
+  }
+  .activity-item:hover{border-color:var(--border2);transform:translateX(4px)}
+  .activity-item::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:linear-gradient(180deg,var(--accent),var(--accent3));
+    border-radius:0 4px 4px 0;opacity:0;transition:opacity .25s;
+  }
+  .activity-item:hover::before{opacity:1}
+  .activity-icon{
+    width:40px;height:40px;border-radius:11px;
+    background:rgba(108,99,255,0.1);
+    display:flex;align-items:center;justify-content:center;
+    font-size:19px;flex-shrink:0;
+  }
+  .activity-body{flex:1;min-width:0}
+  .activity-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .activity-meta{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .activity-tag{padding:2px 8px;border-radius:99px;background:rgba(108,99,255,0.1);color:var(--accent2);font-size:10px;font-weight:700}
+  .activity-time{font-size:12px;color:var(--text3);flex-shrink:0;white-space:nowrap}
+
+  /* empty activity */
+  .empty-activity{
+    padding:60px 20px;text-align:center;
+    background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+    color:var(--text3);
+  }
+  .empty-activity i{font-size:42px;margin-bottom:14px;display:block;color:var(--text3)}
+  .empty-activity p{font-size:14px;line-height:1.6}
+
+  /* ── TABS ── */
+  .profile-tabs{display:flex;gap:4px;background:var(--bg2);border-radius:12px;padding:4px;margin-bottom:22px}
+  .profile-tab{
+    flex:1;padding:9px 16px;text-align:center;border-radius:9px;
+    font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;
+    color:var(--text2);background:transparent;border:none;font-family:inherit;
+  }
+  .profile-tab.active{background:var(--card2);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,0.3)}
+
+  /* ── LOADING STATE ── */
+  .state-screen{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    padding:24px;z-index:50;background:var(--bg);
+  }
+  .state-card{max-width:340px;width:100%;text-align:center}
+  .state-card i.big{font-size:46px;color:var(--accent2);margin-bottom:18px;display:inline-block}
+  .state-card h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:10px}
+  .state-card p{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:22px}
+  .spin{animation:spin 1s linear infinite}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  /* ── TOAST ── */
+  .toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:14px 20px;border-radius:12px;background:var(--card2);border:1px solid var(--border2);font-size:14px;color:var(--text);box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;pointer-events:none}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{border-color:rgba(52,211,153,.3)}
+  .toast.error{border-color:rgba(248,113,113,.3)}
+
+  /* ── OWN PROFILE EDIT HINT ── */
+  .edit-hint{
+    display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);
+    padding:6px 12px;border-radius:8px;border:1px dashed var(--border2);
+    cursor:pointer;transition:all .2s;background:transparent;font-family:inherit;
+    margin-top:2px;
+  }
+  .edit-hint:hover{color:var(--accent2);border-color:rgba(108,99,255,0.4)}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:960px){
+    .profile-grid{grid-template-columns:1fr}
+    .stats-strip{grid-template-columns:repeat(2,1fr)}
+    .profile-hero{grid-template-columns:auto 1fr;gap:24px}
+    .profile-actions{flex-direction:row;grid-column:1/-1;align-items:center}
+  }
+  @media(max-width:640px){
+    nav{padding:0 16px}
+    .page{padding:88px 16px 60px}
+    .profile-hero{grid-template-columns:1fr;text-align:center;padding:28px 24px}
+    .profile-avatar-wrap{margin:0 auto}
+    .profile-identity{display:flex;flex-direction:column;align-items:center}
+    .profile-actions{justify-content:center}
+    .stats-strip{grid-template-columns:repeat(2,1fr);gap:12px}
+    .profile-hero::after{display:none}
+  }
+</style>
+</head>
+<body>
+
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+  window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- LOADING -->
+<div class="state-screen" id="loadingState">
+  <div class="state-card">
+    <i class="ti ti-loader big spin"></i>
+    <h2>Loading profile…</h2>
+    <p>Just a moment.</p>
+  </div>
+</div>
+
+<!-- NOT FOUND -->
+<div class="state-screen" id="notFoundState" style="display:none">
+  <div class="state-card">
+    <i class="ti ti-user-off big"></i>
+    <h2>Profile not found</h2>
+    <p>This user doesn't exist or the link is incorrect.</p>
+    <a href="index.html" class="btn-follow" style="display:inline-flex;margin:0 auto">← Back to StudyHub</a>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav" style="display:none">
+  <a href="index.html" class="back-link"><i class="ti ti-arrow-left"></i> <span>Back</span></a>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon"><i class="ti ti-atom"></i></div>
+    StudyHub
+  </a>
+  <div class="nav-right" id="navRight"></div>
+</nav>
+
+<!-- MAIN PAGE -->
+<div class="page" id="mainPage" style="display:none">
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <!-- Avatar -->
+    <div class="profile-avatar-wrap">
+      <div class="avatar-online-ring"></div>
+      <div class="profile-avatar" id="profileAvatar">?</div>
+      <div class="avatar-badge" id="profileBadge" title="Active member">✓</div>
+    </div>
+
+    <!-- Identity -->
+    <div class="profile-identity">
+      <div class="profile-role-tag">
+        <i class="ti ti-user-check" style="font-size:11px"></i>
+        <span id="profileRoleLabel">Member</span>
+      </div>
+      <h1 class="profile-name" id="profileName">—</h1>
+      <div class="profile-email">
+        <i class="ti ti-mail"></i>
+        <span id="profileEmail">—</span>
+      </div>
+      <p class="profile-bio" id="profileBio">Passionate learner on StudyHub. Exploring knowledge across subjects and building expertise one PDF at a time.</p>
+      <div class="profile-tags" id="profileTagsRow">
+        <span class="profile-tag"><i class="ti ti-calendar"></i><span id="joinedLabel">Joined recently</span></span>
+        <span class="profile-tag"><i class="ti ti-books"></i><span id="viewsLabel">0 PDFs read</span></span>
+        <span class="profile-tag"><i class="ti ti-download"></i><span id="downloadsLabel">0 downloads</span></span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="profile-actions" id="profileActions">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stat-tile">
+      <div class="tile-icon" style="background:rgba(108,99,255,0.12);color:var(--accent2)"><i class="ti ti-eye"></i></div>
+      <div class="tile-val" id="statViews">—</div>
+      <div class="tile-lbl">PDFs Viewed</div>
+    </div>
+    <div class="stat-tile">
+      <div class="tile-icon" style="background:rgba(56,189,248,0.1);color:var(--accent3)"><i class="ti ti-download"></i></div>
+      <div class="tile-val" id="statDownloads">—</div>
+      <div class="tile-lbl">Downloads</div>
+    </div>
+    <div class="stat-tile">
+      <div class="tile-icon" style="background:rgba(52,211,153,0.1);color:var(--green)"><i class="ti ti-clock"></i></div>
+      <div class="tile-val" id="statTime">—</div>
+      <div class="tile-lbl">Time Reading</div>
+    </div>
+    <div class="stat-tile">
+      <div class="tile-icon" style="background:rgba(251,191,36,0.1);color:var(--gold)"><i class="ti ti-users"></i></div>
+      <div class="tile-val" id="statFollowers">—</div>
+      <div class="tile-lbl">Followers</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="profile-grid">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="profile-sidebar">
+
+      <!-- About -->
+      <div class="sidebar-card">
+        <div class="card-heading"><i class="ti ti-id-badge"></i> About</div>
+        <div class="about-row">
+          <div class="about-row-icon"><i class="ti ti-user"></i></div>
+          <div class="about-row-body">
+            <div class="lbl">Full Name</div>
+            <div class="val" id="aboutName">—</div>
+          </div>
+        </div>
+        <div class="about-row">
+          <div class="about-row-icon"><i class="ti ti-shield-check"></i></div>
+          <div class="about-row-body">
+            <div class="lbl">Account Type</div>
+            <div class="val" id="aboutRole">Member</div>
+          </div>
+        </div>
+        <div class="about-row">
+          <div class="about-row-icon"><i class="ti ti-calendar-event"></i></div>
+          <div class="about-row-body">
+            <div class="lbl">Member Since</div>
+            <div class="val" id="aboutJoined">—</div>
+          </div>
+        </div>
+        <div class="about-row">
+          <div class="about-row-icon"><i class="ti ti-map-pin"></i></div>
+          <div class="about-row-body">
+            <div class="lbl">Location</div>
+            <div class="val" id="aboutLocation">Earth 🌍</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subjects of Interest -->
+      <div class="sidebar-card">
+        <div class="card-heading"><i class="ti ti-book"></i> Subjects Explored</div>
+        <div class="subject-chips" id="subjectChips">
+          <span style="font-size:13px;color:var(--text3)">Loading…</span>
+        </div>
+      </div>
+
+      <!-- Followers -->
+      <div class="sidebar-card">
+        <div class="card-heading"><i class="ti ti-users"></i> Community</div>
+        <div class="followers-row">
+          <div>
+            <div class="followers-avatars" id="followerAvatars" style="display:flex;margin-bottom:8px"></div>
+            <div class="followers-count"><strong id="followerCount">0</strong> followers · <strong id="followingCount">0</strong> following</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: ACTIVITY -->
+    <div class="activity-section">
+      <div class="sec-label">Recent Activity</div>
+
+      <!-- Tabs -->
+      <div class="profile-tabs">
+        <button class="profile-tab active" data-tab="views" onclick="switchTab('views')">PDFs Viewed</button>
+        <button class="profile-tab" data-tab="downloads" onclick="switchTab('downloads')">Downloads</button>
+      </div>
+
+      <!-- Feed -->
+      <div id="activityFeed">
+        <div class="empty-activity">
+          <i class="ti ti-loader spin"></i>
+          <p>Loading activity…</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
+
+<script>
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+// ── URL params ──
+// profile.html?uid=XYZ  — view someone else
+// profile.html           — view own profile
+const params      = new URLSearchParams(location.search);
+const targetUid   = params.get('uid');   // null = own profile
+
+let currentUser   = null;
+let profileData   = null;  // the user being viewed
+let currentTab    = 'views';
+
+const subjectEmoji = {
+  'Mathematics':'🧮','Physics':'⚛️','Chemistry':'⚗️','Biology':'🧬',
+  'CS & Tech':'💻','Economics':'📈','Literature':'📚','History':'📜',
+  'Psychology':'🧠','Engineering':'⚙️','Default':'📄'
+};
+
+// ── Avatar colour (same fn as chat.html) ──
+function avatarColor(uid){
+  const colors = [
+    'linear-gradient(135deg,#6C63FF,#A78BFA)',
+    'linear-gradient(135deg,#38BDF8,#0EA5E9)',
+    'linear-gradient(135deg,#34D399,#059669)',
+    'linear-gradient(135deg,#F472B6,#EC4899)',
+    'linear-gradient(135deg,#FBBF24,#F59E0B)',
+    'linear-gradient(135deg,#F87171,#EF4444)',
+  ];
+  let hash = 0;
+  for(let c of (uid||'x')) hash = (hash<<5) - hash + c.charCodeAt(0);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function formatSeconds(s){
+  s = s || 0;
+  if(s < 60)   return s + 's';
+  if(s < 3600) return Math.floor(s/60) + 'm';
+  return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
+}
+
+function timeAgo(date){
+  const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+  if(diff < 60)    return 'just now';
+  if(diff < 3600)  return Math.floor(diff/60) + 'm ago';
+  if(diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  if(diff < 604800)return Math.floor(diff/86400) + 'd ago';
+  return date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+// ── Auth → load ──
+auth.onAuthStateChanged(async user => {
+  currentUser = user;
+  updateNav(user);
+
+  // decide which uid to load
+  const uidToLoad = targetUid || (user ? user.uid : null);
+
+  if(!uidToLoad){
+    // no uid, no login → redirect to login
+    window.location.href = 'index.html?login=1';
+    return;
+  }
+
+  await loadProfile(uidToLoad, user);
+});
+
+// ── Nav ──
+function isAdmin(u){ return u && window.ADMIN_EMAILS.includes(u.email); }
+
+function updateNav(user){
+  document.getElementById('mainNav').style.display = 'flex';
+  const nr = document.getElementById('navRight');
+  if(!user){
+    nr.innerHTML = `<a href="index.html" class="btn-ghost"><i class="ti ti-home"></i> Home</a>`;
+    return;
+  }
+  const initials = (user.displayName||user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const adminLink = isAdmin(user)
+    ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>`
+    : '';
+  nr.innerHTML = `
+    <a href="chat.html" class="btn-ghost"><i class="ti ti-messages"></i> Chat</a>
+    <div class="dropdown" id="userDropdown">
+      <div class="user-pill" onclick="toggleDropdown()">
+        <div class="user-av">${initials}</div>
+        <span class="user-name">${user.displayName||user.email.split('@')[0]}</span>
+        <i class="ti ti-chevron-down" style="font-size:11px;color:var(--text3)"></i>
+      </div>
+      <div class="dropdown-menu">
+        <div style="padding:8px 12px 4px;font-size:12px;color:var(--text3)">${escHtml(user.email)}</div>
+        <div class="dropdown-divider"></div>
+        ${adminLink}
+        <a class="dropdown-item" href="profile.html"><i class="ti ti-user"></i> My Profile</a>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item danger" onclick="handleLogout()"><i class="ti ti-logout"></i> Sign Out</button>
+      </div>
+    </div>`;
+}
+
+function toggleDropdown(){ document.getElementById('userDropdown')?.classList.toggle('open'); }
+document.addEventListener('click', e=>{ if(!e.target.closest('#userDropdown')) document.getElementById('userDropdown')?.classList.remove('open'); });
+async function handleLogout(){ await auth.signOut(); window.location.href='index.html'; }
+
+// ── Load Profile ──
+async function loadProfile(uid, viewer){
+  try {
+    // Fetch views to reconstruct profile info
+    const viewsSnap = await db.collection('views').where('userId','==',uid).orderBy('viewedAt','desc').limit(50).get();
+    const dlSnap    = await db.collection('downloads').where('userId','==',uid).orderBy('downloadedAt','desc').limit(50).get();
+
+    const views     = viewsSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const downloads = dlSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+    // Build synthetic profile from view/download data
+    // In a full app you'd have a /users/{uid} document
+    let displayName = '—';
+    let email       = '—';
+    let photoURL    = null;
+    let createdAt   = null;
+    let adminFlag   = false;
+
+    // If viewing own profile, pull from auth
+    if(viewer && viewer.uid === uid){
+      displayName = viewer.displayName || viewer.email.split('@')[0];
+      email       = viewer.email;
+      createdAt   = viewer.metadata?.creationTime ? new Date(viewer.metadata.creationTime) : null;
+      adminFlag   = isAdmin(viewer);
+    } else if(views.length > 0){
+      // Pull from first view record
+      displayName = views[0].userName || '—';
+      email       = views[0].userEmail || '—';
+      adminFlag   = window.ADMIN_EMAILS.includes(email);
+    } else if(downloads.length > 0){
+      displayName = downloads[0].userName || '—';
+      email       = downloads[0].userEmail || '—';
+      adminFlag   = window.ADMIN_EMAILS.includes(email);
+    } else {
+      // Nothing found for this uid
+      showState('notFoundState');
+      return;
+    }
+
+    profileData = { uid, displayName, email, createdAt, adminFlag, views, downloads };
+
+    renderProfile(profileData, viewer);
+    showState('mainPage');
+
+  } catch(err){
+    console.error(err);
+    showState('notFoundState');
+  }
+}
+
+function showState(id){
+  document.getElementById('loadingState').style.display  = 'none';
+  document.getElementById('notFoundState').style.display = 'none';
+  document.getElementById('mainPage').style.display      = 'none';
+  if(id === 'mainPage'){
+    document.getElementById('mainPage').style.display = 'block';
+  } else {
+    document.getElementById(id).style.display = 'flex';
+  }
+}
+
+// ── Render ──
+function renderProfile(p, viewer){
+  const isOwn   = viewer && viewer.uid === p.uid;
+  const initials= p.displayName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
+
+  // Avatar
+  const avEl = document.getElementById('profileAvatar');
+  avEl.textContent = initials;
+  avEl.style.background = avatarColor(p.uid);
+
+  // Admin badge
+  if(p.adminFlag){
+    document.getElementById('profileBadge').innerHTML = '👑';
+    document.getElementById('profileBadge').title = 'Admin';
+    document.getElementById('profileRoleLabel').textContent = 'Admin';
+  }
+
+  // Name / email
+  document.getElementById('profileName').textContent  = p.displayName;
+  document.getElementById('profileEmail').textContent = p.email;
+  document.getElementById('aboutName').textContent    = p.displayName;
+  document.getElementById('aboutRole').textContent    = p.adminFlag ? '👑 Admin' : '📘 Member';
+
+  // Joined
+  if(p.createdAt){
+    const jStr = p.createdAt.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+    document.getElementById('joinedLabel').textContent  = 'Joined ' + jStr;
+    document.getElementById('aboutJoined').textContent  = jStr;
+  } else {
+    document.getElementById('aboutJoined').textContent = 'Active member';
+  }
+
+  // Stats
+  const totalReadSecs = p.views.reduce((a,v)=> a + (v.timeSpentSeconds||0), 0);
+  document.getElementById('statViews').textContent     = p.views.length;
+  document.getElementById('statDownloads').textContent = p.downloads.length;
+  document.getElementById('statTime').textContent      = formatSeconds(totalReadSecs);
+  document.getElementById('statFollowers').textContent = '—';  // placeholder
+
+  // Tags row
+  document.getElementById('viewsLabel').textContent     = p.views.length + ' PDFs read';
+  document.getElementById('downloadsLabel').textContent = p.downloads.length + ' downloads';
+
+  // Subjects explored
+  const subjectSet = new Set([
+    ...p.views.map(v=>v.pdfSubject),
+    ...p.downloads.map(d=>d.pdfSubject)
+  ].filter(Boolean));
+
+  const chipsEl = document.getElementById('subjectChips');
+  if(subjectSet.size === 0){
+    chipsEl.innerHTML = '<span style="font-size:13px;color:var(--text3)">No subjects yet</span>';
+  } else {
+    chipsEl.innerHTML = [...subjectSet].map(s => `
+      <span class="subject-chip">${subjectEmoji[s]||'📄'} ${escHtml(s)}</span>
+    `).join('');
+  }
+
+  // Follower avatars (placeholder colors)
+  const mockColors = ['#6C63FF','#38BDF8','#34D399','#F472B6'];
+  const mockLabels = ['A','B','C','D'];
+  document.getElementById('followerAvatars').innerHTML = mockLabels.map((l,i)=>`
+    <div class="follower-av" style="background:${mockColors[i]}">${l}</div>
+  `).join('');
+  document.getElementById('followerCount').textContent   = '—';
+  document.getElementById('followingCount').textContent  = '—';
+
+  // Actions
+  const actionsEl = document.getElementById('profileActions');
+  if(isOwn){
+    actionsEl.innerHTML = `
+      <button class="btn-follow" onclick="showToast('Edit profile coming soon!','success')">
+        <i class="ti ti-pencil"></i> Edit Profile
+      </button>
+      <button class="edit-hint" onclick="showToast('Settings coming soon!','success')">
+        <i class="ti ti-settings"></i> Settings
+      </button>
+      <div class="profile-joined"><i class="ti ti-eye"></i> Viewing your public profile</div>`;
+  } else {
+    actionsEl.innerHTML = `
+      <button class="btn-follow" id="followBtn" onclick="handleFollow()">
+        <i class="ti ti-user-plus"></i> Follow
+      </button>
+      <button class="btn-message" onclick="window.location.href='chat.html'">
+        <i class="ti ti-message-circle"></i> Message
+      </button>
+      <div class="profile-joined"><i class="ti ti-calendar"></i> <span>Member since ${document.getElementById('aboutJoined').textContent}</span></div>`;
+  }
+
+  // Render activity
+  renderActivityFeed('views');
+}
+
+// ── Activity Feed ──
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.profile-tab').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  renderActivityFeed(tab);
+}
+
+function renderActivityFeed(tab){
+  const feed = document.getElementById('activityFeed');
+  const items = tab === 'views' ? profileData.views : profileData.downloads;
+
+  if(!items.length){
+    const label = tab === 'views' ? 'viewed any PDFs' : 'downloaded anything';
+    feed.innerHTML = `
+      <div class="empty-activity">
+        <i class="ti ti-${tab==='views'?'eye-off':'download-off'}"></i>
+        <p>Hasn't ${label} yet.<br/>Explore the library to get started.</p>
+      </div>`;
+    return;
+  }
+
+  feed.innerHTML = items.map(item => {
+    const ts   = item.viewedAt || item.downloadedAt;
+    const date = ts ? new Date(ts.seconds*1000) : new Date();
+    const ago  = timeAgo(date);
+    const subj = item.pdfSubject || 'General';
+    const emoji= subjectEmoji[subj] || '📄';
+    const timeInfo = tab === 'views' && item.timeSpentSeconds
+      ? `<span>· ${formatSeconds(item.timeSpentSeconds)} read</span>` : '';
+    const href = `viewer.html?id=${encodeURIComponent(item.pdfId||'')}`;
+    return `
+      <a class="activity-item" href="${href}">
+        <div class="activity-icon">${emoji}</div>
+        <div class="activity-body">
+          <div class="activity-title">${escHtml(item.pdfTitle||'Untitled')}</div>
+          <div class="activity-meta">
+            <span class="activity-tag">${escHtml(subj)}</span>
+            ${timeInfo}
+          </div>
+        </div>
+        <div class="activity-time">${ago}</div>
+      </a>`;
+  }).join('');
+}
+
+// ── Follow (placeholder) ──
+function handleFollow(){
+  const btn = document.getElementById('followBtn');
+  if(!currentUser){
+    showToast('Sign in to follow users','error');
+    return;
+  }
+  // Toggle UI — functionality wired up later
+  const isFollowing = btn.classList.contains('following');
+  if(isFollowing){
+    btn.classList.remove('following');
+    btn.innerHTML = '<i class="ti ti-user-plus"></i> Follow';
+    showToast('Unfollowed','success');
+  } else {
+    btn.classList.add('following');
+    btn.innerHTML = '<i class="ti ti-user-check"></i> Following';
+    showToast('Following! 🎉','success');
+  }
+}
+
+function showToast(msg, type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastIcon').className=type==='success'?'ti ti-check':'ti ti-alert-circle';
+  t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+</script>
+<script src="notifications.js"></script>
+</body>
+</html>
