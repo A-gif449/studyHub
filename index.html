@@ -579,11 +579,19 @@ function updateNav(user) {
       <button class="btn-primary" onclick="openModal('signup')">Get Started</button>`;
   }
 
-  // Re-attach notification bell BEFORE the dropdown/buttons
-  const bell = document.getElementById('sh-notif-wrap');
-  if (bell && nr && !nr.contains(bell)) {
-    nr.insertBefore(bell, nr.firstChild);
+  // Wait for notifications.js to inject the bell, then move it into nav-right
+  function attachBell() {
+    const bell = document.getElementById('sh-notif-wrap');
+    const navRight = document.getElementById('navRight');
+    if (bell && navRight && !navRight.contains(bell)) {
+      navRight.insertBefore(bell, navRight.firstChild);
+    }
   }
+
+  // Try immediately, then retry after short delays in case script hasn't run yet
+  attachBell();
+  setTimeout(attachBell, 100);
+  setTimeout(attachBell, 500);
 }
 
 function toggleDropdown() {
