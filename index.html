@@ -559,7 +559,7 @@ function isAdmin(user) {
   return user && window.ADMIN_EMAILS.includes(user.email);
 }
 
-(function updateNav(user) {
+function updateNav(user) {
   const section = document.getElementById('navUserSection');
   if (user) {
     const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
