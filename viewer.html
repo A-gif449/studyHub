@@ -1,3 +1,4 @@
+//viewer.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -342,6 +343,7 @@ function updateNav(user){
       ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>`
       : '';
     nr.innerHTML = `
+      <a href="chat.html" class="btn-ghost"><i class="ti ti-messages"></i> Chat</a>
       <div class="dropdown" id="userDropdown">
         <div class="user-pill" onclick="toggleDropdown()">
           <div class="user-av">${initials}</div>
