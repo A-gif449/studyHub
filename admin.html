@@ -429,13 +429,24 @@
     </div>
   </div>
    
-  <!-- VIEWS PANEL -->
-    <div class="panel" style="margin-top:24px">
-      <div class="panel-title"><i class="ti ti-eye"></i> Recent Views</div>
-      <div id="viewsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
-        <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
-      </div>
-    </div>  
+ <!-- VIEWS PANEL -->
+  <div class="panel" style="margin-top:24px">
+    <div class="panel-title"><i class="ti ti-eye"></i> Recent Views</div>
+    <div id="viewsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
+      <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+    </div>
+  </div>
+
+  <!-- DOWNLOADS PANEL -->
+  <div class="panel" style="margin-top:24px">
+    <div class="panel-title"><i class="ti ti-download"></i> Recent Downloads</div>
+    <div id="downloadsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
+      <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+    </div>
+  </div>
+
+  </div>
+</div> 
 
   </div>
 </div>
@@ -520,26 +531,24 @@ function showNotAdminGate(email){
   document.getElementById('adminUI').style.display = 'none';
 }
 
-function loadViews(){
-  db.collection('views').orderBy('viewedAt','desc').limit(50).onSnapshot(snap => {
-    const el = document.getElementById('viewsList');
+function loadDownloads(){
+  db.collection('downloads').orderBy('downloadedAt','desc').limit(50).onSnapshot(snap => {
+    const el = document.getElementById('downloadsList');
     if(!snap.docs.length){
-      el.innerHTML = `<div class="empty-list"><i class="ti ti-eye-off"></i><p>No views yet.</p></div>`;
+      el.innerHTML = `<div class="empty-list"><i class="ti ti-download-off"></i><p>No downloads yet.</p></div>`;
       return;
     }
     el.innerHTML = snap.docs.map(d => {
       const v = d.data();
-      const time = v.viewedAt ? new Date(v.viewedAt.seconds * 1000).toLocaleString() : 'Just now';
-      const pdf = allPdfs.find(p => p.id === v.pdfId);
-      const pdfTitle = pdf ? pdf.title : 'Unknown PDF';
+      const time = v.downloadedAt ? new Date(v.downloadedAt.seconds * 1000).toLocaleString() : 'Just now';
       return `
         <div class="pdf-item">
-          <div class="pdf-emoji">👁️</div>
+          <div class="pdf-emoji">⬇️</div>
           <div class="pdf-info">
-            <div class="pdf-title">${escHtml(pdfTitle)}</div>
+            <div class="pdf-title">${escHtml(v.pdfTitle || 'Unknown PDF')}</div>
             <div class="pdf-meta">
-              <span class="tag">${escHtml(v.userName)}</span>
-              <span>${escHtml(v.userEmail)}</span>
+              <span class="tag">${escHtml(v.userName || 'Unknown')}</span>
+              <span>${escHtml(v.userEmail || '')}</span>
               <span>· ${time}</span>
             </div>
           </div>
@@ -556,6 +565,7 @@ function showAdmin(user){
   document.getElementById('adminName').textContent = user.displayName || user.email;
   loadPdfs();
   loadViews();
+  loadDownloads();
 }
 
 // ── Gate Login ──

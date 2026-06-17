@@ -1,3 +1,4 @@
+//viewer.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -466,21 +467,24 @@ async function recordView(pdfId) {
 }
 
 // ── Track Download ──
-function trackDownload() {
+async function trackDownload(e) {
   if (!currentUser || !docId) return;
-  db.collection('downloads').add({
-    pdfId: docId,
-    pdfTitle: currentPdf?.title || '',
-    pdfSubject: currentPdf?.subject || '',
-    userId: currentUser.uid,
-    userEmail: currentUser.email,
-    userName: currentUser.displayName || currentUser.email,
-    downloadedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).catch(() => {});
-  // bump download count on the pdf document
-  db.collection('pdfs').doc(docId).update({
-    downloadCount: firebase.firestore.FieldValue.increment(1)
-  }).catch(() => {});
+  try {
+    await db.collection('downloads').add({
+      pdfId: docId,
+      pdfTitle: currentPdf?.title || '',
+      pdfSubject: currentPdf?.subject || '',
+      userId: currentUser.uid,
+      userEmail: currentUser.email,
+      userName: currentUser.displayName || currentUser.email,
+      downloadedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    db.collection('pdfs').doc(docId).update({
+      downloadCount: firebase.firestore.FieldValue.increment(1)
+    }).catch(() => {});
+  } catch(err) {
+    console.warn('trackDownload error:', err);
+  }
 }
 
 // ── Auth ──
