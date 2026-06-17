@@ -394,11 +394,18 @@
     wrap.appendChild(panel);
 
     // Insert bell BEFORE the last child of nav-right (or directly into nav)
+    // const navRight = nav.querySelector(".nav-right");
+    // if (navRight) {
+    //   navRight.insertBefore(wrap, navRight.firstChild);
+    // } else {
+    //   nav.appendChild(wrap);
+    // }
+
     const navRight = nav.querySelector(".nav-right");
     if (navRight) {
-      navRight.insertBefore(wrap, navRight.firstChild);
+        navRight.appendChild(wrap);   // append at end so auth rewrites don't remove it
     } else {
-      nav.appendChild(wrap);
+        nav.appendChild(wrap);
     }
 
     // close panel when clicking outside

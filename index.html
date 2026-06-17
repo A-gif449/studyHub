@@ -578,6 +578,9 @@ function updateNav(user) {
       <button class="btn-ghost" onclick="openModal('login')">Sign In</button>
       <button class="btn-primary" onclick="openModal('signup')">Get Started</button>`;
   }
+
+  // Re-attach notification bell if notifications.js already injected it
+  if (window._shReattach) window._shReattach();
 }
 
 function toggleDropdown() {
@@ -791,5 +794,6 @@ if (new URLSearchParams(location.search).get('login') === '1') {
   setTimeout(() => openModal('login'), 500);
 }
 </script>
+<script src="notifications.js"></script>
 </body>
 </html>
