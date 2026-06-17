@@ -348,28 +348,24 @@
   /* ══════════════════════════════════════════════════════════
      2.  BUILD THE BELL BUTTON + PANEL
      ══════════════════════════════════════════════════════════ */
-  function buildBell() {
+function buildBell() {
     const nav = document.querySelector("nav");
     if (!nav) return;
 
-    // wrapper keeps bell + panel in a positioned container
     const wrap = document.createElement("div");
     wrap.id = "sh-notif-wrap";
 
-    // ── bell button ──
     const btn = document.createElement("button");
     btn.id = "sh-bell-btn";
     btn.title = "Notifications";
     btn.innerHTML = `<img src="1781704084645_bell.png" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);opacity:.75" alt="bell" onerror="this.outerHTML='<i class=\\'ti ti-bell\\'></i>'"/>`;
     btn.addEventListener("click", togglePanel);
 
-    // ── badge ──
     const badge = document.createElement("span");
     badge.id = "sh-badge";
     badge.textContent = "0";
     btn.appendChild(badge);
 
-    // ── dropdown panel ──
     const panel = document.createElement("div");
     panel.id = "sh-panel";
     panel.innerHTML = `
@@ -393,19 +389,17 @@
     wrap.appendChild(btn);
     wrap.appendChild(panel);
 
-    // Insert bell BEFORE the last child of nav-right (or directly into nav)
-    // const navRight = nav.querySelector(".nav-right");
-    // if (navRight) {
-    //   navRight.insertBefore(wrap, navRight.firstChild);
-    // } else {
-    //   nav.appendChild(wrap);
-    // }
-
-    const navRight = nav.querySelector(".nav-right");
-    if (navRight) {
-        navRight.appendChild(wrap);
+    // Insert into dedicated bellSlot if available, otherwise fallback
+    const bellSlot = document.getElementById("bellSlot");
+    if (bellSlot) {
+      bellSlot.appendChild(wrap);
     } else {
-    nav.appendChild(wrap);
+      const navRight = nav.querySelector(".nav-right");
+      if (navRight) {
+        navRight.insertBefore(wrap, navRight.firstChild);
+      } else {
+        nav.appendChild(wrap);
+      }
     }
 
     // close panel when clicking outside
@@ -413,7 +407,6 @@
       if (!wrap.contains(e.target)) closePanel();
     });
 
-    // expose mark-all globally so inline onclick can reach it
     window._shMarkAll = markAllRead;
   }
 
