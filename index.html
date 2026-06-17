@@ -237,10 +237,16 @@
     <a href="#reviews">Reviews</a>
     <a href="chat.html">💬 Community Chat</a>
   </div>
+  <!-- <div class="nav-right" id="navRight">
+    <button class="btn-ghost" onclick="openModal('login')">Sign In</button>
+    <button class="btn-primary" onclick="openModal('signup')">Get Started</button>
+  </div> -->
   <div class="nav-right" id="navRight">
+  <div id="navUserSection">
     <button class="btn-ghost" onclick="openModal('login')">Sign In</button>
     <button class="btn-primary" onclick="openModal('signup')">Get Started</button>
   </div>
+</div>
 </nav>
 
 <!-- HERO -->
@@ -552,14 +558,14 @@ function isAdmin(user) {
   return user && window.ADMIN_EMAILS.includes(user.email);
 }
 
-function updateNav(user) {
-  const nr = document.getElementById('navRight');
+(function updateNav(user) {
+  const section = document.getElementById('navUserSection');
   if (user) {
     const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     const adminLink = isAdmin(user)
       ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>`
       : '';
-    nr.innerHTML = `
+    section.innerHTML = `
       <div class="dropdown" id="userDropdown">
         <div class="user-pill" onclick="toggleDropdown()">
           <div class="user-av">${initials}</div>
@@ -574,24 +580,10 @@ function updateNav(user) {
         </div>
       </div>`;
   } else {
-    nr.innerHTML = `
+    section.innerHTML = `
       <button class="btn-ghost" onclick="openModal('login')">Sign In</button>
       <button class="btn-primary" onclick="openModal('signup')">Get Started</button>`;
   }
-
-  // Wait for notifications.js to inject the bell, then move it into nav-right
-  function attachBell() {
-    const bell = document.getElementById('sh-notif-wrap');
-    const navRight = document.getElementById('navRight');
-    if (bell && navRight && !navRight.contains(bell)) {
-      navRight.insertBefore(bell, navRight.firstChild);
-    }
-  }
-
-  // Try immediately, then retry after short delays in case script hasn't run yet
-  attachBell();
-  setTimeout(attachBell, 100);
-  setTimeout(attachBell, 500);
 }
 
 function toggleDropdown() {

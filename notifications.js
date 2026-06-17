@@ -403,9 +403,9 @@
 
     const navRight = nav.querySelector(".nav-right");
     if (navRight) {
-        navRight.appendChild(wrap);   // append at end so auth rewrites don't remove it
+        navRight.appendChild(wrap);
     } else {
-        nav.appendChild(wrap);
+    nav.appendChild(wrap);
     }
 
     // close panel when clicking outside
