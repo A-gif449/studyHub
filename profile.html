@@ -1,3 +1,4 @@
+//profile.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -654,50 +655,67 @@ async function handleLogout(){ await auth.signOut(); window.location.href='index
 // ── Load Profile ──
 async function loadProfile(uid, viewer){
   try {
-    // Fetch views to reconstruct profile info
-    const viewsSnap = await db.collection('views').where('userId','==',uid).orderBy('viewedAt','desc').limit(50).get();
-    const dlSnap    = await db.collection('downloads').where('userId','==',uid).orderBy('downloadedAt','desc').limit(50).get();
+    const viewsSnap = await db.collection('views')
+      .where('userId','==',uid).orderBy('viewedAt','desc').limit(50).get();
+    const dlSnap = await db.collection('downloads')
+      .where('userId','==',uid).orderBy('downloadedAt','desc').limit(50).get();
 
     const views     = viewsSnap.docs.map(d=>({id:d.id,...d.data()}));
     const downloads = dlSnap.docs.map(d=>({id:d.id,...d.data()}));
 
-    // Build synthetic profile from view/download data
-    // In a full app you'd have a /users/{uid} document
-    let displayName = '—';
+    let displayName = 'Unknown User';
     let email       = '—';
-    let photoURL    = null;
     let createdAt   = null;
     let adminFlag   = false;
 
-    // If viewing own profile, pull from auth
+    // ── FIXED: always use auth user data when viewing own profile ──
     if(viewer && viewer.uid === uid){
       displayName = viewer.displayName || viewer.email.split('@')[0];
       email       = viewer.email;
-      createdAt   = viewer.metadata?.creationTime ? new Date(viewer.metadata.creationTime) : null;
+      createdAt   = viewer.metadata?.creationTime
+                      ? new Date(viewer.metadata.creationTime) : null;
       adminFlag   = isAdmin(viewer);
     } else if(views.length > 0){
-      // Pull from first view record
-      displayName = views[0].userName || '—';
+      displayName = views[0].userName  || '—';
       email       = views[0].userEmail || '—';
       adminFlag   = window.ADMIN_EMAILS.includes(email);
     } else if(downloads.length > 0){
-      displayName = downloads[0].userName || '—';
+      displayName = downloads[0].userName  || '—';
       email       = downloads[0].userEmail || '—';
       adminFlag   = window.ADMIN_EMAILS.includes(email);
+    } else if(viewer && viewer.uid === uid){
+      // ── Fallback: own profile, zero activity — still show it ──
+      displayName = viewer.displayName || viewer.email.split('@')[0];
+      email       = viewer.email;
     } else {
-      // Nothing found for this uid
       showState('notFoundState');
       return;
     }
 
     profileData = { uid, displayName, email, createdAt, adminFlag, views, downloads };
-
     renderProfile(profileData, viewer);
     showState('mainPage');
 
   } catch(err){
     console.error(err);
-    showState('notFoundState');
+    // ── FIXED: if Firestore query fails (e.g. missing index),
+    //    still show own profile using auth data ──
+    if(viewer && viewer.uid === uid){
+      profileData = {
+        uid,
+        displayName: viewer.displayName || viewer.email.split('@')[0],
+        email:       viewer.email,
+        createdAt:   viewer.metadata?.creationTime
+                       ? new Date(viewer.metadata.creationTime) : null,
+        adminFlag:   isAdmin(viewer),
+        views:       [],
+        downloads:   []
+      };
+      renderProfile(profileData, viewer);
+      showState('mainPage');
+    } else {
+      showState('notFoundState');
+    }
   }
 }
 
