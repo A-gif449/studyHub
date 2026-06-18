@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Friends & People You May Know – StudyHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0A0A12;--bg2:#0F0F1C;--bg3:#13131F;--card:#14141F;--card2:#1A1A2E;
+    --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+    --accent:#6C63FF;--accent2:#A78BFA;--accent3:#38BDF8;--accent4:#F472B6;
+    --gold:#FBBF24;--green:#34D399;--red:#F87171;
+    --text:#F0EFF8;--text2:#A09DC0;--text3:#6B6880;
+    --r:14px;--r2:20px;--r3:28px;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:var(--bg2)}
+  ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:99px}
+  .orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+  .orb1{width:600px;height:600px;top:-200px;left:-100px;background:rgba(108,99,255,0.13)}
+  .orb2{width:400px;height:400px;bottom:10%;right:-100px;background:rgba(56,189,248,0.08)}
+
+  /* ── NAV ── */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,18,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);text-decoration:none}
+  .nav-logo img{width:34px;height:34px;border-radius:9px;object-fit:cover}
+  .back-link{display:flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;padding:7px 14px;border-radius:9px;border:1px solid var(--border2);transition:all .2s}
+  .back-link:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
+  .nav-right{display:flex;align-items:center;gap:10px}
+  .btn-ghost{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);color:var(--text2);background:transparent;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
+  .btn-danger{padding:8px 16px;border-radius:9px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+  .user-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+  .dropdown{position:relative}
+  .dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:6px;min-width:180px;z-index:200;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+  .dropdown.open .dropdown-menu{display:block}
+  .dropdown-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;text-decoration:none;border:none;background:none;width:100%;font-family:inherit}
+  .dropdown-item:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+  .dropdown-item.danger:hover{background:rgba(248,113,113,0.1);color:var(--red)}
+  .dropdown-divider{height:1px;background:var(--border);margin:5px 0}
+  .user-pill{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:99px;background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.25);cursor:pointer;transition:all .2s}
+
+  /* ── PAGE ── */
+  .page{padding:96px 5% 70px;position:relative;z-index:1;max-width:1100px;margin:0 auto}
+
+  /* ── PAGE HEADER ── */
+  .page-header{margin-bottom:36px}
+  .page-header h1{font-family:'Syne',sans-serif;font-size:clamp(24px,3.5vw,34px);font-weight:800;margin-bottom:6px}
+  .page-header p{font-size:14px;color:var(--text2);max-width:480px;line-height:1.6}
+
+  /* ── TABS ── */
+  .main-tabs{display:flex;gap:4px;background:var(--bg2);border-radius:12px;padding:4px;margin-bottom:32px;width:fit-content}
+  .main-tab{padding:10px 22px;text-align:center;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2);background:transparent;border:none;font-family:inherit;display:flex;align-items:center;gap:7px}
+  .main-tab.active{background:var(--card2);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,0.4)}
+  .main-tab .tab-badge{min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:rgba(108,99,255,0.25);color:var(--accent2);font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+  .main-tab.active .tab-badge{background:rgba(108,99,255,0.35)}
+
+  /* ── SECTION LABEL ── */
+  .sec-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent2);display:flex;align-items:center;gap:6px;margin-bottom:18px}
+  .sec-eyebrow::before{content:'';width:14px;height:2px;background:var(--accent2);border-radius:99px;flex-shrink:0}
+
+  /* ── SUGGESTIONS GRID ── */
+  .suggestions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:40px}
+
+  .person-card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+    padding:22px 20px 18px;display:flex;flex-direction:column;align-items:center;
+    text-align:center;transition:all .3s;position:relative;overflow:hidden;
+  }
+  .person-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent3));opacity:0;transition:opacity .3s}
+  .person-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,0.35)}
+  .person-card:hover::before{opacity:1}
+
+  .person-av{width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff;margin:0 auto 14px;position:relative;flex-shrink:0}
+  .person-av-ring{position:absolute;inset:-3px;border-radius:23px;border:2px solid transparent;background:linear-gradient(var(--card),var(--card)) padding-box, linear-gradient(135deg,var(--accent),var(--accent3)) border-box;opacity:0;transition:opacity .3s}
+  .person-card:hover .person-av-ring{opacity:1}
+  .person-online{position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid var(--card)}
+
+  .person-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .person-handle{font-size:12px;color:var(--text3);margin-bottom:10px}
+  .person-subjects{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;min-height:22px}
+  .person-subject-chip{padding:3px 9px;border-radius:99px;background:rgba(108,99,255,0.1);color:var(--accent2);font-size:10px;font-weight:600}
+  .person-mutual{font-size:11px;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:5px;justify-content:center}
+  .person-mutual i{font-size:12px;color:var(--green)}
+  .person-stats{display:flex;gap:14px;justify-content:center;margin-bottom:16px;font-size:11px;color:var(--text3)}
+  .person-stats strong{color:var(--text2);font-weight:700;display:block;font-size:14px}
+
+  .card-actions{display:flex;gap:8px;width:100%}
+  .btn-add{flex:1;padding:9px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 0 16px rgba(108,99,255,0.3)}
+  .btn-add:hover{transform:translateY(-1px);box-shadow:0 4px 24px rgba(108,99,255,0.45)}
+  .btn-add:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  .btn-add.pending{background:rgba(251,191,36,0.12);color:var(--gold);border:1px solid rgba(251,191,36,0.3);box-shadow:none}
+  .btn-add.friends{background:rgba(52,211,153,0.1);color:var(--green);border:1px solid rgba(52,211,153,0.25);box-shadow:none}
+  .btn-add.friends:hover{background:rgba(248,113,113,0.1);color:var(--red);border-color:rgba(248,113,113,0.3)}
+  .btn-view{width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all .2s;flex-shrink:0;text-decoration:none}
+  .btn-view:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
+
+  /* ── PENDING REQUESTS ── */
+  .requests-list{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+  .request-item{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--card);border:1px solid rgba(108,99,255,0.2);border-radius:var(--r2);transition:all .2s}
+  .request-item:hover{border-color:rgba(108,99,255,0.35)}
+  .request-av{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#fff;flex-shrink:0}
+  .request-info{flex:1;min-width:0}
+  .request-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+  .request-meta{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
+  .request-actions{display:flex;gap:8px;flex-shrink:0}
+  .btn-accept{padding:8px 18px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:6px;box-shadow:0 0 14px rgba(108,99,255,0.3)}
+  .btn-accept:hover{transform:translateY(-1px)}
+  .btn-decline{padding:8px 14px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+  .btn-decline:hover{color:var(--red);border-color:rgba(248,113,113,0.3)}
+
+  /* ── FRIENDS GRID ── */
+  .friends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+  .friend-tile{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);transition:all .2s;cursor:pointer;text-decoration:none}
+  .friend-tile:hover{border-color:var(--border2);background:var(--card2);transform:translateX(3px)}
+  .friend-tile-av{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+  .friend-tile-body{flex:1;min-width:0}
+  .friend-tile-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+  .friend-tile-sub{font-size:11px;color:var(--text3)}
+  .friend-tile-actions{display:flex;gap:6px;flex-shrink:0}
+  .mini-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text3);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:all .2s}
+  .mini-btn:hover{border-color:var(--border2);color:var(--text)}
+  .mini-btn.del:hover{border-color:rgba(248,113,113,0.4);color:var(--red)}
+
+  /* ── SEARCH BAR ── */
+  .search-row{display:flex;gap:10px;margin-bottom:24px}
+  .search-wrap{flex:1;position:relative;max-width:420px}
+  .search-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px;pointer-events:none}
+  .search-wrap input{width:100%;padding:11px 14px 11px 40px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .2s}
+  .search-wrap input:focus{border-color:var(--accent)}
+  .search-wrap input::placeholder{color:var(--text3)}
+
+  /* ── EMPTY / LOADING ── */
+  .empty-box{padding:60px 24px;text-align:center;color:var(--text3);background:var(--card);border:1px solid var(--border);border-radius:var(--r2)}
+  .empty-box i{font-size:40px;margin-bottom:14px;display:block;color:var(--text3)}
+  .empty-box h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text2);margin-bottom:8px}
+  .empty-box p{font-size:13px;line-height:1.6;max-width:300px;margin:0 auto}
+  .skeleton{border-radius:var(--r2);height:240px;background:linear-gradient(90deg,var(--card) 25%,rgba(255,255,255,0.04) 50%,var(--card) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  /* ── TOAST ── */
+  .toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:14px 20px;border-radius:12px;background:var(--card2);border:1px solid var(--border2);font-size:14px;color:var(--text);box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;pointer-events:none}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{border-color:rgba(52,211,153,.3)}
+  .toast.error{border-color:rgba(248,113,113,.3)}
+
+  /* ── GATE ── */
+  .gate-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:50;background:var(--bg)}
+  .gate-card{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:40px;max-width:420px;width:100%;text-align:center}
+  .gate-card i{font-size:42px;color:var(--accent2);margin-bottom:18px;display:block}
+  .gate-card h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px}
+  .gate-card p{font-size:14px;color:var(--text2);margin-bottom:24px;line-height:1.6}
+  .gate-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .btn-primary{padding:11px 26px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:7px;box-shadow:0 0 22px rgba(108,99,255,0.3);text-decoration:none}
+  .btn-primary:hover{transform:translateY(-1px)}
+
+  /* ── SPINNER ── */
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .spin{animation:spin 1s linear infinite}
+
+  @media(max-width:640px){
+    nav{padding:0 16px}
+    .page{padding:88px 16px 60px}
+    .main-tabs{width:100%}
+    .main-tab{flex:1;justify-content:center;padding:10px 8px}
+    .suggestions-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+    .request-item{flex-wrap:wrap}
+    .request-actions{width:100%;justify-content:flex-end}
+  }
+</style>
+</head>
+<body>
+
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+  window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- GATE for logged-out users -->
+<div class="gate-screen" id="gateScreen" style="display:none">
+  <div class="gate-card">
+    <i class="ti ti-users"></i>
+    <h2>Sign in to see Friends</h2>
+    <p>Discover fellow learners, send friend requests, and follow people studying the same subjects as you.</p>
+    <div class="gate-btns">
+      <a href="index.html?login=1" class="btn-primary"><i class="ti ti-login"></i> Sign In</a>
+      <a href="index.html" class="btn-ghost">Back to Home</a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav" style="display:none">
+  <a href="index.html" class="back-link"><i class="ti ti-arrow-left"></i> <span>Back</span></a>
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="StudyHub" onerror="this.style.display='none'"/>
+    StudyHub
+  </a>
+  <div class="nav-right" id="navRight">
+    <div id="bellSlot"></div>
+  </div>
+</nav>
+
+<!-- MAIN PAGE -->
+<div class="page" id="mainPage" style="display:none">
+  <div class="page-header">
+    <h1>👥 Friends & Community</h1>
+    <p>Discover learners studying the same subjects, send requests, and build your study network.</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="main-tabs">
+    <button class="main-tab active" data-tab="suggestions" onclick="switchTab('suggestions')">
+      <i class="ti ti-sparkles"></i> Suggestions
+    </button>
+    <button class="main-tab" data-tab="requests" onclick="switchTab('requests')">
+      <i class="ti ti-bell"></i> Requests
+      <span class="tab-badge" id="reqBadge" style="display:none">0</span>
+    </button>
+    <button class="main-tab" data-tab="friends" onclick="switchTab('friends')">
+      <i class="ti ti-users"></i> My Friends
+    </button>
+    <button class="main-tab" data-tab="following" onclick="switchTab('following')">
+      <i class="ti ti-rss"></i> Following
+    </button>
+  </div>
+
+  <!-- ── SUGGESTIONS TAB ── -->
+  <div id="tabSuggestions">
+    <div class="search-row">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by name or subject…" oninput="filterSuggestions()"/>
+      </div>
+    </div>
+    <div class="sec-eyebrow">People You May Know</div>
+    <div class="suggestions-grid" id="suggestionsGrid">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+  </div>
+
+  <!-- ── REQUESTS TAB ── -->
+  <div id="tabRequests" style="display:none">
+    <div class="sec-eyebrow">Incoming Requests</div>
+    <div class="requests-list" id="requestsList">
+      <div class="empty-box"><i class="ti ti-loader spin"></i><h3>Loading…</h3></div>
+    </div>
+    <div class="sec-eyebrow" style="margin-top:16px">Sent Requests</div>
+    <div class="requests-list" id="sentList">
+      <div class="empty-box"><i class="ti ti-loader spin"></i><h3>Loading…</h3></div>
+    </div>
+  </div>
+
+  <!-- ── FRIENDS TAB ── -->
+  <div id="tabFriends" style="display:none">
+    <div class="sec-eyebrow">Your Friends</div>
+    <div class="friends-grid" id="friendsGrid">
+      <div class="empty-box" style="grid-column:1/-1"><i class="ti ti-loader spin"></i><h3>Loading…</h3></div>
+    </div>
+  </div>
+
+  <!-- ── FOLLOWING TAB ── -->
+  <div id="tabFollowing" style="display:none">
+    <div class="sec-eyebrow">People You Follow</div>
+    <div class="friends-grid" id="followingGrid">
+      <div class="empty-box" style="grid-column:1/-1"><i class="ti ti-loader spin"></i><h3>Loading…</h3></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
+
+<script>
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+let currentUser = null;
+let allUsers    = [];   // everyone in views/downloads collections (discovered users)
+let currentTab  = 'suggestions';
+
+// ── Avatar color (same seed as rest of app) ──
+function avatarColor(uid) {
+  const colors = [
+    'linear-gradient(135deg,#6C63FF,#A78BFA)',
+    'linear-gradient(135deg,#38BDF8,#0EA5E9)',
+    'linear-gradient(135deg,#34D399,#059669)',
+    'linear-gradient(135deg,#F472B6,#EC4899)',
+    'linear-gradient(135deg,#FBBF24,#F59E0B)',
+    'linear-gradient(135deg,#F87171,#EF4444)',
+  ];
+  let hash = 0;
+  for (let c of (uid||'x')) hash = (hash<<5) - hash + c.charCodeAt(0);
+  return colors[Math.abs(hash) % colors.length];
+}
+function initials(name) {
+  return String(name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+}
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Auth ──
+auth.onAuthStateChanged(async user => {
+  currentUser = user;
+  if (!user) {
+    document.getElementById('gateScreen').style.display = 'flex';
+    document.getElementById('mainNav').style.display    = 'none';
+    document.getElementById('mainPage').style.display   = 'none';
+    return;
+  }
+  document.getElementById('gateScreen').style.display = 'none';
+  document.getElementById('mainNav').style.display    = 'flex';
+  document.getElementById('mainPage').style.display   = 'block';
+  buildNav(user);
+  await discoverUsers();
+  loadRequests();
+  loadFriends();
+  loadFollowing();
+});
+
+// ── Nav ──
+function isAdmin(u){ return u && window.ADMIN_EMAILS.includes(u.email); }
+function buildNav(user) {
+  const nr = document.getElementById('navRight');
+  const init = initials(user.displayName || user.email);
+  const adminLink = isAdmin(user)
+    ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>` : '';
+  // keep bellSlot, inject user dropdown beside it
+  const bellSlot = document.getElementById('bellSlot');
+  const wrap = document.createElement('div');
+  wrap.style.display = 'flex';
+  wrap.style.alignItems = 'center';
+  wrap.style.gap = '10px';
+  wrap.innerHTML = `
+    <div class="dropdown" id="userDropdown">
+      <div class="user-pill" onclick="document.getElementById('userDropdown').classList.toggle('open')">
+        <div class="user-av">${init}</div>
+        <span style="font-size:12px;color:var(--text2)">${escHtml(user.displayName||user.email.split('@')[0])}</span>
+        <i class="ti ti-chevron-down" style="font-size:11px;color:var(--text3)"></i>
+      </div>
+      <div class="dropdown-menu">
+        <div style="padding:8px 12px 4px;font-size:12px;color:var(--text3)">${escHtml(user.email)}</div>
+        <div class="dropdown-divider"></div>
+        ${adminLink}
+        <a class="dropdown-item" href="profile.html"><i class="ti ti-user"></i> My Profile</a>
+        <a class="dropdown-item" href="chat.html"><i class="ti ti-messages"></i> Community Chat</a>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item danger" onclick="auth.signOut().then(()=>location.href='index.html')"><i class="ti ti-logout"></i> Sign Out</button>
+      </div>
+    </div>`;
+  nr.insertBefore(wrap, bellSlot);
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#userDropdown')) document.getElementById('userDropdown')?.classList.remove('open');
+  });
+}
+
+// ── Discover users from views + downloads collections ──
+// This is the key trick: we mine the views/downloads collections to find
+// all UIDs that have ever used the app, then build a "people you may know" list.
+async function discoverUsers() {
+  const userMap = {};    // uid → { uid, name, email, subjects: Set, viewCount, downloadCount }
+
+  try {
+    // Pull recent views (up to 200 docs, enough to discover many users)
+    const viewsSnap = await db.collection('views').limit(200).get();
+    viewsSnap.forEach(d => {
+      const v = d.data();
+      if (!v.userId || v.userId === currentUser.uid) return;
+      if (!userMap[v.userId]) {
+        userMap[v.userId] = { uid: v.userId, name: v.userName||'Unknown', email: v.userEmail||'', subjects: new Set(), viewCount: 0, downloadCount: 0 };
+      }
+      userMap[v.userId].viewCount++;
+      if (v.pdfSubject) userMap[v.userId].subjects.add(v.pdfSubject);
+    });
+  } catch(e) { /* might fail if no views yet */ }
+
+  try {
+    const dlSnap = await db.collection('downloads').limit(100).get();
+    dlSnap.forEach(d => {
+      const v = d.data();
+      if (!v.userId || v.userId === currentUser.uid) return;
+      if (!userMap[v.userId]) {
+        userMap[v.userId] = { uid: v.userId, name: v.userName||'Unknown', email: v.userEmail||'', subjects: new Set(), viewCount: 0, downloadCount: 0 };
+      }
+      userMap[v.userId].downloadCount++;
+      if (v.pdfSubject) userMap[v.userId].subjects.add(v.pdfSubject);
+    });
+  } catch(e) { /* ignore */ }
+
+  // Convert to array, collapse subjects Set to Array
+  allUsers = Object.values(userMap).map(u => ({ ...u, subjects: [...u.subjects] }));
+
+  // Sort: prefer users with shared subjects
+  const mySubjects = await getMySubjects();
+  allUsers.sort((a, b) => {
+    const aShared = a.subjects.filter(s => mySubjects.has(s)).length;
+    const bShared = b.subjects.filter(s => mySubjects.has(s)).length;
+    if (bShared !== aShared) return bShared - aShared;
+    return (b.viewCount + b.downloadCount) - (a.viewCount + a.downloadCount);
+  });
+
+  renderSuggestions(allUsers);
+}
+
+async function getMySubjects() {
+  const set = new Set();
+  try {
+    const snap = await db.collection('views').where('userId','==',currentUser.uid).limit(50).get();
+    snap.forEach(d => { if (d.data().pdfSubject) set.add(d.data().pdfSubject); });
+  } catch(e) {}
+  return set;
+}
+
+// ── Render Suggestions ──
+let suggestionsData = [];  // filtered snapshot
+
+async function renderSuggestions(users) {
+  const grid = document.getElementById('suggestionsGrid');
+  suggestionsData = users;
+
+  if (!users.length) {
+    grid.innerHTML = `
+      <div class="empty-box" style="grid-column:1/-1">
+        <i class="ti ti-user-search"></i>
+        <h3>No suggestions yet</h3>
+        <p>As more students use StudyHub, you'll see people to connect with here.</p>
+      </div>`;
+    return;
+  }
+
+  // Get friend/follow statuses for all users in one batch (grouped queries)
+  const statuses = await batchGetStatuses(users.map(u => u.uid));
+
+  grid.innerHTML = users.map(u => buildPersonCard(u, statuses[u.uid] || {})).join('');
+}
+
+function filterSuggestions() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  if (!q) { renderSuggestions(allUsers); return; }
+  const filtered = allUsers.filter(u =>
+    u.name.toLowerCase().includes(q) ||
+    u.email.toLowerCase().includes(q) ||
+    u.subjects.some(s => s.toLowerCase().includes(q))
+  );
+  renderSuggestions(filtered);
+}
+
+function buildPersonCard(u, status) {
+  const av   = initials(u.name);
+  const color = avatarColor(u.uid);
+  const isAdm = window.ADMIN_EMAILS.includes(u.email);
+
+  // Friend button label/class
+  let friendLabel = '<i class="ti ti-user-plus"></i> Add Friend';
+  let friendClass = '';
+  let friendOnclick = `addFriend('${u.uid}','${escHtml(u.name)}','${escHtml(u.email)}',this)`;
+  if (status.friend === 'friends') {
+    friendLabel = '<i class="ti ti-user-check"></i> Friends';
+    friendClass = 'friends';
+    friendOnclick = `removeFriend('${u.uid}',this)`;
+  } else if (status.friend === 'pending_sent') {
+    friendLabel = '<i class="ti ti-clock"></i> Pending';
+    friendClass = 'pending';
+    friendOnclick = `cancelRequest('${u.uid}',this)`;
+  } else if (status.friend === 'pending_received') {
+    friendLabel = '<i class="ti ti-check"></i> Accept';
+    friendClass = '';
+    friendOnclick = `acceptRequest('${u.uid}',this)`;
+  }
+
+  const subjects = u.subjects.slice(0,3).map(s =>
+    `<span class="person-subject-chip">${escHtml(s)}</span>`
+  ).join('');
+
+  const adminBadge = isAdm ? ' 👑' : '';
+
+  return `
+    <div class="person-card" id="card-${u.uid}">
+      <div class="person-av" style="background:${color}">
+        <div class="person-av-ring"></div>
+        ${av}${adminBadge}
+      </div>
+      <div class="person-name">${escHtml(u.name)}</div>
+      <div class="person-handle">${escHtml(u.email)}</div>
+      <div class="person-subjects">${subjects || '<span style="font-size:11px;color:var(--text3)">Exploring subjects…</span>'}</div>
+      <div class="person-stats">
+        <div><strong>${u.viewCount}</strong>views</div>
+        <div><strong>${u.downloadCount}</strong>downloads</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-add ${friendClass}" onclick="${friendOnclick}">
+          ${friendLabel}
+        </button>
+        <a class="btn-view" href="profile.html?uid=${u.uid}" title="View profile">
+          <i class="ti ti-eye"></i>
+        </a>
+      </div>
+    </div>`;
+}
+
+// ── Batch get all statuses ──
+async function batchGetStatuses(uids) {
+  const result = {};
+  if (!uids.length) return result;
+
+  // Friend statuses
+  try {
+    const fSnap = await db.collection('friendships')
+      .where('users', 'array-contains', currentUser.uid).get();
+    const friendUids = new Set();
+    fSnap.forEach(d => {
+      const other = d.data().users.find(u => u !== currentUser.uid);
+      if (other) friendUids.add(other);
+    });
+    uids.forEach(uid => {
+      if (friendUids.has(uid)) result[uid] = { ...(result[uid]||{}), friend: 'friends' };
+    });
+  } catch(e) {}
+
+  try {
+    // Pending sent
+    const sentSnap = await db.collection('friendRequests')
+      .where('from', '==', currentUser.uid)
+      .where('status', '==', 'pending').get();
+    sentSnap.forEach(d => {
+      const to = d.data().to;
+      if (uids.includes(to) && !(result[to]?.friend === 'friends'))
+        result[to] = { ...(result[to]||{}), friend: 'pending_sent' };
+    });
+    // Pending received
+    const recvSnap = await db.collection('friendRequests')
+      .where('to', '==', currentUser.uid)
+      .where('status', '==', 'pending').get();
+    recvSnap.forEach(d => {
+      const from = d.data().from;
+      if (uids.includes(from) && !(result[from]?.friend === 'friends'))
+        result[from] = { ...(result[from]||{}), friend: 'pending_received' };
+    });
+  } catch(e) {}
+
+  return result;
+}
+
+// ── Friend actions ──
+async function addFriend(uid, name, email, btn) {
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader spin"></i>';
+  try {
+    await db.collection('friendRequests').add({
+      from: currentUser.uid,
+      fromName: currentUser.displayName || currentUser.email,
+      fromEmail: currentUser.email,
+      to: uid, toName: name, toEmail: email,
+      status: 'pending',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    btn.className = 'btn-add pending';
+    btn.innerHTML = '<i class="ti ti-clock"></i> Pending';
+    btn.onclick = () => cancelRequest(uid, btn);
+    btn.disabled = false;
+    showToast('Friend request sent! 🎉', 'success');
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-user-plus"></i> Add Friend';
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+async function cancelRequest(uid, btn) {
+  btn.disabled = true;
+  try {
+    const snap = await db.collection('friendRequests')
+      .where('from', '==', currentUser.uid)
+      .where('to', '==', uid)
+      .where('status', '==', 'pending').get();
+    for (const d of snap.docs) await d.ref.delete();
+    btn.className = 'btn-add';
+    btn.innerHTML = '<i class="ti ti-user-plus"></i> Add Friend';
+    btn.disabled = false;
+    // fix onclick
+    const user = allUsers.find(u => u.uid === uid);
+    if (user) btn.onclick = () => addFriend(uid, user.name, user.email, btn);
+    showToast('Request cancelled', 'success');
+  } catch(e) {
+    btn.disabled = false;
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+async function acceptRequest(uid, btn) {
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader spin"></i>';
+  try {
+    const snap = await db.collection('friendRequests')
+      .where('from', '==', uid)
+      .where('to', '==', currentUser.uid)
+      .where('status', '==', 'pending').get();
+    if (snap.empty) { showToast('Request not found', 'error'); btn.disabled=false; return; }
+    const reqRef = snap.docs[0].ref;
+    const reqData = snap.docs[0].data();
+    await reqRef.update({ status: 'accepted' });
+    await db.collection('friendships').add({
+      users: [currentUser.uid, uid].sort(),
+      names: {
+        [currentUser.uid]: currentUser.displayName || currentUser.email,
+        [uid]: reqData.fromName
+      },
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    btn.className = 'btn-add friends';
+    btn.innerHTML = '<i class="ti ti-user-check"></i> Friends';
+    btn.disabled = false;
+    btn.onclick = () => removeFriend(uid, btn);
+    showToast('You are now friends! 🎉', 'success');
+    loadRequests(); // refresh badge
+  } catch(e) {
+    btn.disabled = false;
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+async function removeFriend(uid, btn) {
+  if (!confirm('Remove this friend?')) return;
+  btn.disabled = true;
+  try {
+    const snap = await db.collection('friendships')
+      .where('users', 'array-contains', currentUser.uid).get();
+    for (const d of snap.docs) {
+      if (d.data().users.includes(uid)) await d.ref.delete();
+    }
+    btn.className = 'btn-add';
+    btn.innerHTML = '<i class="ti ti-user-plus"></i> Add Friend';
+    btn.disabled = false;
+    const user = allUsers.find(u => u.uid === uid);
+    if (user) btn.onclick = () => addFriend(uid, user.name, user.email, btn);
+    showToast('Friend removed', 'success');
+    loadFriends();
+  } catch(e) {
+    btn.disabled = false;
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── Load Pending Requests ──
+async function loadRequests() {
+  try {
+    // Incoming
+    const inSnap = await db.collection('friendRequests')
+      .where('to', '==', currentUser.uid)
+      .where('status', '==', 'pending').get();
+
+    const reqBadge = document.getElementById('reqBadge');
+    if (inSnap.size > 0) {
+      reqBadge.textContent = inSnap.size;
+      reqBadge.style.display = 'inline-flex';
+    } else {
+      reqBadge.style.display = 'none';
+    }
+
+    const reqList = document.getElementById('requestsList');
+    if (inSnap.empty) {
+      reqList.innerHTML = `<div class="empty-box"><i class="ti ti-inbox"></i><h3>No pending requests</h3><p>All clear!</p></div>`;
+    } else {
+      reqList.innerHTML = inSnap.docs.map(d => {
+        const r = d.data();
+        const color = avatarColor(r.from);
+        const init  = initials(r.fromName);
+        return `
+          <div class="request-item" id="req-${d.id}">
+            <div class="request-av" style="background:${color}">${init}</div>
+            <div class="request-info">
+              <div class="request-name">${escHtml(r.fromName||'Unknown')}</div>
+              <div class="request-meta">
+                <i class="ti ti-mail" style="font-size:12px"></i> ${escHtml(r.fromEmail||'')}
+              </div>
+            </div>
+            <div class="request-actions">
+              <button class="btn-accept" onclick="acceptReqById('${d.id}','${r.from}',this)">
+                <i class="ti ti-check"></i> Accept
+              </button>
+              <button class="btn-decline" onclick="declineReqById('${d.id}',this)">
+                Decline
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // Sent
+    const sentSnap = await db.collection('friendRequests')
+      .where('from', '==', currentUser.uid)
+      .where('status', '==', 'pending').get();
+    const sentList = document.getElementById('sentList');
+    if (sentSnap.empty) {
+      sentList.innerHTML = `<div class="empty-box"><i class="ti ti-send"></i><h3>No sent requests</h3><p>You haven't sent any pending requests.</p></div>`;
+    } else {
+      sentList.innerHTML = sentSnap.docs.map(d => {
+        const r = d.data();
+        const color = avatarColor(r.to);
+        const init  = initials(r.toName);
+        return `
+          <div class="request-item" id="sent-${d.id}">
+            <div class="request-av" style="background:${color}">${init}</div>
+            <div class="request-info">
+              <div class="request-name">${escHtml(r.toName||'Unknown')}</div>
+              <div class="request-meta">
+                <i class="ti ti-clock" style="font-size:12px"></i> Pending
+              </div>
+            </div>
+            <div class="request-actions">
+              <button class="btn-decline" onclick="cancelReqById('${d.id}',this)">
+                Cancel
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+  } catch(e) {
+    document.getElementById('requestsList').innerHTML = `<div class="empty-box"><i class="ti ti-alert-circle"></i><h3>Could not load</h3><p>${escHtml(e.message)}</p></div>`;
+  }
+}
+
+async function acceptReqById(docId, fromUid, btn) {
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader spin"></i>';
+  try {
+    const ref = db.collection('friendRequests').doc(docId);
+    const snap = await ref.get();
+    if (!snap.exists) return;
+    const data = snap.data();
+    await ref.update({ status: 'accepted' });
+    await db.collection('friendships').add({
+      users: [currentUser.uid, fromUid].sort(),
+      names: {
+        [currentUser.uid]: currentUser.displayName || currentUser.email,
+        [fromUid]: data.fromName
+      },
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('req-'+docId)?.remove();
+    showToast('Friend added! 🎉', 'success');
+    loadRequests();
+    loadFriends();
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+async function declineReqById(docId, btn) {
+  btn.disabled = true;
+  try {
+    await db.collection('friendRequests').doc(docId).update({ status: 'declined' });
+    document.getElementById('req-'+docId)?.remove();
+    showToast('Request declined', 'success');
+    loadRequests();
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+async function cancelReqById(docId, btn) {
+  btn.disabled = true;
+  try {
+    await db.collection('friendRequests').doc(docId).delete();
+    document.getElementById('sent-'+docId)?.remove();
+    showToast('Request cancelled', 'success');
+    loadRequests();
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ── Load Friends ──
+async function loadFriends() {
+  const grid = document.getElementById('friendsGrid');
+  try {
+    const snap = await db.collection('friendships')
+      .where('users', 'array-contains', currentUser.uid).get();
+    if (snap.empty) {
+      grid.innerHTML = `
+        <div class="empty-box" style="grid-column:1/-1">
+          <i class="ti ti-user-plus"></i>
+          <h3>No friends yet</h3>
+          <p>Go to Suggestions to find people studying the same subjects as you.</p>
+        </div>`;
+      return;
+    }
+    grid.innerHTML = snap.docs.map(d => {
+      const data  = d.data();
+      const uid   = data.users.find(u => u !== currentUser.uid);
+      const name  = data.names?.[uid] || 'Unknown';
+      const color = avatarColor(uid);
+      return `
+        <a class="friend-tile" href="profile.html?uid=${uid}">
+          <div class="friend-tile-av" style="background:${color}">${initials(name)}</div>
+          <div class="friend-tile-body">
+            <div class="friend-tile-name">${escHtml(name)}</div>
+            <div class="friend-tile-sub">Friends</div>
+          </div>
+          <div class="friend-tile-actions" onclick="event.preventDefault()">
+            <button class="mini-btn" title="View profile" onclick="location.href='profile.html?uid=${uid}'">
+              <i class="ti ti-eye"></i>
+            </button>
+            <button class="mini-btn del" title="Remove friend" onclick="removeFriendById('${d.id}',this)">
+              <i class="ti ti-user-minus"></i>
+            </button>
+          </div>
+        </a>`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = `<div class="empty-box" style="grid-column:1/-1"><i class="ti ti-alert-circle"></i><h3>Could not load</h3><p>${escHtml(e.message)}</p></div>`;
+  }
+}
+
+async function removeFriendById(friendshipId, btn) {
+  if (!confirm('Remove this friend?')) return;
+  btn.disabled = true;
+  try {
+    await db.collection('friendships').doc(friendshipId).delete();
+    showToast('Friend removed', 'success');
+    loadFriends();
+  } catch(e) { showToast('Error: '+e.message,'error'); btn.disabled=false; }
+}
+
+// ── Load Following ──
+async function loadFollowing() {
+  const grid = document.getElementById('followingGrid');
+  try {
+    const snap = await db.collection('follows')
+      .where('followerId', '==', currentUser.uid).get();
+    if (snap.empty) {
+      grid.innerHTML = `
+        <div class="empty-box" style="grid-column:1/-1">
+          <i class="ti ti-rss"></i>
+          <h3>Not following anyone yet</h3>
+          <p>Visit someone's profile or go to Suggestions to start following learners.</p>
+        </div>`;
+      return;
+    }
+    grid.innerHTML = snap.docs.map(d => {
+      const data  = d.data();
+      const color = avatarColor(data.followingId);
+      return `
+        <a class="friend-tile" href="profile.html?uid=${data.followingId}">
+          <div class="friend-tile-av" style="background:${color}">${initials(data.followingName)}</div>
+          <div class="friend-tile-body">
+            <div class="friend-tile-name">${escHtml(data.followingName||'Unknown')}</div>
+            <div class="friend-tile-sub">Following</div>
+          </div>
+          <div class="friend-tile-actions" onclick="event.preventDefault()">
+            <button class="mini-btn del" title="Unfollow" onclick="unfollowById('${d.id}',this)">
+              <i class="ti ti-x"></i>
+            </button>
+          </div>
+        </a>`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = `<div class="empty-box" style="grid-column:1/-1"><i class="ti ti-alert-circle"></i><h3>Could not load</h3></div>`;
+  }
+}
+
+async function unfollowById(followId, btn) {
+  if (!confirm('Unfollow this person?')) return;
+  btn.disabled = true;
+  try {
+    await db.collection('follows').doc(followId).delete();
+    showToast('Unfollowed', 'success');
+    loadFollowing();
+  } catch(e) { showToast('Error: '+e.message,'error'); btn.disabled=false; }
+}
+
+// ── Tabs ──
+function switchTab(tab) {
+  currentTab = tab;
+  ['suggestions','requests','friends','following'].forEach(t => {
+    document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).style.display = t === tab ? 'block' : 'none';
+    document.querySelector(`[data-tab="${t}"]`)?.classList.toggle('active', t === tab);
+  });
+}
+
+// ── Toast ──
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').className = type==='success' ? 'ti ti-check' : 'ti ti-alert-circle';
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// Spinner CSS
+const s = document.createElement('style');
+s.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+document.head.appendChild(s);
+</script>
+
+<script src="friends.js"></script>
+<script src="notifications.js"></script>
+</body>
+</html>
