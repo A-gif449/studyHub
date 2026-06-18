@@ -28,7 +28,7 @@
  *   SHFriends.renderButton(targetUid, targetName, targetEmail, containerEl)
  *   SHFriends.openFriendsPage()   — navigate to friends.html
  */
-
+//friends.js
 window.SHFriends = (function () {
   "use strict";
 

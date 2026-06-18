@@ -1,27 +1,4 @@
 //notifications.js
-/**
- * StudyHub Notification System
- * Drop this script into every page (after Firebase SDKs + config).
- * It injects a bell icon into the nav and manages unread-PDF counters
- * via localStorage so state persists across sessions on the same browser.
- *
- * HOW IT WORKS
- * ─────────────
- * • When a PDF is added to Firestore it gets an `uploadedAt` timestamp.
- * • We store `studyhub_last_seen` (ISO string) in localStorage —
- *   the moment the user last opened the notification panel.
- * • Any PDF whose `uploadedAt` is after `last_seen` counts as "new".
- * • Opening the panel resets the counter (updates `last_seen`).
- *
- * USAGE
- * ─────
- * 1. Copy this file next to your HTML files.
- * 2. Add  <script src="notifications.js"></script>
- *    AFTER the Firebase SDKs and AFTER window.FIREBASE_CONFIG is defined
- *    but BEFORE </body>.
- * 3. The script finds the <nav> element automatically and appends the bell.
- */
-
 (function () {
   "use strict";
 

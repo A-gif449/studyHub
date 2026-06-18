@@ -789,14 +789,46 @@ function renderProfile(p, viewer){
   }
 
   // Follower avatars (placeholder colors)
-  const mockColors = ['#6C63FF','#38BDF8','#34D399','#F472B6'];
-  const mockLabels = ['A','B','C','D'];
-  document.getElementById('followerAvatars').innerHTML = mockLabels.map((l,i)=>`
-    <div class="follower-av" style="background:${mockColors[i]}">${l}</div>
-  `).join('');
-  document.getElementById('followerCount').textContent   = '—';
-  document.getElementById('followingCount').textContent  = '—';
+// Real follower/following counts + avatars from Firestore
+if (typeof SHFriends !== 'undefined') {
+  SHFriends.init(viewer);
 
+  // Get follower count + their initials for avatars
+  db.collection('follows')
+    .where('followingId', '==', p.uid)
+    .limit(4)
+    .get()
+    .then(snap => {
+      document.getElementById('followerCount').textContent = snap.size;
+      document.getElementById('statFollowers').textContent = snap.size;
+      const avatarColors = ['#6C63FF','#38BDF8','#34D399','#F472B6'];
+      document.getElementById('followerAvatars').innerHTML = snap.docs.map((d, i) => {
+        const name = d.data().followerName || '?';
+        const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        return `<div class="follower-av" style="background:${avatarColors[i % avatarColors.length]}" title="${escHtml(name)}">${initials}</div>`;
+      }).join('');
+    })
+    .catch(() => {
+      document.getElementById('followerCount').textContent = '0';
+      document.getElementById('followerAvatars').innerHTML = '';
+    });
+
+  // Get following count
+  db.collection('follows')
+    .where('followerId', '==', p.uid)
+    .get()
+    .then(snap => {
+      document.getElementById('followingCount').textContent = snap.size;
+    })
+    .catch(() => {
+      document.getElementById('followingCount').textContent = '0';
+    });
+
+} else {
+  document.getElementById('followerCount').textContent  = '0';
+  document.getElementById('followingCount').textContent = '0';
+  document.getElementById('followerAvatars').innerHTML  = '';
+}
   // Actions
   const actionsEl = document.getElementById('profileActions');
   if(isOwn){
@@ -809,14 +841,26 @@ function renderProfile(p, viewer){
       </button>
       <div class="profile-joined"><i class="ti ti-eye"></i> Viewing your public profile</div>`;
   } else {
+    // Render the friend/follow buttons via SHFriends
     actionsEl.innerHTML = `
-      <button class="btn-follow" id="followBtn" onclick="handleFollow()">
-        <i class="ti ti-user-plus"></i> Follow
-      </button>
+      <div id="shFriendsBtnWrap"></div>
       <button class="btn-message" onclick="window.location.href='chat.html'">
         <i class="ti ti-message-circle"></i> Message
       </button>
-      <div class="profile-joined"><i class="ti ti-calendar"></i> <span>Member since ${document.getElementById('aboutJoined').textContent}</span></div>`;
+      <div class="profile-joined"><i class="ti ti-calendar"></i>
+        <span>Member since ${document.getElementById('aboutJoined').textContent}</span>
+      </div>`;
+
+    // Init SHFriends with current user and render the button
+    if (typeof SHFriends !== 'undefined' && viewer) {
+      SHFriends.init(viewer);
+      SHFriends.renderButton(
+        p.uid,
+        p.displayName,
+        p.email,
+        document.getElementById('shFriendsBtnWrap')
+      );
+    }
   }
 
   // Render activity
@@ -898,6 +942,7 @@ function showToast(msg, type='success'){
   setTimeout(()=>t.classList.remove('show'),3200);
 }
 </script>
+<script src="friends.js"></script>
 <script src="notifications.js"></script>
 </body>
 </html>
