@@ -1,3 +1,4 @@
+//friends.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -911,6 +912,9 @@ function showToast(msg, type='success') {
 const s = document.createElement('style');
 s.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
 document.head.appendChild(s);
+// Auto-switch to requests tab if URL says so
+const _urlTab = new URLSearchParams(location.search).get('tab');
+if (_urlTab) switchTab(_urlTab);
 </script>
 
 <script src="friends.js"></script>

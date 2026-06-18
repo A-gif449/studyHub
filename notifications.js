@@ -8,7 +8,8 @@
 
   /* ─── state ─── */
   let unread     = [];   // array of new PDF objects
-  let allRecent  = [];   // last MAX_SHOW PDFs (for the list)
+  let allRecent  = []; 
+  let friendRequestNotifs = [];  // last MAX_SHOW PDFs (for the list)
   let panelOpen  = false;
 
   /* ─── wait for DOM + Firebase ─── */
@@ -390,8 +391,7 @@ function buildBell() {
   /* ══════════════════════════════════════════════════════════
      3.  FIRESTORE LISTENER
      ══════════════════════════════════════════════════════════ */
-  function subscribeToFirestore() {
-    // Wait until firebase is available
+function subscribeToFirestore() {
     if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
       setTimeout(subscribeToFirestore, 300);
       return;
@@ -399,6 +399,7 @@ function buildBell() {
 
     const db = firebase.firestore();
 
+    // Listen to new PDFs
     db.collection("pdfs")
       .orderBy("uploadedAt", "desc")
       .limit(MAX_SHOW)
@@ -415,6 +416,24 @@ function buildBell() {
           console.warn("[StudyHub Notif] Firestore error:", err.message);
         }
       );
+
+    // Listen to incoming friend requests for the current user
+    auth.onAuthStateChanged(function (user) {
+      if (!user) return;
+      db.collection("friendRequests")
+        .where("to", "==", user.uid)
+        .where("status", "==", "pending")
+        .onSnapshot(function (snap) {
+          friendRequestNotifs = snap.docs.map(function (d) {
+            return Object.assign({ id: d.id, _type: "friendRequest" }, d.data());
+          });
+          computeUnread();
+          renderList();
+          updateBadge();
+        }, function (err) {
+          console.warn("[StudyHub Notif] friendRequests error:", err.message);
+        });
+    });
   }
 
   /* ══════════════════════════════════════════════════════════
@@ -425,13 +444,15 @@ function buildBell() {
     return v ? new Date(v) : new Date(0); // epoch = first ever visit
   }
 
-  function computeUnread() {
+function computeUnread() {
     const lastSeen = getLastSeen();
-    unread = allRecent.filter(function (pdf) {
+    const unreadPdfs = allRecent.filter(function (pdf) {
       if (!pdf.uploadedAt) return false;
       const ts = pdf.uploadedAt.toDate ? pdf.uploadedAt.toDate() : new Date(pdf.uploadedAt);
       return ts > lastSeen;
     });
+    // All pending friend requests are always "unread" until accepted/declined
+    unread = [...unreadPdfs, ...friendRequestNotifs];
   }
 
   function markAllRead() {
@@ -530,7 +551,24 @@ function buildBell() {
       return;
     }
 
-    list.innerHTML = allRecent.map(function (pdf) {
+    // Render friend request notifications first
+    const friendReqHtml = friendRequestNotifs.map(function (req) {
+      return `
+        <div class="sh-item sh-new" onclick="window._shOpenFriends()">
+          <div class="sh-emoji">👋</div>
+          <div class="sh-item-body">
+            <div class="sh-item-title">${esc(req.fromName || "Someone")} sent you a friend request</div>
+            <div class="sh-item-meta">
+              <span class="sh-tag">Friend Request</span>
+              <span>· Tap to respond</span>
+            </div>
+          </div>
+          <div class="sh-dot"></div>
+        </div>`;
+    }).join("");
+
+    // Render PDF notifications
+    const pdfHtml = allRecent.map(function (pdf) {
       const emoji = subjectEmoji[pdf.subject] || subjectEmoji["Default"];
       const _new  = isNew(pdf);
       let ago = "";
@@ -553,9 +591,17 @@ function buildBell() {
           <div class="sh-dot"></div>
         </div>`;
     }).join("");
+
+    list.innerHTML = friendReqHtml + pdfHtml;
   }
 
   /* ── open a PDF ── */
+
+  window._shOpenFriends = function () {
+    closePanel();
+    window.location.href = "friends.html?tab=requests";
+  };
+
   window._shOpenPdf = function (id) {
     closePanel();
     markAllRead();
