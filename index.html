@@ -567,22 +567,21 @@ function updateNav(user) {
       ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>`
       : '';
     section.innerHTML = `
-      section.innerHTML = `
-    <div class="dropdown" id="userDropdown">
-      <div class="user-pill" onclick="toggleDropdown()">
-        <div class="user-av">${initials}</div>
-        <span class="user-name">${user.displayName || user.email.split('@')[0]}</span>
-        <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i>
-      </div>
-      <div class="dropdown-menu">
-        <div style="padding:8px 12px 4px;font-size:12px;color:var(--text3)">${user.email}</div>
-        <div class="dropdown-divider"></div>
-        ${adminLink}
-        <a class="dropdown-item" href="profile.html"><i class="ti ti-user"></i> My Profile</a>
-        <div class="dropdown-divider"></div>
-        <button class="dropdown-item danger" onclick="handleLogout()"><i class="ti ti-logout"></i> Sign Out</button>
-      </div>
-    </div>`;
+      <div class="dropdown" id="userDropdown">
+        <div class="user-pill" onclick="toggleDropdown()">
+          <div class="user-av">${initials}</div>
+          <span class="user-name">${user.displayName || user.email.split('@')[0]}</span>
+          <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i>
+        </div>
+        <div class="dropdown-menu">
+          <div style="padding:8px 12px 4px;font-size:12px;color:var(--text3)">${user.email}</div>
+          <div class="dropdown-divider"></div>
+          ${adminLink}
+          <a class="dropdown-item" href="profile.html"><i class="ti ti-user"></i> My Profile</a>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item danger" onclick="handleLogout()"><i class="ti ti-logout"></i> Sign Out</button>
+        </div>
+      </div>`;
   } else {
     section.innerHTML = `
       <button class="btn-ghost" onclick="openModal('login')">Sign In</button>
