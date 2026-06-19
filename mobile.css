@@ -374,8 +374,8 @@ nav{
 .nav-logo{
   gap:8px !important;
   font-size:16px !important;
-  flex:1;
   min-width:0;
+  max-width:180px;
 }
 
 .nav-logo img,
@@ -645,7 +645,7 @@ nav{
    VIEWER PAGE
    ════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .viewer-page { padding-top: var(--mobile-nav-h) !important; }
+  .viewer-page { padding-top: calc(var(--mobile-nav-h) + 10px) !important; }
   .viewer-toolbar {
     padding: 12px 14px !important;
     gap: 12px !important;
