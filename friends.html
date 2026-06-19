@@ -497,6 +497,14 @@ function buildPersonCard(u, status) {
     friendOnclick = `acceptRequest('${u.uid}',this)`;
   }
 
+  // Follow button label/class
+  const isFollowing = status.following === true;
+  const followLabel = isFollowing
+    ? '<i class="ti ti-bell-check"></i> Following'
+    : '<i class="ti ti-bell-plus"></i> Follow';
+  const followClass = isFollowing ? 'follow-active' : '';
+  const followOnclick = `toggleFollowCard('${u.uid}','${escHtml(u.name)}',this)`;
+
   const subjects = u.subjects.slice(0,3).map(s =>
     `<span class="person-subject-chip">${escHtml(s)}</span>`
   ).join('');
@@ -516,9 +524,12 @@ function buildPersonCard(u, status) {
         <div><strong>${u.viewCount}</strong>views</div>
         <div><strong>${u.downloadCount}</strong>downloads</div>
       </div>
-      <div class="card-actions">
+      <div class="card-actions" style="flex-wrap:wrap">
         <button class="btn-add ${friendClass}" onclick="${friendOnclick}">
           ${friendLabel}
+        </button>
+        <button class="btn-add ${followClass}" style="${isFollowing ? 'background:rgba(56,189,248,0.12);color:var(--accent3);border:1px solid rgba(56,189,248,0.3);box-shadow:none' : 'background:rgba(255,255,255,0.05);color:var(--text2);border:1px solid var(--border2);box-shadow:none'}" onclick="${followOnclick}">
+          ${followLabel}
         </button>
         <a class="btn-view" href="profile.html?uid=${u.uid}" title="View profile">
           <i class="ti ti-eye"></i>
@@ -567,8 +578,60 @@ async function batchGetStatuses(uids) {
     });
   } catch(e) {}
 
+  // Follow statuses
+  try {
+    const followSnap = await db.collection('follows')
+      .where('followerId', '==', currentUser.uid).get();
+    followSnap.forEach(d => {
+      const followingId = d.data().followingId;
+      if (uids.includes(followingId)) {
+        result[followingId] = { ...(result[followingId]||{}), following: true };
+      }
+    });
+  } catch(e) {}
+
   return result;
 }
+
+async function toggleFollowCard(uid, name, btn) {
+  btn.disabled = true;
+  try {
+    const snap = await db.collection('follows')
+      .where('followerId', '==', currentUser.uid)
+      .where('followingId', '==', uid).get();
+
+    if (snap.empty) {
+      await db.collection('follows').add({
+        followerId: currentUser.uid,
+        followerName: currentUser.displayName || currentUser.email,
+        followerEmail: currentUser.email,
+        followingId: uid,
+        followingName: name,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      btn.classList.add('follow-active');
+      btn.style.background = 'rgba(56,189,248,0.12)';
+      btn.style.color = 'var(--accent3)';
+      btn.style.border = '1px solid rgba(56,189,248,0.3)';
+      btn.innerHTML = '<i class="ti ti-bell-check"></i> Following';
+      btn.onclick = () => toggleFollowCard(uid, name, btn);
+      showToast('Now following ' + name + ' 🔔', 'success');
+    } else {
+      for (const d of snap.docs) await d.ref.delete();
+      btn.classList.remove('follow-active');
+      btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.color = 'var(--text2)';
+      btn.style.border = '1px solid var(--border2)';
+      btn.innerHTML = '<i class="ti ti-bell-plus"></i> Follow';
+      btn.onclick = () => toggleFollowCard(uid, name, btn);
+      showToast('Unfollowed', 'success');
+    }
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+  btn.disabled = false;
+}
+
 
 // ── Friend actions ──
 async function addFriend(uid, name, email, btn) {

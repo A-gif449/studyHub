@@ -694,16 +694,29 @@ async function handleUpload(){
 }
 
 // ── Notify Followers via EmailJS ──
+// ── Notify Followers via EmailJS (DEBUG VERSION) ──
 async function notifyFollowers(pdf) {
   try {
     const adminUid = auth.currentUser.uid;
+    console.log('🔍 [notifyFollowers] Admin UID:', adminUid);
+    console.log('🔍 [notifyFollowers] Admin email:', auth.currentUser.email);
 
     // Get all users following the admin
     const followsSnap = await db.collection('follows')
       .where('followingId', '==', adminUid)
       .get();
 
+    console.log('🔍 [notifyFollowers] Matching follow docs:', followsSnap.size);
+    followsSnap.forEach(d => console.log('   →', d.id, JSON.stringify(d.data())));
+
     if (followsSnap.empty) {
+      // Dump the whole collection so we can see what UIDs actually exist
+      const allFollows = await db.collection('follows').limit(25).get();
+      console.log('🔍 [notifyFollowers] Entire follows collection (up to 25 docs):');
+      if (allFollows.empty) {
+        console.log('   (collection is completely empty — no one has ever followed anyone)');
+      }
+      allFollows.forEach(d => console.log('   →', d.id, JSON.stringify(d.data())));
       showToast('PDF published! (No followers yet) 🎉', 'success');
       return;
     }
@@ -714,10 +727,9 @@ async function notifyFollowers(pdf) {
 
     for (const doc of followsSnap.docs) {
       const data = doc.data();
-      let email = data.followerEmail || null;   // set if friends.js was updated
+      let email = data.followerEmail || null;
       let name  = data.followerName  || 'Learner';
 
-      // Fallback: find email from views collection
       if (!email) {
         try {
           const viewSnap = await db.collection('views')
@@ -730,7 +742,6 @@ async function notifyFollowers(pdf) {
         } catch(e) {}
       }
 
-      // Fallback: find email from downloads collection
       if (!email) {
         try {
           const dlSnap = await db.collection('downloads')
@@ -744,12 +755,11 @@ async function notifyFollowers(pdf) {
       }
 
       if (!email) {
-        console.warn('No email found for follower:', name);
+        console.warn('No email found for follower:', name, data.followerId);
         failed++;
         continue;
       }
 
-      // Send email via EmailJS
       try {
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
           to_email:    email,
@@ -777,8 +787,7 @@ async function notifyFollowers(pdf) {
     }
 
   } catch(err) {
-    // Non-fatal — PDF is already saved
-    console.warn('notifyFollowers error:', err);
+    console.error('notifyFollowers error:', err);
     showToast('PDF published! (Email notify failed) 🎉', 'success');
   }
 }
