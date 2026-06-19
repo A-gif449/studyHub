@@ -124,6 +124,139 @@
     .back-link span{display:none}
     .gate-card{padding:26px}
   }
+
+/* ════════════════════════════════════════
+   ENGAGEMENT BAR (like / share / subscribe)
+   Sits right under the toolbar, above the PDF
+   ════════════════════════════════════════ */
+.engage-bar{
+  flex-shrink:0;
+  padding:12px 5%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.015);
+}
+.engage-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.engage-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:9px 16px;border-radius:99px;
+  border:1px solid var(--border2);
+  background:rgba(255,255,255,0.03);
+  color:var(--text2);font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .2s;
+  white-space:nowrap;
+}
+.engage-btn:hover{border-color:rgba(255,255,255,0.25);color:var(--text);background:rgba(255,255,255,0.06)}
+.engage-btn i{font-size:15px}
+.engage-btn.like-btn.active{
+  background:rgba(248,113,113,0.12);
+  border-color:rgba(248,113,113,0.35);
+  color:var(--red);
+}
+.engage-btn.like-btn.active i{color:var(--red)}
+.engage-btn.like-btn.pulse{animation:likePulse .4s ease}
+@keyframes likePulse{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+.engage-btn.sub-btn.active{
+  background:rgba(108,99,255,0.14);
+  border-color:rgba(108,99,255,0.4);
+  color:var(--accent2);
+}
+.engage-count{font-size:12px;color:var(--text3);font-weight:700}
+.engage-btn.like-btn.active .engage-count{color:var(--red)}
+.engage-right{display:flex;align-items:center;gap:8px;position:relative}
+.share-menu{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--card2);border:1px solid var(--border2);border-radius:14px;
+  padding:6px;min-width:190px;z-index:50;box-shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+.share-menu.open{display:block}
+.share-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;
+  font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;
+  border:none;background:none;width:100%;font-family:inherit;text-decoration:none;
+}
+.share-item:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.share-item i{font-size:15px;width:18px;text-align:center;color:var(--accent2)}
+
+/* ════════════════════════════════════════
+   COMMENTS SECTION (below the PDF)
+   ════════════════════════════════════════ */
+.comments-section{
+  flex-shrink:0;
+  padding:24px 5% 50px;
+  border-top:1px solid var(--border);
+}
+.comments-heading{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Syne',sans-serif;font-size:17px;font-weight:800;
+  margin-bottom:18px;
+}
+.comments-heading .c-count{
+  font-size:12px;font-weight:700;color:var(--accent2);
+  background:rgba(108,99,255,0.12);padding:2px 10px;border-radius:99px;
+}
+.comment-form{display:flex;gap:12px;margin-bottom:24px;align-items:flex-start}
+.comment-av{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;
+}
+.comment-input-wrap{flex:1;display:flex;flex-direction:column;gap:8px}
+.comment-textarea{
+  width:100%;padding:11px 14px;background:var(--bg2);
+  border:1px solid var(--border2);border-radius:12px;color:var(--text);
+  font-size:13.5px;font-family:inherit;outline:none;resize:vertical;
+  min-height:44px;max-height:140px;line-height:1.5;transition:border-color .2s;
+}
+.comment-textarea:focus{border-color:var(--accent)}
+.comment-form-actions{display:flex;justify-content:flex-end;gap:8px}
+.comment-submit{
+  padding:8px 18px;border-radius:9px;
+  background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;
+  border:none;font-size:12.5px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all .2s;
+}
+.comment-submit:hover{transform:translateY(-1px)}
+.comment-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+.comments-list{display:flex;flex-direction:column;gap:4px}
+.comment-item{display:flex;gap:12px;padding:14px 4px;border-bottom:1px solid var(--border)}
+.comment-item:last-child{border-bottom:none}
+.comment-body{flex:1;min-width:0}
+.comment-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.comment-name{font-size:13px;font-weight:700;color:var(--text)}
+.comment-name .admin-chip{
+  padding:1px 7px;border-radius:99px;background:rgba(248,113,113,0.12);
+  color:var(--red);font-size:9px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.4px;margin-left:4px;
+}
+.comment-time{font-size:11px;color:var(--text3)}
+.comment-text{font-size:13.5px;color:var(--text2);line-height:1.6;word-break:break-word;white-space:pre-wrap}
+.comment-del{
+  width:26px;height:26px;border-radius:7px;border:1px solid transparent;
+  background:transparent;color:var(--text3);display:flex;align-items:center;
+  justify-content:center;font-size:13px;cursor:pointer;transition:all .2s;
+  flex-shrink:0;opacity:0;
+}
+.comment-item:hover .comment-del{opacity:1}
+.comment-del:hover{border-color:rgba(248,113,113,0.35);color:var(--red);background:rgba(248,113,113,0.08)}
+.comments-empty{padding:30px 10px;text-align:center;color:var(--text3);font-size:13px}
+.comments-empty i{font-size:30px;display:block;margin-bottom:10px}
+.comments-loading{padding:20px;text-align:center;color:var(--text3);font-size:13px}
+
+@media(max-width:640px){
+  .engage-bar{padding:10px 16px}
+  .engage-btn{padding:8px 13px;font-size:12px}
+  .engage-btn span.btn-label{display:none}
+  .comments-section{padding:20px 16px 40px}
+}
+
+
+
 </style>
 <link rel="stylesheet" href="mobile.css"/>
 </head>
@@ -248,11 +381,69 @@
     </div>
   </div>
 
+  <!-- ════════════════════════════════════════
+     ENGAGEMENT BAR — paste this AFTER .viewer-toolbar
+     and BEFORE .details-panel in viewer.html
+     ════════════════════════════════════════ -->
+<div class="engage-bar" id="engageBar">
+  <div class="engage-left">
+    <button class="engage-btn like-btn" id="likeBtn" onclick="toggleLike()">
+      <i class="ti ti-heart" id="likeIcon"></i>
+      <span class="btn-label">Like</span>
+      <span class="engage-count" id="likeCount">0</span>
+    </button>
+    <button class="engage-btn sub-btn" id="subBtn" onclick="toggleSubscribe()">
+      <i class="ti ti-bell" id="subIcon"></i>
+      <span class="btn-label" id="subLabel">Subscribe</span>
+    </button>
+  </div>
+  <div class="engage-right">
+    <button class="engage-btn" onclick="toggleShareMenu()">
+      <i class="ti ti-share-2"></i>
+      <span class="btn-label">Share</span>
+    </button>
+    <div class="share-menu" id="shareMenu">
+      <button class="share-item" onclick="copyShareLink()"><i class="ti ti-link"></i> Copy link</button>
+      <a class="share-item" id="shareWhatsapp" href="#" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i> WhatsApp</a>
+      <a class="share-item" id="shareTwitter" href="#" target="_blank" rel="noopener"><i class="ti ti-brand-x"></i> Twitter / X</a>
+      <a class="share-item" id="shareEmail" href="#"><i class="ti ti-mail"></i> Email</a>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     COMMENTS SECTION — paste this AFTER
+     .viewer-stage (after the closing </div>
+     of pdf-frame-wrap's parent), i.e. right
+     before the closing </div> of #viewerUI
+     ════════════════════════════════════════ -->
+<div class="comments-section" id="commentsSection">
+  <div class="comments-heading">
+    <i class="ti ti-message-circle-2" style="color:var(--accent2)"></i>
+    Comments
+    <span class="c-count" id="commentCount">0</span>
+  </div>
+
+  <div class="comment-form" id="commentForm" style="display:none">
+    <div class="comment-av" id="commentFormAv">?</div>
+    <div class="comment-input-wrap">
+      <textarea class="comment-textarea" id="commentInput" placeholder="Share your thoughts on this material…" maxlength="500" oninput="autoGrowComment(this)"></textarea>
+      <div class="comment-form-actions">
+        <button class="comment-submit" id="commentSubmitBtn" onclick="postComment()">Post Comment</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="comments-list" id="commentsList">
+    <div class="comments-loading"><i class="ti ti-loader spin"></i> Loading comments…</div>
+  </div>
+</div>
+
   <div class="details-panel" id="detailsPanel">
     <div class="details-inner" id="detailsContent"></div>
   </div>
 
-  <div class="viewer-stage">
+<div class="viewer-stage">
     <div class="pdf-frame-wrap" id="pdfContainer">
       <div id="pdfLoading">
         <i class="ti ti-loader spin" style="font-size:32px;color:var(--accent2)"></i>
@@ -270,7 +461,34 @@
       </div>
     </div>
   </div>
+  <!-- 👆 this closes .viewer-stage -->
+
+  <!-- ▼▼▼ PASTE THE COMMENTS SECTION HTML HERE ▼▼▼ -->
+  <div class="comments-section" id="commentsSection">
+    <div class="comments-heading">
+      <i class="ti ti-message-circle-2" style="color:var(--accent2)"></i>
+      Comments
+      <span class="c-count" id="commentCount">0</span>
+    </div>
+
+    <div class="comment-form" id="commentForm" style="display:none">
+      <div class="comment-av" id="commentFormAv">?</div>
+      <div class="comment-input-wrap">
+        <textarea class="comment-textarea" id="commentInput" placeholder="Share your thoughts on this material…" maxlength="500" oninput="autoGrowComment(this)"></textarea>
+        <div class="comment-form-actions">
+          <button class="comment-submit" id="commentSubmitBtn" onclick="postComment()">Post Comment</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="comments-list" id="commentsList">
+      <div class="comments-loading"><i class="ti ti-loader spin"></i> Loading comments…</div>
+    </div>
+  </div>
+  <!-- ▲▲▲ END COMMENTS SECTION ▲▲▲ -->
+
 </div>
+<!-- 👆 this is the original closing </div> for #viewerUI -->
 
 <!-- TOAST -->
 <div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
@@ -387,6 +605,8 @@ function loadDoc(){
     showState('viewerUI');
     recordView(docId);
     startReadTimer();
+    initEngagement();
+    setupShareLinks();
   }).catch(err=>{
     showToast('Error loading material: '+err.message,'error');
     showState('notFoundState');
@@ -486,6 +706,281 @@ async function trackDownload(e) {
     }).catch(() => {});
   } catch(err) {
     console.warn('trackDownload error:', err);
+  }
+}
+
+// ════════════════════════════════════════
+// ENGAGEMENT: LIKES, SUBSCRIBE, SHARE, COMMENTS
+// Paste this whole block into viewer.html's <script>,
+// right after the existing trackDownload() function.
+// ════════════════════════════════════════
+
+let isLiked = false;
+let isSubscribed = false;
+let likeDocId = null;
+let subDocId = null;
+let commentsUnsub = null;
+
+function avatarColorEngage(uid) {
+  const colors = [
+    'linear-gradient(135deg,#6C63FF,#A78BFA)',
+    'linear-gradient(135deg,#38BDF8,#0EA5E9)',
+    'linear-gradient(135deg,#34D399,#059669)',
+    'linear-gradient(135deg,#F472B6,#EC4899)',
+    'linear-gradient(135deg,#FBBF24,#F59E0B)',
+    'linear-gradient(135deg,#F87171,#EF4444)',
+  ];
+  let hash = 0;
+  for (let c of (uid || 'x')) hash = (hash << 5) - hash + c.charCodeAt(0);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+// ── Called once the doc + user are both known (hook this into loadDoc / auth) ──
+function initEngagement() {
+  if (!currentUser || !docId) return;
+
+  likeDocId = `${docId}_${currentUser.uid}`;
+  subDocId  = `${currentUser.uid}_pdfLibrary`;
+
+  // show comment form, set avatar
+  const formEl = document.getElementById('commentForm');
+  if (formEl) formEl.style.display = 'flex';
+  const avEl = document.getElementById('commentFormAv');
+  if (avEl) {
+    avEl.style.background = avatarColorEngage(currentUser.uid);
+    avEl.textContent = (currentUser.displayName || currentUser.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  }
+
+  loadLikeState();
+  loadSubscribeState();
+  subscribeComments();
+}
+
+// ── LIKES ──
+async function loadLikeState() {
+  try {
+    const snap = await db.collection('pdfLikes').doc(likeDocId).get();
+    isLiked = snap.exists;
+  } catch (e) { isLiked = false; }
+  renderLikeBtn();
+
+  // live like count from the pdf doc itself (denormalized)
+  db.collection('pdfs').doc(docId).onSnapshot(snap => {
+    const count = snap.exists ? (snap.data().likeCount || 0) : 0;
+    document.getElementById('likeCount').textContent = count;
+  });
+}
+
+function renderLikeBtn() {
+  const btn = document.getElementById('likeBtn');
+  const icon = document.getElementById('likeIcon');
+  if (isLiked) {
+    btn.classList.add('active');
+    icon.className = 'ti ti-heart-filled';
+  } else {
+    btn.classList.remove('active');
+    icon.className = 'ti ti-heart';
+  }
+}
+
+async function toggleLike() {
+  if (!currentUser) { showToast('Sign in to like this material', 'error'); return; }
+  const btn = document.getElementById('likeBtn');
+  btn.classList.add('pulse');
+  setTimeout(() => btn.classList.remove('pulse'), 400);
+
+  const likeRef = db.collection('pdfLikes').doc(likeDocId);
+  const pdfRef  = db.collection('pdfs').doc(docId);
+
+  try {
+    if (isLiked) {
+      await likeRef.delete();
+      await pdfRef.update({ likeCount: firebase.firestore.FieldValue.increment(-1) });
+      isLiked = false;
+    } else {
+      await likeRef.set({
+        pdfId: docId,
+        userId: currentUser.uid,
+        userName: currentUser.displayName || currentUser.email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await pdfRef.update({ likeCount: firebase.firestore.FieldValue.increment(1) });
+      isLiked = true;
+    }
+    renderLikeBtn();
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── SUBSCRIBE (to all future uploads, i.e. the library) ──
+async function loadSubscribeState() {
+  try {
+    const snap = await db.collection('pdfSubscriptions').doc(subDocId).get();
+    isSubscribed = snap.exists;
+  } catch (e) { isSubscribed = false; }
+  renderSubBtn();
+}
+
+function renderSubBtn() {
+  const btn = document.getElementById('subBtn');
+  const icon = document.getElementById('subIcon');
+  const label = document.getElementById('subLabel');
+  if (isSubscribed) {
+    btn.classList.add('active');
+    icon.className = 'ti ti-bell-ringing';
+    label.textContent = 'Subscribed';
+  } else {
+    btn.classList.remove('active');
+    icon.className = 'ti ti-bell';
+    label.textContent = 'Subscribe';
+  }
+}
+
+async function toggleSubscribe() {
+  if (!currentUser) { showToast('Sign in to subscribe', 'error'); return; }
+  const subRef = db.collection('pdfSubscriptions').doc(subDocId);
+  try {
+    if (isSubscribed) {
+      await subRef.delete();
+      isSubscribed = false;
+      showToast('Unsubscribed', 'success');
+    } else {
+      await subRef.set({
+        userId: currentUser.uid,
+        userName: currentUser.displayName || currentUser.email,
+        userEmail: currentUser.email,
+        target: 'pdfLibrary',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      isSubscribed = true;
+      showToast('Subscribed! You\'ll get new material updates 🔔', 'success');
+    }
+    renderSubBtn();
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── SHARE ──
+function toggleShareMenu() {
+  document.getElementById('shareMenu').classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('shareMenu');
+  if (menu && !e.target.closest('.engage-right')) menu.classList.remove('open');
+});
+
+function getShareUrl() {
+  return `${location.origin}/viewer.html?id=${docId}`;
+}
+
+function copyShareLink() {
+  const url = getShareUrl();
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('Link copied to clipboard! 🔗', 'success');
+    document.getElementById('shareMenu').classList.remove('open');
+  }).catch(() => showToast('Could not copy link', 'error'));
+}
+
+function setupShareLinks() {
+  const url = getShareUrl();
+  const title = currentPdf?.title || 'this material';
+  document.getElementById('shareWhatsapp').href = `https://wa.me/?text=${encodeURIComponent(title + ' — ' + url)}`;
+  document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+  document.getElementById('shareEmail').href = `mailto:?subject=${encodeURIComponent(title + ' — StudyHub')}&body=${encodeURIComponent('Check this out: ' + url)}`;
+}
+
+// ── COMMENTS ──
+function autoGrowComment(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function subscribeComments() {
+  if (commentsUnsub) commentsUnsub();
+  commentsUnsub = db.collection('comments').doc(docId).collection('items')
+    .orderBy('createdAt', 'desc')
+    .onSnapshot(snap => {
+      renderComments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      document.getElementById('commentCount').textContent = snap.size;
+    }, err => {
+      console.warn('comments error:', err);
+      document.getElementById('commentsList').innerHTML =
+        `<div class="comments-empty"><i class="ti ti-alert-circle"></i>Could not load comments.</div>`;
+    });
+}
+
+function renderComments(items) {
+  const list = document.getElementById('commentsList');
+  if (!items.length) {
+    list.innerHTML = `<div class="comments-empty"><i class="ti ti-message-circle"></i>No comments yet. Be the first to share your thoughts!</div>`;
+    return;
+  }
+  list.innerHTML = items.map(c => {
+    const ts = c.createdAt ? new Date(c.createdAt.seconds * 1000) : new Date();
+    const ago = commentTimeAgo(ts);
+    const isAdminComment = window.ADMIN_EMAILS.includes(c.userEmail || '');
+    const canDelete = currentUser && (currentUser.uid === c.userId || isAdmin(currentUser));
+    return `
+      <div class="comment-item" id="comment-${c.id}">
+        <div class="comment-av" style="background:${avatarColorEngage(c.userId)}">
+          ${(c.userName || '?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}
+        </div>
+        <div class="comment-body">
+          <div class="comment-head">
+            <span class="comment-name">${escHtml(c.userName || 'Anonymous')}${isAdminComment ? '<span class="admin-chip">Admin</span>' : ''}</span>
+            <span class="comment-time">${ago}</span>
+          </div>
+          <div class="comment-text">${escHtml(c.text)}</div>
+        </div>
+        ${canDelete ? `<button class="comment-del" onclick="deleteComment('${c.id}')" title="Delete"><i class="ti ti-trash"></i></button>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function commentTimeAgo(date) {
+  const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+async function postComment() {
+  if (!currentUser) { showToast('Sign in to comment', 'error'); return; }
+  const input = document.getElementById('commentInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const btn = document.getElementById('commentSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Posting…';
+
+  try {
+    await db.collection('comments').doc(docId).collection('items').add({
+      text,
+      userId: currentUser.uid,
+      userName: currentUser.displayName || currentUser.email,
+      userEmail: currentUser.email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    input.value = '';
+    input.style.height = 'auto';
+  } catch (e) {
+    showToast('Error posting comment: ' + e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Post Comment';
+}
+
+async function deleteComment(commentId) {
+  if (!confirm('Delete this comment?')) return;
+  try {
+    await db.collection('comments').doc(docId).collection('items').doc(commentId).delete();
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
   }
 }
 
