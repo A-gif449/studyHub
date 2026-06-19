@@ -11,7 +11,7 @@
     buildHamburger();
     buildDrawer();
     watchAuth();
-     setTimeout(function() { renderDrawerContent(currentUser); }, 500);
+    //  setTimeout(function() { renderDrawerContent(currentUser); }, 500);
     // Chat-only: floating "rooms" shortcut for the sidebar list
     if (document.getElementById("roomsList")) {
       buildRoomsSheet();
