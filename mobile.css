@@ -86,8 +86,19 @@
   box-shadow: -24px 0 70px rgba(0,0,0,0.45);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden;        /* fixed: was "overflow: overflow" (invalid) */
+  min-height: 0;            /* fixed: needed so flex children can scroll */
   animation: drawerSlideIn .38s cubic-bezier(.25,.85,.35,1.15);
+}
+
+.sh-drawer-nav {
+  flex: 1 1 auto;
+  min-height: 0;            /* fixed: without this, flex:1 children won't scroll, they get pushed/collapsed */
+  padding: 14px 14px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  overflow-y: auto;
 }
 @keyframes drawerSlideIn {
   from { transform: translateX(105%) }
