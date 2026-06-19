@@ -347,8 +347,10 @@
 /* ════════════════════════════════════════════
    ≤ 768 px  — GLOBAL MOBILE
    ════════════════════════════════════════════ */
+
 @media(max-width:768px){
-  #sh-panel{
+
+#sh-panel{
     position: fixed !important;
     top: 60px !important;
     left: 8px !important;
@@ -356,8 +358,8 @@
     width: calc(100vw - 16px) !important;
     max-height: 70vh !important;
     border-radius: 16px !important;
+    z-index: 9999 !important;
   }
-}
 
 /* ── NAV ── */
   nav {
@@ -707,7 +709,7 @@
 /* ════════════════════════════════════════════
    NOTIFICATION PANEL  (responsive)
    ════════════════════════════════════════════ */
-@media (max-width: 480px) {
+/* @media (max-width: 480px) {
   #sh-panel {
     position: fixed !important;
     top: var(--mobile-nav-h) !important;
@@ -717,7 +719,7 @@
     max-height: 65vh !important;
     border-radius: 0 0 20px 20px !important;
   }
-}
+} */
 
 /* ════════════════════════════════════════════
    SMALL PHONES  ≤ 390px
