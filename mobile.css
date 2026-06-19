@@ -349,7 +349,7 @@
    ════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
-  /* ── NAV ── */
+/* ── NAV ── */
   nav {
     padding: 0 16px !important;
     height: var(--mobile-nav-h) !important;
@@ -359,11 +359,25 @@
 
   /* Hide desktop right-side items that appear in drawer */
   .nav-right {
-    gap: 6px !important;
-    align-items: center;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
   }
   #sh-notif-wrap {
-    margin-right: 2px;
+    display: inline-flex !important;
+    align-items: center;
+  }
+  #sh-bell-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+  }
+  #sh-hamburger {
+    width: 36px !important;
+    height: 36px !important;
+    margin-left: 4px !important;
   }
   .nav-right .btn-ghost,
   .nav-right .btn-primary,
