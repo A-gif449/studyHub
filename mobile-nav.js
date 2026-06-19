@@ -33,7 +33,7 @@
   /* ══════════════════════════════════════════
      1. HAMBURGER BUTTON
      ══════════════════════════════════════════ */
-  function buildHamburger() {
+function buildHamburger() {
     const nav = document.querySelector("nav");
     if (!nav || document.getElementById("sh-hamburger")) return;
 
@@ -47,8 +47,12 @@
       toggleDrawer();
     });
 
+    // Always append to end of nav-right
     const navRight = nav.querySelector(".nav-right");
     if (navRight) {
+      navRight.style.display = "flex";
+      navRight.style.alignItems = "center";
+      navRight.style.gap = "8px";
       navRight.appendChild(btn);
     } else {
       nav.appendChild(btn);

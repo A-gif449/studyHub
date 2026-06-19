@@ -336,7 +336,8 @@ function buildBell() {
     const btn = document.createElement("button");
     btn.id = "sh-bell-btn";
     btn.title = "Notifications";
-    btn.innerHTML = `<img src="1781704084645_bell.png" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);opacity:.75" alt="bell" onerror="this.outerHTML='<i class=\\'ti ti-bell\\'></i>'"/>`;
+    btn.innerHTML = `<i class="ti ti-bell"></i>`;
+    // btn.innerHTML = `<img src="1781704084645_bell.png" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);opacity:.75" alt="bell" onerror="this.outerHTML='<i class=\\'ti ti-bell\\'></i>'"/>`;
     btn.addEventListener("click", togglePanel);
 
     const badge = document.createElement("span");
