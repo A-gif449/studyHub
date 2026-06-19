@@ -52,7 +52,7 @@ function buildHamburger() {
     if (navRight) {
       navRight.style.display = "flex";
       navRight.style.alignItems = "center";
-      navRight.style.gap = "8px";
+      navRight.style.gap = "16px";
       navRight.appendChild(btn);
     } else {
       nav.appendChild(btn);

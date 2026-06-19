@@ -362,35 +362,56 @@
   }
 
 /* ── NAV ── */
-  nav {
-    padding: 0 16px !important;
-    height: var(--mobile-nav-h) !important;
-  }
-  .nav-links   { display: none !important; }
-  #sh-hamburger { display: flex !important; }
+nav{
+  padding:0 12px !important;
+  height:60px !important;
+}
 
-  /* Hide desktop right-side items that appear in drawer */
-  .nav-right {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 8px !important;
-  }
-  #sh-notif-wrap {
-    display: inline-flex !important;
-    align-items: center;
-  }
-  #sh-bell-btn {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 10px !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
-  }
-  #sh-hamburger {
-    width: 36px !important;
-    height: 36px !important;
-    margin-left: 4px !important;
-  }
+.nav-links{
+  display:none !important;
+}
+
+.nav-logo{
+  gap:8px !important;
+  font-size:16px !important;
+  flex:1;
+  min-width:0;
+}
+
+.nav-logo img,
+.nav-logo .logo-icon{
+  width:30px !important;
+  height:30px !important;
+  border-radius:8px !important;
+  flex-shrink:0;
+}
+
+#sh-hamburger{
+  display:flex !important;
+  width:34px !important;
+  height:34px !important;
+  margin-left:2px !important;
+}
+
+.nav-right{
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:6px !important;
+  flex-shrink:0;
+}
+
+#sh-notif-wrap{
+  display:inline-flex !important;
+  align-items:center;
+}
+
+#sh-bell-btn{
+  width:34px !important;
+  height:34px !important;
+  border-radius:10px !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+}
   .nav-right .btn-ghost,
   .nav-right .btn-primary,
   .nav-right .btn-danger,
