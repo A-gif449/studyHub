@@ -8,6 +8,7 @@
 /* ════════════════════════════════════════════
    TOKENS & BASE
    ════════════════════════════════════════════ */
+//mobile-nav.js
 :root {
   --mobile-nav-h: 60px;
   --touch-min: 44px; /* WCAG minimum tap target */
@@ -261,9 +262,12 @@
   font-family: inherit;
   transition: transform .18s ease, background .2s, border-color .2s;
   text-align: left;
-  opacity: 0;
-  transform: translateX(14px);
+  opacity: 1;
+  transform: translateX(0);
   animation: shItemIn .38s ease forwards;
+  -webkit-animation: shItemIn .38s ease forwards;
+  animation-fill-mode: forwards;
+  -webkit-animation-fill-mode: forwards;
 }
 /* staggered entrance — signature motion moment */
 .sh-drawer-item:nth-child(1)  { animation-delay: .04s }

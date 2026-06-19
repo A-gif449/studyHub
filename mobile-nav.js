@@ -1,19 +1,4 @@
-/**
- * StudyHub — Mobile Side Navigation
- * ===================================
- * Injects a 3-line hamburger button into the existing <nav>,
- * and a card-based, organic-blob side drawer (inspired by modern
- * "wellness app" side-nav patterns, restyled in StudyHub's own
- * dark indigo palette) for screens ≤ 768px.
- *
- * USAGE — add to every HTML page, AFTER Firebase SDKs + auth init,
- * and AFTER mobile.css is linked in <head>:
- *   <script src="mobile-nav.js"></script>
- *
- * No configuration needed. It detects the current page from the
- * URL, reads window.ADMIN_EMAILS (already defined on every page),
- * and listens to firebase.auth() if present.
- */
+//mobile-nav.js
 (function () {
   "use strict";
 
@@ -26,6 +11,7 @@
     buildHamburger();
     buildDrawer();
     watchAuth();
+     setTimeout(function() { renderDrawerContent(currentUser); }, 500);
     // Chat-only: floating "rooms" shortcut for the sidebar list
     if (document.getElementById("roomsList")) {
       buildRoomsSheet();
@@ -90,7 +76,7 @@
       if (e.key === "Escape" && drawerOpen) closeDrawer();
     });
 
-    renderDrawerContent(null); // guest state until auth resolves
+    renderDrawerContent(currentUser || null); // guest state until auth resolves
   }
 
   function toggleDrawer() {
