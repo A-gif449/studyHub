@@ -1,4 +1,3 @@
-//admin.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,8 +26,6 @@
   .orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
   .orb1{width:500px;height:500px;top:-150px;left:-100px;background:rgba(108,99,255,0.12)}
   .orb2{width:400px;height:400px;bottom:10%;right:-100px;background:rgba(56,189,248,0.08)}
-
-  /* ── NAV ── */
   nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,18,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
   .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);text-decoration:none}
   .nav-logo .logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--red),var(--accent4));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff}
@@ -42,34 +39,24 @@
   .btn-danger:hover{background:rgba(248,113,113,0.18)}
   .user-info{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)}
   .user-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--accent4));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
-
-  /* ── LAYOUT ── */
   .page-wrap{padding:88px 5% 60px;position:relative;z-index:1}
   .page-header{margin-bottom:36px}
   .page-header h1{font-family:'Syne',sans-serif;font-size:clamp(24px,3.5vw,36px);font-weight:800;margin-bottom:6px}
   .page-header p{font-size:14px;color:var(--text2)}
-
-  /* ── CONFIG BANNER ── */
   .config-banner{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);border-radius:var(--r2);padding:20px 24px;margin-bottom:28px;display:flex;align-items:flex-start;gap:14px}
   .config-banner i{font-size:20px;color:var(--gold);flex-shrink:0;margin-top:1px}
   .config-banner h4{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:4px}
   .config-banner p{font-size:13px;color:var(--text2);line-height:1.6}
   .config-banner code{background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;font-size:12px;font-family:monospace;color:var(--accent2)}
-
-  /* ── STATS ROW ── */
   .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:28px}
   .stat-card{padding:20px 22px;border-radius:var(--r2);background:var(--card);border:1px solid var(--border)}
   .stat-card .s-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px}
   .stat-card .s-lbl{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
-
-  /* ── UPLOAD PANEL ── */
   .grid-2{display:grid;grid-template-columns:420px 1fr;gap:24px;align-items:start}
   @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
-
   .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:28px}
   .panel-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px}
   .panel-title i{color:var(--accent2)}
-
   .form-group{margin-bottom:15px}
   .form-group label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:7px}
   .form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;-webkit-appearance:none}
@@ -78,8 +65,6 @@
   .form-group textarea{resize:vertical;min-height:80px;line-height:1.5}
   .form-group select option{background:var(--card2)}
   .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-  /* ── DROP ZONE ── */
   .drop-zone{border:2px dashed rgba(108,99,255,0.3);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .25s;background:rgba(108,99,255,0.03);position:relative;margin-bottom:15px}
   .drop-zone:hover,.drop-zone.dragging{border-color:rgba(108,99,255,0.6);background:rgba(108,99,255,0.07)}
   .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -89,13 +74,10 @@
   .file-chosen{background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.3)!important;display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 20px!important}
   .file-chosen i{color:var(--green);font-size:22px}
   .file-chosen span{font-size:13px;color:var(--green);font-weight:600}
-
-  /* ── PROGRESS ── */
   .progress-wrap{margin-bottom:15px;display:none}
   .progress-bar{height:6px;border-radius:99px;background:var(--bg2);overflow:hidden}
   .progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent3));width:0%;transition:width .3s}
   .progress-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:flex;justify-content:space-between}
-
   .form-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 0 24px rgba(108,99,255,0.3);display:flex;align-items:center;justify-content:center;gap:8px}
   .form-submit:hover{transform:translateY(-1px);box-shadow:0 4px 36px rgba(108,99,255,0.45)}
   .form-submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
@@ -103,13 +85,10 @@
   .upload-error.show{display:block}
   .upload-success{background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:12px;display:none;align-items:center;gap:8px}
   .upload-success.show{display:flex}
-
-  /* ── PDF LIST ── */
   .search-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
   .search-bar input{flex:1;padding:10px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:13px;font-family:inherit;outline:none}
   .search-bar input:focus{border-color:var(--accent)}
   .search-bar input::placeholder{color:var(--text3)}
-
   .pdf-list{display:flex;flex-direction:column;gap:10px;max-height:620px;overflow-y:auto;padding-right:4px}
   .pdf-item{padding:14px 16px;border-radius:var(--r);background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;gap:14px;transition:border-color .2s}
   .pdf-item:hover{border-color:var(--border2)}
@@ -128,30 +107,8 @@
   .empty-list{padding:40px 20px;text-align:center;color:var(--text3)}
   .empty-list i{font-size:36px;margin-bottom:10px;display:block}
   .empty-list p{font-size:13px}
-
-  /* ── ACCESS GATE ── */
-  #accessGate{
-    display:none;
-    align-items:center;
-    justify-content:center;
-    min-height:100vh;
-    flex-direction:column;
-    gap:0;
-    text-align:center;
-    padding:40px;
-    position:relative;
-    z-index:1;
-  }
-  .gate-card{
-    background:var(--card2);
-    border:1px solid var(--border2);
-    border-radius:var(--r3);
-    padding:40px;
-    width:100%;
-    max-width:420px;
-    text-align:left;
-    animation:gateIn .3s ease;
-  }
+  #accessGate{display:none;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:0;text-align:center;padding:40px;position:relative;z-index:1}
+  .gate-card{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:40px;width:100%;max-width:420px;text-align:left;animation:gateIn .3s ease}
   @keyframes gateIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
   .gate-logo-row{display:flex;align-items:center;gap:12px;margin-bottom:28px}
   .gate-logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--red),var(--accent4));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
@@ -180,14 +137,10 @@
   .gate-not-admin i{font-size:32px;color:var(--red);margin-bottom:10px;display:block}
   .gate-not-admin h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:6px;color:var(--text)}
   .gate-not-admin p{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6}
-
-  /* ── TOAST ── */
   .toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:14px 20px;border-radius:12px;background:var(--card2);border:1px solid var(--border2);font-size:14px;color:var(--text);box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;pointer-events:none}
   .toast.show{transform:translateY(0);opacity:1}
   .toast.success{border-color:rgba(52,211,153,.3)}
   .toast.error{border-color:rgba(248,113,113,.3)}
-
-  /* ── MODAL (edit) ── */
   .modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(5,5,12,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center}
   .modal-backdrop.show{display:flex}
   .modal{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:36px;width:100%;max-width:480px;position:relative;animation:modalIn .25s ease}
@@ -195,12 +148,15 @@
   .modal-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
   .modal-close:hover{border-color:var(--border2);color:var(--text)}
   .modal h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:20px}
-
   @media(max-width:640px){.page-wrap{padding:78px 20px 50px}.form-row{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.gate-card{padding:28px}}
 </style>
 <link rel="stylesheet" href="mobile.css"/>
 </head>
+
+<!-- ✅ EmailJS SDK loaded FIRST in <head> so it's ready before any script uses it -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="mobile-nav.js"></script>
+
 <body>
 
 <script>
@@ -212,9 +168,7 @@
     messagingSenderId: "520877226051",
     appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
   };
-
   window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
-
   window.CLOUDINARY_CONFIG = {
     cloudName:    "dwmvn4kj3",
     uploadPreset: "preupload"
@@ -229,12 +183,8 @@
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
 
-<!-- ══════════════════════════════════════════════════════════
-     ACCESS GATE — shown when not signed in or not admin
-     ══════════════════════════════════════════════════════════ -->
+<!-- ACCESS GATE -->
 <div id="accessGate">
-
-  <!-- Login Card -->
   <div class="gate-card" id="gateLoginCard">
     <div class="gate-logo-row">
       <div class="gate-logo-icon"><i class="ti ti-shield-check"></i></div>
@@ -245,12 +195,9 @@
         </div>
       </div>
     </div>
-
     <h2 class="gate-title">Welcome back, Admin</h2>
     <p class="gate-sub">Sign in with your admin credentials to manage the PDF library.</p>
-
     <div class="gate-error" id="gateError"></div>
-
     <div class="gate-form-group">
       <label>Email Address</label>
       <input type="email" id="gateEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')gateLogin()"/>
@@ -259,23 +206,18 @@
       <label>Password</label>
       <input type="password" id="gatePass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')gateLogin()"/>
     </div>
-
     <button class="gate-submit" id="gateLoginBtn" onclick="gateLogin()">
       <i class="ti ti-login"></i> Sign In to Admin Panel
     </button>
-
     <div class="gate-divider"><span>or continue with</span></div>
-
     <button class="gate-google" onclick="gateGoogleLogin()">
       <i class="ti ti-brand-google"></i> Sign in with Google
     </button>
-
     <a href="index.html" class="gate-back">
       <i class="ti ti-arrow-left" style="font-size:13px"></i> Back to StudyHub
     </a>
   </div>
 
-  <!-- Not-admin warning (shown when signed in but not admin) -->
   <div class="gate-not-admin" id="gateNotAdmin">
     <i class="ti ti-shield-x"></i>
     <h3>Access Denied</h3>
@@ -288,20 +230,14 @@
       <i class="ti ti-arrow-left" style="font-size:13px"></i> Back to StudyHub
     </a>
   </div>
-
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     MAIN ADMIN UI — hidden until verified
-     ══════════════════════════════════════════════════════════ -->
+<!-- MAIN ADMIN UI -->
 <div id="adminUI" style="display:none">
   <nav>
     <a href="index.html" class="nav-logo">
-      <!-- Admin gets a different red/pink logo icon -->
       <img src="logo.png" style="width:36px;height:36px;border-radius:10px;object-fit:cover" alt="StudyHub"/>
-      <!-- <div class="logo-icon" style="background:linear-gradient(135deg,var(--red),var(--accent4));width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff"> -->
-        <i class="ti ti-shield-check"></i>
-      </div>
+      <i class="ti ti-shield-check"></i>
       StudyHub
     </a>
     <div class="admin-badge"><i class="ti ti-shield" style="font-size:10px"></i> Admin Panel</div>
@@ -321,35 +257,19 @@
       <p>Upload study materials to Cloudinary and publish them to the library.</p>
     </div>
 
-    <!-- STATS -->
     <div class="stats-row" id="statsRow">
-      <div class="stat-card">
-        <div class="s-val" id="statTotal">—</div>
-        <div class="s-lbl">Total PDFs</div>
-      </div>
-      <div class="stat-card">
-        <div class="s-val" id="statBeginner">—</div>
-        <div class="s-lbl">Beginner</div>
-      </div>
-      <div class="stat-card">
-        <div class="s-val" id="statIntermediate">—</div>
-        <div class="s-lbl">Intermediate</div>
-      </div>
-      <div class="stat-card">
-        <div class="s-val" id="statAdvanced">—</div>
-        <div class="s-lbl">Advanced</div>
-      </div>
+      <div class="stat-card"><div class="s-val" id="statTotal">—</div><div class="s-lbl">Total PDFs</div></div>
+      <div class="stat-card"><div class="s-val" id="statBeginner">—</div><div class="s-lbl">Beginner</div></div>
+      <div class="stat-card"><div class="s-val" id="statIntermediate">—</div><div class="s-lbl">Intermediate</div></div>
+      <div class="stat-card"><div class="s-val" id="statAdvanced">—</div><div class="s-lbl">Advanced</div></div>
     </div>
 
     <div class="grid-2">
-      <!-- ── UPLOAD FORM ── -->
       <div class="panel">
         <div class="panel-title"><i class="ti ti-cloud-upload"></i> Upload New PDF</div>
-
         <div class="upload-error" id="uploadError"></div>
         <div class="upload-success" id="uploadSuccess"><i class="ti ti-circle-check"></i><span id="uploadSuccessMsg"></span></div>
 
-        <!-- DROP ZONE -->
         <div class="drop-zone" id="dropZone">
           <input type="file" id="pdfFile" accept="image/*" onchange="handleFileSelect(this)"/>
           <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
@@ -357,7 +277,6 @@
           <p>Maximum file size: 50 MB</p>
         </div>
 
-        <!-- UPLOAD PROGRESS -->
         <div class="progress-wrap" id="progressWrap">
           <div class="progress-label">
             <span id="progressText">Uploading to Cloudinary…</span>
@@ -379,25 +298,16 @@
             <label>Subject *</label>
             <select id="pdfSubject">
               <option value="">Select subject…</option>
-              <option>Mathematics</option>
-              <option>Physics</option>
-              <option>Chemistry</option>
-              <option>Biology</option>
-              <option>CS & Tech</option>
-              <option>Economics</option>
-              <option>Literature</option>
-              <option>History</option>
-              <option>Psychology</option>
-              <option>Engineering</option>
+              <option>Mathematics</option><option>Physics</option><option>Chemistry</option>
+              <option>Biology</option><option>CS & Tech</option><option>Economics</option>
+              <option>Literature</option><option>History</option><option>Psychology</option><option>Engineering</option>
             </select>
           </div>
           <div class="form-group">
             <label>Level *</label>
             <select id="pdfLevel">
               <option value="">Select level…</option>
-              <option>Beginner</option>
-              <option>Intermediate</option>
-              <option>Advanced</option>
+              <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
             </select>
           </div>
         </div>
@@ -417,7 +327,6 @@
         </button>
       </div>
 
-      <!-- ── PDF LIST ── -->
       <div class="panel">
         <div class="panel-title"><i class="ti ti-list"></i> Published PDFs</div>
         <div class="search-bar">
@@ -429,27 +338,20 @@
         </div>
       </div>
     </div>
-  </div>
-   
- <!-- VIEWS PANEL -->
-  <div class="panel" style="margin-top:24px">
-    <div class="panel-title"><i class="ti ti-eye"></i> Recent Views</div>
-    <div id="viewsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
-      <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+
+    <div class="panel" style="margin-top:24px">
+      <div class="panel-title"><i class="ti ti-eye"></i> Recent Views</div>
+      <div id="viewsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
+        <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+      </div>
     </div>
-  </div>
 
-  <!-- DOWNLOADS PANEL -->
-  <div class="panel" style="margin-top:24px">
-    <div class="panel-title"><i class="ti ti-download"></i> Recent Downloads</div>
-    <div id="downloadsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
-      <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+    <div class="panel" style="margin-top:24px">
+      <div class="panel-title"><i class="ti ti-download"></i> Recent Downloads</div>
+      <div id="downloadsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
+        <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+      </div>
     </div>
-  </div>
-
-  </div>
-</div> 
-
   </div>
 </div>
 
@@ -489,6 +391,16 @@
 <div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 
 <script>
+// ══════════════════════════════════════════
+// EMAILJS CONFIG  ← your real IDs are here
+// ══════════════════════════════════════════
+const EMAILJS_SERVICE_ID  = 'service_ni2xagc';
+const EMAILJS_TEMPLATE_ID = 'template_ckbvrir';
+const EMAILJS_PUBLIC_KEY  = 'tSeNtgGkF6IZXcDF4';
+
+// Init EmailJS once at top
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
 // ── Init Firebase ──
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth = firebase.auth();
@@ -504,17 +416,8 @@ const subjectEmoji = {
 
 // ── Auth Guard ──
 auth.onAuthStateChanged(user => {
-  if (!user) {
-    // Not signed in — show login form
-    showLoginGate();
-    return;
-  }
-  if (!window.ADMIN_EMAILS.includes(user.email)) {
-    // Signed in but not admin — show not-admin message
-    showNotAdminGate(user.email);
-    return;
-  }
-  // All good — show admin panel
+  if (!user) { showLoginGate(); return; }
+  if (!window.ADMIN_EMAILS.includes(user.email)) { showNotAdminGate(user.email); return; }
   showAdmin(user);
 });
 
@@ -533,32 +436,6 @@ function showNotAdminGate(email){
   document.getElementById('adminUI').style.display = 'none';
 }
 
-function loadDownloads(){
-  db.collection('downloads').orderBy('downloadedAt','desc').limit(50).onSnapshot(snap => {
-    const el = document.getElementById('downloadsList');
-    if(!snap.docs.length){
-      el.innerHTML = `<div class="empty-list"><i class="ti ti-download-off"></i><p>No downloads yet.</p></div>`;
-      return;
-    }
-    el.innerHTML = snap.docs.map(d => {
-      const v = d.data();
-      const time = v.downloadedAt ? new Date(v.downloadedAt.seconds * 1000).toLocaleString() : 'Just now';
-      return `
-        <div class="pdf-item">
-          <div class="pdf-emoji">⬇️</div>
-          <div class="pdf-info">
-            <div class="pdf-title">${escHtml(v.pdfTitle || 'Unknown PDF')}</div>
-            <div class="pdf-meta">
-              <span class="tag">${escHtml(v.userName || 'Unknown')}</span>
-              <span>${escHtml(v.userEmail || '')}</span>
-              <span>· ${time}</span>
-            </div>
-          </div>
-        </div>`;
-    }).join('');
-  });
-}
-
 function showAdmin(user){
   document.getElementById('accessGate').style.display = 'none';
   document.getElementById('adminUI').style.display = 'block';
@@ -572,24 +449,16 @@ function showAdmin(user){
 
 // ── Gate Login ──
 async function gateLogin(){
-  const email  = document.getElementById('gateEmail').value.trim();
-  const pass   = document.getElementById('gatePass').value;
-  const errEl  = document.getElementById('gateError');
+  const email = document.getElementById('gateEmail').value.trim();
+  const pass  = document.getElementById('gatePass').value;
+  const errEl = document.getElementById('gateError');
   errEl.classList.remove('show');
-
-  if(!email || !pass){
-    errEl.textContent = 'Please fill in both fields.';
-    errEl.classList.add('show');
-    return;
-  }
-
+  if(!email || !pass){ errEl.textContent='Please fill in both fields.'; errEl.classList.add('show'); return; }
   const btn = document.getElementById('gateLoginBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Signing in…';
-
   try {
     await auth.signInWithEmailAndPassword(email, pass);
-    // onAuthStateChanged fires and routes correctly
   } catch(e) {
     errEl.textContent = friendlyError(e.code);
     errEl.classList.add('show');
@@ -604,7 +473,6 @@ async function gateGoogleLogin(){
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
     await auth.signInWithPopup(provider);
-    // onAuthStateChanged fires and routes correctly
   } catch(e) {
     errEl.textContent = friendlyError(e.code);
     errEl.classList.add('show');
@@ -637,6 +505,58 @@ function loadPdfs(){
     renderList(allPdfs);
   }, err => {
     showToast('Firestore error: '+err.message, 'error');
+  });
+}
+
+function loadViews(){
+  db.collection('views').orderBy('viewedAt','desc').limit(50).onSnapshot(snap => {
+    const el = document.getElementById('viewsList');
+    if(!snap.docs.length){
+      el.innerHTML = `<div class="empty-list"><i class="ti ti-eye-off"></i><p>No views yet.</p></div>`;
+      return;
+    }
+    el.innerHTML = snap.docs.map(d => {
+      const v = d.data();
+      const time = v.viewedAt ? new Date(v.viewedAt.seconds * 1000).toLocaleString() : 'Just now';
+      return `
+        <div class="pdf-item">
+          <div class="pdf-emoji">👁️</div>
+          <div class="pdf-info">
+            <div class="pdf-title">${escHtml(v.pdfTitle || 'Unknown PDF')}</div>
+            <div class="pdf-meta">
+              <span class="tag">${escHtml(v.userName || 'Unknown')}</span>
+              <span>${escHtml(v.userEmail || '')}</span>
+              <span>· ${time}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  });
+}
+
+function loadDownloads(){
+  db.collection('downloads').orderBy('downloadedAt','desc').limit(50).onSnapshot(snap => {
+    const el = document.getElementById('downloadsList');
+    if(!snap.docs.length){
+      el.innerHTML = `<div class="empty-list"><i class="ti ti-download-off"></i><p>No downloads yet.</p></div>`;
+      return;
+    }
+    el.innerHTML = snap.docs.map(d => {
+      const v = d.data();
+      const time = v.downloadedAt ? new Date(v.downloadedAt.seconds * 1000).toLocaleString() : 'Just now';
+      return `
+        <div class="pdf-item">
+          <div class="pdf-emoji">⬇️</div>
+          <div class="pdf-info">
+            <div class="pdf-title">${escHtml(v.pdfTitle || 'Unknown PDF')}</div>
+            <div class="pdf-meta">
+              <span class="tag">${escHtml(v.userName || 'Unknown')}</span>
+              <span>${escHtml(v.userEmail || '')}</span>
+              <span>· ${time}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
   });
 }
 
@@ -684,10 +604,11 @@ function renderList(pdfs){
 
 // ── File select ──
 let selectedFile = null;
+
 function handleFileSelect(input){
   const file = input.files[0];
   if(!file) return;
-  if(!file.type.startsWith('image/')){ showUploadError('Only PDF files are allowed.'); input.value=''; return; }
+  if(!file.type.startsWith('image/')){ showUploadError('Only image/PDF files are allowed.'); input.value=''; return; }
   if(file.size > 52428800){ showUploadError('File exceeds 50 MB limit.'); input.value=''; return; }
   selectedFile = file;
   const dz = document.getElementById('dropZone');
@@ -709,17 +630,17 @@ dz.addEventListener('drop', e=>{
 // ── Upload ──
 async function handleUpload(){
   clearUploadMessages();
-  const title   = document.getElementById('pdfTitle').value.trim();
-  const subject = document.getElementById('pdfSubject').value;
-  const level   = document.getElementById('pdfLevel').value;
-  const desc    = document.getElementById('pdfDesc').value.trim();
-  const pages   = document.getElementById('pdfPages').value.trim();
-  const readTime= document.getElementById('pdfReadTime').value.trim();
+  const title    = document.getElementById('pdfTitle').value.trim();
+  const subject  = document.getElementById('pdfSubject').value;
+  const level    = document.getElementById('pdfLevel').value;
+  const desc     = document.getElementById('pdfDesc').value.trim();
+  const pages    = document.getElementById('pdfPages').value.trim();
+  const readTime = document.getElementById('pdfReadTime').value.trim();
 
-  if(!selectedFile){ showUploadError('Please select a PDF file.'); return; }
-  if(!title){ showUploadError('Title is required.'); return; }
-  if(!subject){ showUploadError('Please select a subject.'); return; }
-  if(!level){ showUploadError('Please select a level.'); return; }
+  if(!selectedFile){ showUploadError('Please select a file.'); return; }
+  if(!title)        { showUploadError('Title is required.'); return; }
+  if(!subject)      { showUploadError('Please select a subject.'); return; }
+  if(!level)        { showUploadError('Please select a level.'); return; }
 
   const btn = document.getElementById('uploadBtn');
   btn.disabled = true;
@@ -730,13 +651,14 @@ async function handleUpload(){
   setProgress(0, 'Uploading to Cloudinary…');
 
   try {
-    const cloudUrl = await uploadToCloudinary(selectedFile, pct => setProgress(pct * 0.85, 'Uploading to Cloudinary…'));
+    // Step 1: Upload file to Cloudinary
+    const cloudUrl = await uploadToCloudinary(
+      selectedFile,
+      pct => setProgress(pct * 0.85, 'Uploading to Cloudinary…')
+    );
     setProgress(90, 'Saving to database…');
 
-    try {
-    const cloudUrl = await uploadToCloudinary(selectedFile, pct => setProgress(pct * 0.85, 'Uploading to Cloudinary…'));
-    setProgress(90, 'Saving to database…');
-
+    // Step 2: Save to Firestore
     const pdfRef = await db.collection('pdfs').add({
       title, subject, level,
       description: desc,
@@ -748,6 +670,8 @@ async function handleUpload(){
     });
 
     setProgress(95, 'Notifying followers…');
+
+    // Step 3: Send emails to followers
     await notifyFollowers({ id: pdfRef.id, title, subject, level, cloudUrl });
 
     setProgress(100, 'Done!');
@@ -757,40 +681,115 @@ async function handleUpload(){
     document.getElementById('uploadSuccessMsg').textContent = `"${title}" published successfully!`;
     document.getElementById('uploadSuccess').classList.add('show');
     setTimeout(()=> document.getElementById('uploadSuccess').classList.remove('show'), 4000);
-    showToast('PDF published & followers notified! 🎉', 'success');
 
   } catch(err){
     pw.style.display = 'none';
     showUploadError('Upload failed: ' + err.message);
     showToast('Upload failed', 'error');
-  }
-
-    setProgress(100, 'Done!');
-    setTimeout(()=>{ pw.style.display='none'; setProgress(0,''); }, 1200);
-
-    resetForm();
-    document.getElementById('uploadSuccessMsg').textContent = `"${title}" published successfully!`;
-    document.getElementById('uploadSuccess').classList.add('show');
-    setTimeout(()=> document.getElementById('uploadSuccess').classList.remove('show'), 4000);
-    showToast('PDF published! 🎉', 'success')
-
-  } catch(err){
-    pw.style.display = 'none';
-    showUploadError('Upload failed: ' + err.message);
-    showToast('Upload failed', 'error');
+    console.error('Upload error:', err);
   }
 
   btn.disabled = false;
   btn.innerHTML = '<i class="ti ti-upload"></i> Upload & Publish PDF';
 }
 
+// ── Notify Followers via EmailJS ──
+async function notifyFollowers(pdf) {
+  try {
+    const adminUid = auth.currentUser.uid;
+
+    // Get all users following the admin
+    const followsSnap = await db.collection('follows')
+      .where('followingId', '==', adminUid)
+      .get();
+
+    if (followsSnap.empty) {
+      showToast('PDF published! (No followers yet) 🎉', 'success');
+      return;
+    }
+
+    const viewerUrl = `${location.origin}/viewer.html?id=${pdf.id}`;
+    let sent = 0;
+    let failed = 0;
+
+    for (const doc of followsSnap.docs) {
+      const data = doc.data();
+      let email = data.followerEmail || null;   // set if friends.js was updated
+      let name  = data.followerName  || 'Learner';
+
+      // Fallback: find email from views collection
+      if (!email) {
+        try {
+          const viewSnap = await db.collection('views')
+            .where('userId', '==', data.followerId)
+            .limit(1).get();
+          if (!viewSnap.empty) {
+            email = viewSnap.docs[0].data().userEmail || null;
+            name  = viewSnap.docs[0].data().userName  || name;
+          }
+        } catch(e) {}
+      }
+
+      // Fallback: find email from downloads collection
+      if (!email) {
+        try {
+          const dlSnap = await db.collection('downloads')
+            .where('userId', '==', data.followerId)
+            .limit(1).get();
+          if (!dlSnap.empty) {
+            email = dlSnap.docs[0].data().userEmail || null;
+            name  = dlSnap.docs[0].data().userName  || name;
+          }
+        } catch(e) {}
+      }
+
+      if (!email) {
+        console.warn('No email found for follower:', name);
+        failed++;
+        continue;
+      }
+
+      // Send email via EmailJS
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_email:    email,
+          to_name:     name,
+          pdf_title:   pdf.title,
+          pdf_subject: pdf.subject,
+          pdf_level:   pdf.level || 'All levels',
+          pdf_url:     viewerUrl,
+        });
+        sent++;
+        console.log(`✅ Notified: ${email}`);
+      } catch(e) {
+        console.warn(`❌ Failed to email ${email}:`, e);
+        failed++;
+      }
+    }
+
+    if (sent > 0) {
+      showToast(`PDF published! Notified ${sent} follower${sent > 1 ? 's' : ''} 📧`, 'success');
+    } else {
+      showToast('PDF published! 🎉', 'success');
+    }
+    if (failed > 0) {
+      console.warn(`${failed} follower(s) could not be notified (no email found).`);
+    }
+
+  } catch(err) {
+    // Non-fatal — PDF is already saved
+    console.warn('notifyFollowers error:', err);
+    showToast('PDF published! (Email notify failed) 🎉', 'success');
+  }
+}
+
+// ── Cloudinary Upload ──
 function uploadToCloudinary(file, onProgress){
   return new Promise((resolve, reject) => {
     const cfg = window.CLOUDINARY_CONFIG;
-    const fd = new FormData();
+    const fd  = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', cfg.uploadPreset);
-
     const xhr = new XMLHttpRequest();
     xhr.upload.addEventListener('progress', e => {
       if(e.lengthComputable) onProgress(e.loaded / e.total);
@@ -820,13 +819,13 @@ function setProgress(pct, label){
 
 function resetForm(){
   selectedFile = null;
-  document.getElementById('pdfFile').value = '';
-  document.getElementById('pdfTitle').value = '';
-  document.getElementById('pdfDesc').value = '';
+  document.getElementById('pdfFile').value    = '';
+  document.getElementById('pdfTitle').value   = '';
+  document.getElementById('pdfDesc').value    = '';
   document.getElementById('pdfSubject').value = '';
-  document.getElementById('pdfLevel').value = '';
-  document.getElementById('pdfPages').value = '';
-  document.getElementById('pdfReadTime').value = '';
+  document.getElementById('pdfLevel').value   = '';
+  document.getElementById('pdfPages').value   = '';
+  document.getElementById('pdfReadTime').value= '';
   const dz = document.getElementById('dropZone');
   dz.classList.remove('file-chosen');
   dz.innerHTML = `
@@ -836,16 +835,16 @@ function resetForm(){
     <p>Maximum file size: 50 MB</p>`;
 }
 
-// ── Edit ──
+// ── Edit Modal ──
 function openEditModal(id){
   const pdf = allPdfs.find(p=>p.id===id);
   if(!pdf) return;
-  document.getElementById('editId').value = id;
-  document.getElementById('editTitle').value = pdf.title || '';
-  document.getElementById('editDesc').value = pdf.description || '';
-  document.getElementById('editSubject').value = pdf.subject || 'Mathematics';
-  document.getElementById('editLevel').value = pdf.level || 'Beginner';
-  document.getElementById('editPages').value = pdf.pages || '';
+  document.getElementById('editId').value       = id;
+  document.getElementById('editTitle').value    = pdf.title || '';
+  document.getElementById('editDesc').value     = pdf.description || '';
+  document.getElementById('editSubject').value  = pdf.subject || 'Mathematics';
+  document.getElementById('editLevel').value    = pdf.level || 'Beginner';
+  document.getElementById('editPages').value    = pdf.pages || '';
   document.getElementById('editReadTime').value = pdf.readTime || '';
   document.getElementById('editModal').classList.add('show');
 }
@@ -854,12 +853,12 @@ function closeEditModal(){ document.getElementById('editModal').classList.remove
 async function saveEdit(){
   const id = document.getElementById('editId').value;
   const data = {
-    title:      document.getElementById('editTitle').value.trim(),
-    description:document.getElementById('editDesc').value.trim(),
-    subject:    document.getElementById('editSubject').value,
-    level:      document.getElementById('editLevel').value,
-    pages:      parseInt(document.getElementById('editPages').value)||null,
-    readTime:   document.getElementById('editReadTime').value.trim()||null,
+    title:       document.getElementById('editTitle').value.trim(),
+    description: document.getElementById('editDesc').value.trim(),
+    subject:     document.getElementById('editSubject').value,
+    level:       document.getElementById('editLevel').value,
+    pages:       parseInt(document.getElementById('editPages').value)||null,
+    readTime:    document.getElementById('editReadTime').value.trim()||null,
   };
   if(!data.title){ showToast('Title cannot be empty.','error'); return; }
   try {
@@ -871,7 +870,7 @@ async function saveEdit(){
 
 // ── Delete ──
 async function deletePdf(id, title){
-  if(!confirm(`Delete "${title}"?\n\nThis removes it from the library. The Cloudinary file remains (delete manually in Cloudinary if needed).`)) return;
+  if(!confirm(`Delete "${title}"?\n\nThis removes it from the library.`)) return;
   try {
     await db.collection('pdfs').doc(id).delete();
     showToast('PDF deleted.','success');
@@ -901,96 +900,11 @@ document.getElementById('editModal').addEventListener('click', e=>{
 });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeEditModal(); });
 
-// Spinner CSS
 const style = document.createElement('style');
 style.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
 document.head.appendChild(style);
-
-// ── EmailJS config — fill these in ──
-const EMAILJS_SERVICE_ID  = 'service_ni2xagc';   // e.g. 'service_abc123'
-const EMAILJS_TEMPLATE_ID = 'template_ckbvrir';  // e.g. 'template_xyz789'
-const EMAILJS_PUBLIC_KEY  = 'tSeNtgGkF6IZXcDF4';   // e.g. 'abcDEFghiJKL'
-
-// Initialize EmailJS once
-emailjs.init(EMAILJS_PUBLIC_KEY);
-
-async function notifyFollowers(pdf) {
-  try {
-    // Get all users who follow the admin account
-    const adminUid = auth.currentUser.uid;
-    const followsSnap = await db.collection('follows')
-      .where('followingId', '==', adminUid)
-      .get();
-
-    if (followsSnap.empty) {
-      console.log('No followers to notify.');
-      return;
-    }
-
-    // Collect unique emails from follower UIDs via views/downloads
-    // (since we don't store emails in 'follows', we look them up)
-    const followerUids = followsSnap.docs.map(d => d.data().followerId);
-    const emailSet = new Set();
-
-    // Pull emails from views collection (most likely to have them)
-    for (const uid of followerUids) {
-      const viewSnap = await db.collection('views')
-        .where('userId', '==', uid)
-        .limit(1)
-        .get();
-      if (!viewSnap.empty) {
-        const data = viewSnap.docs[0].data();
-        if (data.userEmail) emailSet.add({ email: data.userEmail, name: data.userName || 'Learner' });
-      }
-    }
-
-    // Fallback: also check downloads
-    for (const uid of followerUids) {
-      const alreadyFound = [...emailSet].some(u => u.email);
-      // skip if we already have this uid's email
-      const dlSnap = await db.collection('downloads')
-        .where('userId', '==', uid)
-        .limit(1)
-        .get();
-      if (!dlSnap.empty) {
-        const data = dlSnap.docs[0].data();
-        if (data.userEmail && ![...emailSet].find(u => u.email === data.userEmail)) {
-          emailSet.add({ email: data.userEmail, name: data.userName || 'Learner' });
-        }
-      }
-    }
-
-    const viewerUrl = `${location.origin}/viewer.html?id=${pdf.id}`;
-    let sent = 0;
-
-    for (const { email, name } of emailSet) {
-      try {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-          to_email:    email,
-          to_name:     name,
-          pdf_title:   pdf.title,
-          pdf_subject: pdf.subject,
-          pdf_level:   pdf.level || 'All levels',
-          pdf_url:     viewerUrl,
-        });
-        sent++;
-      } catch(e) {
-        console.warn(`Failed to email ${email}:`, e);
-      }
-    }
-
-    if (sent > 0) showToast(`Notified ${sent} follower${sent > 1 ? 's' : ''} by email! 📧`, 'success');
-
-  } catch(err) {
-    console.warn('notifyFollowers error:', err);
-    // Non-fatal — PDF is already published
-  }
-}
-
-
-
 </script>
+
 <script src="notifications.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </body>
 </html>
