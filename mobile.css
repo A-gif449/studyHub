@@ -33,6 +33,7 @@
   flex-shrink: 0;
   transition: background .2s, border-color .2s;
   z-index: 201;
+  margin-left: 8px;
 }
 #sh-hamburger:hover {
   background: rgba(255,255,255,0.05);
@@ -357,6 +358,13 @@
   #sh-hamburger { display: flex !important; }
 
   /* Hide desktop right-side items that appear in drawer */
+  .nav-right {
+    gap: 6px !important;
+    align-items: center;
+  }
+  #sh-notif-wrap {
+    margin-right: 2px;
+  }
   .nav-right .btn-ghost,
   .nav-right .btn-primary,
   .nav-right .btn-danger,
