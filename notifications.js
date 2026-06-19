@@ -311,12 +311,21 @@
       }
 
       /* mobile tweaks */
-      @media (max-width: 480px) {
+        @media (max-width: 768px) {
         #sh-panel {
-          width: calc(100vw - 32px);
-          right: -12px;
-        }
+        position: fixed !important;
+        top: 60px !important;
+        left: 8px !important;
+        right: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-height: 70vh !important;
+        border-radius: 16px !important;
+        z-index: 9999 !important;
+        overflow-y: auto !important;
       }
+    }
+      
+  
     `;
     const style = document.createElement("style");
     style.textContent = css;
