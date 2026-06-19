@@ -10,7 +10,7 @@
    ════════════════════════════════════════════ */
 //mobile-nav.js
 :root {
-  --mobile-nav-h: 60px;
+  --mobile-nav-h: 64px;
   --touch-min: 44px; /* WCAG minimum tap target */
 }
 
