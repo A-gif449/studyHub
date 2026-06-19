@@ -241,14 +241,14 @@
 }
 
 /* ── Nav: rounded tile cards with tinted icon chips ── */
-.sh-drawer-nav {
+/* .sh-drawer-nav {
   flex: 1;
   padding: 14px 14px 6px;
   display: flex;
   flex-direction: column;
   gap: 7px;
   overflow-y: auto;
-}
+} */
 .sh-drawer-section-label {
   padding: 10px 6px 2px;
   font-size: 10px;
@@ -405,7 +405,7 @@ nav{
 }
 
 .nav-right{
-  display:flex !important;
+  display: flex;
   flex-direction:row !important;
   align-items:center !important;
   gap:6px !important;
