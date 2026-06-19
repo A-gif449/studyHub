@@ -812,20 +812,18 @@ function uploadToCloudinary(file, onProgress){
 }
 
 function setProgress(pct, label){
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressPct').textContent  = Math.round(pct) + '%';
-  document.getElementById('progressText').textContent = label;
+  const fill = document.getElementById('progressFill');
+  const pctEl = document.getElementById('progressPct');
+  const textEl = document.getElementById('progressText');
+  if(fill)  fill.style.width = pct + '%';
+  if(pctEl) pctEl.textContent = Math.round(pct) + '%';
+  if(textEl) textEl.textContent = label;
 }
 
 function resetForm(){
   selectedFile = null;
-  document.getElementById('pdfFile').value    = '';
-  document.getElementById('pdfTitle').value   = '';
-  document.getElementById('pdfDesc').value    = '';
-  document.getElementById('pdfSubject').value = '';
-  document.getElementById('pdfLevel').value   = '';
-  document.getElementById('pdfPages').value   = '';
-  document.getElementById('pdfReadTime').value= '';
+
+  // Rebuild dropzone FIRST (this recreates the pdfFile input)
   const dz = document.getElementById('dropZone');
   dz.classList.remove('file-chosen');
   dz.innerHTML = `
@@ -833,6 +831,12 @@ function resetForm(){
     <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
     <h4>Drop PDF here or click to browse</h4>
     <p>Maximum file size: 50 MB</p>`;
+
+  // Then reset other fields safely
+  ['pdfTitle','pdfDesc','pdfSubject','pdfLevel','pdfPages','pdfReadTime'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
 }
 
 // ── Edit Modal ──
