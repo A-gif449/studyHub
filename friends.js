@@ -165,6 +165,7 @@ window.SHFriends = (function () {
       await db.collection("follows").add({
         followerId: currentUser.uid,
         followerName: currentUser.displayName || currentUser.email,
+        followerEmail: currentUser.email,
         followingId: targetUid,
         followingName: targetName,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),

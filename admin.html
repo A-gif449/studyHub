@@ -733,7 +733,11 @@ async function handleUpload(){
     const cloudUrl = await uploadToCloudinary(selectedFile, pct => setProgress(pct * 0.85, 'Uploading to Cloudinary…'));
     setProgress(90, 'Saving to database…');
 
-    await db.collection('pdfs').add({
+    try {
+    const cloudUrl = await uploadToCloudinary(selectedFile, pct => setProgress(pct * 0.85, 'Uploading to Cloudinary…'));
+    setProgress(90, 'Saving to database…');
+
+    const pdfRef = await db.collection('pdfs').add({
       title, subject, level,
       description: desc,
       pages: pages ? parseInt(pages) : null,
@@ -742,6 +746,24 @@ async function handleUpload(){
       uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
       uploadedBy: auth.currentUser.email
     });
+
+    setProgress(95, 'Notifying followers…');
+    await notifyFollowers({ id: pdfRef.id, title, subject, level, cloudUrl });
+
+    setProgress(100, 'Done!');
+    setTimeout(()=>{ pw.style.display='none'; setProgress(0,''); }, 1200);
+
+    resetForm();
+    document.getElementById('uploadSuccessMsg').textContent = `"${title}" published successfully!`;
+    document.getElementById('uploadSuccess').classList.add('show');
+    setTimeout(()=> document.getElementById('uploadSuccess').classList.remove('show'), 4000);
+    showToast('PDF published & followers notified! 🎉', 'success');
+
+  } catch(err){
+    pw.style.display = 'none';
+    showUploadError('Upload failed: ' + err.message);
+    showToast('Upload failed', 'error');
+  }
 
     setProgress(100, 'Done!');
     setTimeout(()=>{ pw.style.display='none'; setProgress(0,''); }, 1200);
@@ -883,7 +905,92 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeEditModal();
 const style = document.createElement('style');
 style.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
 document.head.appendChild(style);
+
+// ── EmailJS config — fill these in ──
+const EMAILJS_SERVICE_ID  = 'service_ni2xagc';   // e.g. 'service_abc123'
+const EMAILJS_TEMPLATE_ID = 'template_ckbvrir';  // e.g. 'template_xyz789'
+const EMAILJS_PUBLIC_KEY  = 'tSeNtgGkF6IZXcDF4';   // e.g. 'abcDEFghiJKL'
+
+// Initialize EmailJS once
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+async function notifyFollowers(pdf) {
+  try {
+    // Get all users who follow the admin account
+    const adminUid = auth.currentUser.uid;
+    const followsSnap = await db.collection('follows')
+      .where('followingId', '==', adminUid)
+      .get();
+
+    if (followsSnap.empty) {
+      console.log('No followers to notify.');
+      return;
+    }
+
+    // Collect unique emails from follower UIDs via views/downloads
+    // (since we don't store emails in 'follows', we look them up)
+    const followerUids = followsSnap.docs.map(d => d.data().followerId);
+    const emailSet = new Set();
+
+    // Pull emails from views collection (most likely to have them)
+    for (const uid of followerUids) {
+      const viewSnap = await db.collection('views')
+        .where('userId', '==', uid)
+        .limit(1)
+        .get();
+      if (!viewSnap.empty) {
+        const data = viewSnap.docs[0].data();
+        if (data.userEmail) emailSet.add({ email: data.userEmail, name: data.userName || 'Learner' });
+      }
+    }
+
+    // Fallback: also check downloads
+    for (const uid of followerUids) {
+      const alreadyFound = [...emailSet].some(u => u.email);
+      // skip if we already have this uid's email
+      const dlSnap = await db.collection('downloads')
+        .where('userId', '==', uid)
+        .limit(1)
+        .get();
+      if (!dlSnap.empty) {
+        const data = dlSnap.docs[0].data();
+        if (data.userEmail && ![...emailSet].find(u => u.email === data.userEmail)) {
+          emailSet.add({ email: data.userEmail, name: data.userName || 'Learner' });
+        }
+      }
+    }
+
+    const viewerUrl = `${location.origin}/viewer.html?id=${pdf.id}`;
+    let sent = 0;
+
+    for (const { email, name } of emailSet) {
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_email:    email,
+          to_name:     name,
+          pdf_title:   pdf.title,
+          pdf_subject: pdf.subject,
+          pdf_level:   pdf.level || 'All levels',
+          pdf_url:     viewerUrl,
+        });
+        sent++;
+      } catch(e) {
+        console.warn(`Failed to email ${email}:`, e);
+      }
+    }
+
+    if (sent > 0) showToast(`Notified ${sent} follower${sent > 1 ? 's' : ''} by email! 📧`, 'success');
+
+  } catch(err) {
+    console.warn('notifyFollowers error:', err);
+    // Non-fatal — PDF is already published
+  }
+}
+
+
+
 </script>
 <script src="notifications.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </body>
 </html>
