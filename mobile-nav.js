@@ -473,6 +473,7 @@ function buildHamburger() {
     nav += navItem({ href: "index.html", icon: "ti-home", chip: "chip-violet", title: "Home", sub: "Browse the PDF library", page: "index.html" });
     nav += navItem({ href: "index.html#materials", icon: "ti-books", chip: "chip-blue", title: "Materials", sub: "All subjects & levels" });
     nav += navItem({ href: "organizers.html", icon: "ti-notebook", chip: "chip-gold", title: "Organizers", sub: "MAKAUT exam organizers", page: "organizers.html" });
+     nav += navItem({ href: "codespace.html", icon: "ti-code", chip: "chip-blue", title: "Codespace", sub: "Shared live code editor", page: "codespace.html" });
     nav += navItem({ href: "chat.html", icon: "ti-messages", chip: "chip-pink", title: "Community Chat", sub: "Talk with other learners", page: "chat.html" });
     nav += navItem({ href: "friends.html", icon: "ti-users", chip: "chip-green", title: "Friends", sub: "Requests & suggestions", page: "friends.html" });
     if (user) {
