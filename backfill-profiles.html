@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Backfill User Profiles – Admin Tool</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:monospace}
+  body{background:#0A0A12;color:#F0EFF8;padding:40px;min-height:100vh}
+  h1{font-size:20px;margin-bottom:8px;color:#A78BFA}
+  p.sub{color:#A09DC0;margin-bottom:24px;font-size:13px;line-height:1.6}
+  button{padding:12px 24px;background:#6C63FF;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:monospace;margin-bottom:20px}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button.danger{background:#F87171}
+  #log{background:#14141F;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:16px;font-size:12px;line-height:1.7;max-height:600px;overflow-y:auto;white-space:pre-wrap}
+  .ok{color:#34D399}
+  .err{color:#F87171}
+  .info{color:#A09DC0}
+  .warn{color:#FBBF24}
+  #gate{padding:20px;background:#14141F;border-radius:10px;margin-bottom:20px}
+</style>
+</head>
+<body>
+
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+  window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<h1>🔧 Backfill User Profiles</h1>
+<p class="sub">
+  One-time admin tool. Scans views, downloads, follows, friendRequests,
+  and friendships to find every unique user this app has ever seen,
+  then creates a userProfiles/{uid} doc for anyone missing one — so
+  every user resolves correctly on profile.html, even if they've never
+  viewed/downloaded a PDF.<br/><br/>
+  <b style="color:#FBBF24">Admin login required. Safe to run multiple times — existing
+  profiles are never overwritten, only missing ones are created.</b>
+</p>
+
+<div id="gate">Checking admin access…</div>
+
+<div id="controls" style="display:none">
+  <button id="runBtn" onclick="runBackfill()">▶ Run Backfill</button>
+</div>
+
+<div id="log"></div>
+
+<script>
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+const logEl = document.getElementById('log');
+function log(msg, cls) {
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = msg;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+auth.onAuthStateChanged(user => {
+  const gate = document.getElementById('gate');
+  if (!user) {
+    gate.innerHTML = '⚠️ Not signed in. <a href="index.html?login=1" style="color:#A78BFA">Sign in as admin</a> then reload this page.';
+    return;
+  }
+  if (!window.ADMIN_EMAILS.includes(user.email)) {
+    gate.innerHTML = '⛔ Signed in as ' + user.email + ' — this is not an admin account.';
+    return;
+  }
+  gate.innerHTML = '✅ Signed in as admin: ' + user.email;
+  document.getElementById('controls').style.display = 'block';
+});
+
+async function runBackfill() {
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  btn.textContent = 'Running…';
+  logEl.innerHTML = '';
+
+  log('Starting backfill scan…', 'info');
+
+  // userMap: uid -> { name, email, source }
+  const userMap = {};
+
+  function addUser(uid, name, email, source) {
+    if (!uid) return;
+    if (!userMap[uid]) {
+      userMap[uid] = { name: name || null, email: email || null, sources: [] };
+    }
+    if (!userMap[uid].name && name) userMap[uid].name = name;
+    if (!userMap[uid].email && email) userMap[uid].email = email;
+    if (!userMap[uid].sources.includes(source)) userMap[uid].sources.push(source);
+  }
+
+  try {
+    log('Scanning views…', 'info');
+    const viewsSnap = await db.collection('views').get();
+    viewsSnap.forEach(d => {
+      const v = d.data();
+      addUser(v.userId, v.userName, v.userEmail, 'views');
+    });
+    log(`  found ${viewsSnap.size} view docs`, 'ok');
+
+    log('Scanning downloads…', 'info');
+    const dlSnap = await db.collection('downloads').get();
+    dlSnap.forEach(d => {
+      const v = d.data();
+      addUser(v.userId, v.userName, v.userEmail, 'downloads');
+    });
+    log(`  found ${dlSnap.size} download docs`, 'ok');
+
+    log('Scanning follows…', 'info');
+    const followsSnap = await db.collection('follows').get();
+    followsSnap.forEach(d => {
+      const v = d.data();
+      addUser(v.followerId, v.followerName, v.followerEmail, 'follows(follower)');
+      addUser(v.followingId, v.followingName, null, 'follows(following)');
+    });
+    log(`  found ${followsSnap.size} follow docs`, 'ok');
+
+    log('Scanning friendRequests…', 'info');
+    const frSnap = await db.collection('friendRequests').get();
+    frSnap.forEach(d => {
+      const v = d.data();
+      addUser(v.from, v.fromName, v.fromEmail, 'friendRequests(from)');
+      addUser(v.to, v.toName, v.toEmail, 'friendRequests(to)');
+    });
+    log(`  found ${frSnap.size} friendRequest docs`, 'ok');
+
+    log('Scanning friendships…', 'info');
+    const fsSnap = await db.collection('friendships').get();
+    fsSnap.forEach(d => {
+      const v = d.data();
+      (v.users || []).forEach(uid => {
+        const name = v.names ? v.names[uid] : null;
+        addUser(uid, name, null, 'friendships');
+      });
+    });
+    log(`  found ${fsSnap.size} friendship docs`, 'ok');
+
+    log('Scanning chat messages (all rooms)…', 'info');
+    let chatCount = 0;
+    const rooms = ['general','mathematics','physics','chemistry','biology','cs','economics','engineering'];
+    for (const room of rooms) {
+      try {
+        const msgSnap = await db.collection('chats').doc(room).collection('messages').get();
+        msgSnap.forEach(d => {
+          const v = d.data();
+          addUser(v.uid, v.userName, v.email, 'chats');
+          chatCount++;
+        });
+      } catch(e) { /* room might not exist */ }
+    }
+    log(`  found ${chatCount} chat messages`, 'ok');
+
+    const totalUsers = Object.keys(userMap).length;
+    log(``, '');
+    log(`Total unique users discovered: ${totalUsers}`, 'info');
+    log(``, '');
+
+    let created = 0, skipped = 0, failed = 0, noName = 0;
+
+    for (const uid of Object.keys(userMap)) {
+      const u = userMap[uid];
+
+      if (!u.name) {
+        log(`⊘ Skipping ${uid} — no name found in any source (sources checked: ${u.sources.join(', ')})`, 'warn');
+        noName++;
+        continue;
+      }
+
+      try {
+        const existing = await db.collection('userProfiles').doc(uid).get();
+        if (existing.exists) {
+          skipped++;
+          continue; // already has a profile, don't touch it
+        }
+
+        await db.collection('userProfiles').doc(uid).set({
+          uid: uid,
+          displayName: u.name,
+          email: u.email || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+          backfilled: true,
+          backfillSources: u.sources
+        });
+        log(`✓ Created profile for "${u.name}" (${uid.slice(0,8)}…) — from ${u.sources.join(', ')}`, 'ok');
+        created++;
+      } catch(e) {
+        log(`✗ Failed for ${uid.slice(0,8)}…: ${e.message}`, 'err');
+        failed++;
+      }
+    }
+
+    log(``, '');
+    log(`════════════════════════════════════`, 'info');
+    log(`DONE.`, 'ok');
+    log(`  Created: ${created}`, 'ok');
+    log(`  Already existed (skipped): ${skipped}`, 'info');
+    log(`  No name found (skipped): ${noName}`, 'warn');
+    log(`  Failed: ${failed}`, failed > 0 ? 'err' : 'info');
+    log(`════════════════════════════════════`, 'info');
+
+    if (noName > 0) {
+      log(``, '');
+      log(`Note: users with "no name found" only ever appear as a bare uid`, 'warn');
+      log(`somewhere (e.g. follows.followingId with no followingName saved).`, 'warn');
+      log(`These will resolve automatically once that person logs in again.`, 'warn');
+    }
+
+  } catch(err) {
+    log('FATAL ERROR: ' + err.message, 'err');
+    console.error(err);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▶ Run Backfill Again';
+}
+</script>
+</body>
+</html>
