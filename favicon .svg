@@ -1,0 +1,28 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradFav" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6C63FF"/>
+      <stop offset="50%" stop-color="#8B7CF6"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+    <linearGradient id="pageGradFav" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F1EFFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bgGradFav)"/>
+  <rect x="16" y="15" width="22" height="30" rx="3" fill="#FFFFFF" fill-opacity="0.28" transform="rotate(-10 27 30)"/>
+  <path d="M 18 16 L 34 16 Q 37 16 37 19 L 37 41 Q 37 44 34 44 L 21 44 Q 18 44 18 41 Z" fill="url(#pageGradFav)"/>
+  <path d="M 34 16 Q 37 16 37 19 L 37 23 Z" fill="#C7C0FF" opacity="0.7"/>
+  <line x1="22" y1="23" x2="33" y2="23" stroke="#8B7CF6" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+  <line x1="22" y1="27.5" x2="33" y2="27.5" stroke="#8B7CF6" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+  <circle cx="42" cy="40" r="11" fill="#38BDF8" opacity="0.18"/>
+  <line x1="37.5" y1="36" x2="42" y2="40" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+  <line x1="48" y1="34" x2="42" y2="40" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+  <line x1="48" y1="46" x2="42" y2="40" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+  <circle cx="48" cy="34" r="3" fill="#FFFFFF"/>
+  <circle cx="48" cy="46" r="3" fill="#FFFFFF"/>
+  <circle cx="42" cy="40" r="5" fill="#FFFFFF"/>
+  <circle cx="42" cy="40" r="5" fill="none" stroke="#6C63FF" stroke-width="1.5"/>
+  <circle cx="42" cy="40" r="1.8" fill="#38BDF8"/>
+</svg>
