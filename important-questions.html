@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Important Questions - StudyHub</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0A0A12;--bg2:#0F0F1C;--bg3:#13131F;--card:#14141F;--card2:#1A1A2E;
+    --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+    --accent:#6C63FF;--accent2:#A78BFA;--accent3:#38BDF8;--accent4:#F472B6;
+    --gold:#FBBF24;--green:#34D399;--red:#F87171;
+    --text:#F0EFF8;--text2:#A09DC0;--text3:#6B6880;
+    --r:14px;--r2:20px;--r3:28px;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:var(--bg2)}
+  ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:99px}
+  .orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+  .orb1{width:550px;height:550px;top:-180px;left:-120px;background:rgba(52,211,153,0.1)}
+  .orb2{width:420px;height:420px;bottom:8%;right:-110px;background:rgba(108,99,255,0.1)}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,18,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);text-decoration:none}
+  .back-link{display:flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;padding:7px 14px;border-radius:9px;border:1px solid var(--border2);transition:all .2s}
+  .back-link:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
+  .nav-right{display:flex;align-items:center;gap:10px}
+  .btn-ghost{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);color:var(--text2);background:transparent;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
+  .user-pill{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:99px;background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.25);cursor:pointer}
+  .user-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+  .page{padding:100px 5% 70px;position:relative;z-index:1;max-width:1100px;margin:0 auto}
+  .page-header{text-align:center;margin-bottom:46px}
+  .page-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:99px;border:1px solid rgba(52,211,153,0.3);background:rgba(52,211,153,0.08);font-size:12px;font-weight:600;color:var(--green);margin-bottom:18px}
+  .page-header h1{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:800;margin-bottom:10px}
+  .page-header p{font-size:14px;color:var(--text2);max-width:520px;margin:0 auto;line-height:1.7}
+  .unlocked-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+  .iq-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:22px;transition:all .25s}
+  .iq-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+  .iq-card-icon{width:44px;height:44px;border-radius:12px;background:rgba(52,211,153,0.12);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+  .iq-card h3{font-size:15px;font-weight:700;margin-bottom:8px}
+  .iq-card p{font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:14px}
+  .iq-open-btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(52,211,153,0.12);color:var(--green);border:1px solid rgba(52,211,153,0.25);cursor:pointer;font-family:inherit}
+  .checkout-wrap{display:grid;grid-template-columns:1.1fr 0.9fr;gap:0;background:var(--card);border:1px solid var(--border2);border-radius:var(--r3);overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,0.4)}
+  @media(max-width:860px){.checkout-wrap{grid-template-columns:1fr}}
+  .checkout-left{padding:44px 40px;background:linear-gradient(160deg,var(--card2),var(--bg2))}
+  .lock-icon-big{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--accent),#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;margin-bottom:24px;box-shadow:0 0 36px rgba(108,99,255,0.35)}
+  .checkout-left h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:10px;line-height:1.2}
+  .checkout-left .sub{font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:28px}
+  .feature-list{display:flex;flex-direction:column;gap:14px;margin-bottom:30px}
+  .feature-row{display:flex;align-items:flex-start;gap:12px}
+  .feature-row .fchk{width:22px;height:22px;border-radius:7px;background:rgba(52,211,153,0.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px}
+  .feature-row span{font-size:13px;color:var(--text2);line-height:1.5}
+  .feature-row b{color:var(--text)}
+  .preview-list{display:flex;flex-direction:column;gap:8px}
+  .preview-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:12.5px;color:var(--text3)}
+  .preview-item i{font-size:14px;color:var(--text3)}
+  .preview-item .blur-text{filter:blur(3px);user-select:none;flex:1}
+  .checkout-right{padding:44px 40px;background:var(--bg2);display:flex;flex-direction:column}
+  .price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+  .price-row .amount{font-family:'Syne',sans-serif;font-size:38px;font-weight:800}
+  .price-row .currency{font-size:18px;color:var(--text2);font-weight:600}
+  .price-note{font-size:12px;color:var(--text3);margin-bottom:28px;display:flex;align-items:center;gap:6px}
+  .order-summary{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:24px}
+  .order-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text2);padding:7px 0}
+  .order-row.total{border-top:1px solid var(--border);margin-top:6px;padding-top:12px;font-weight:700;color:var(--text);font-size:14px}
+  .pay-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s;box-shadow:0 0 30px rgba(108,99,255,0.4);display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:14px}
+  .pay-btn:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(108,99,255,0.55)}
+  .pay-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  .secure-note{display:flex;align-items:center;justify-content:center;gap:7px;font-size:11.5px;color:var(--text3)}
+  .secure-note i{color:var(--green)}
+  .pay-methods{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+  .pm-chip{padding:5px 11px;border-radius:7px;background:var(--card);border:1px solid var(--border);font-size:10.5px;color:var(--text3);font-weight:600}
+  .gate-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:50;background:var(--bg)}
+  .gate-card{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:40px;max-width:420px;width:100%;text-align:center}
+  .gate-card i{font-size:42px;color:var(--accent2);margin-bottom:18px;display:block}
+  .gate-card h2{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;margin-bottom:8px}
+  .gate-card p{font-size:13.5px;color:var(--text2);margin-bottom:22px;line-height:1.65}
+  .btn-primary{padding:11px 24px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+  .modal-backdrop{display:none;position:fixed;inset:0;z-index:300;background:rgba(5,5,12,0.9);backdrop-filter:blur(10px);align-items:center;justify-content:center}
+  .modal-backdrop.show{display:flex}
+  .success-modal{background:var(--card2);border:1px solid rgba(52,211,153,0.3);border-radius:var(--r3);padding:44px 40px;max-width:400px;width:100%;text-align:center;animation:successIn .4s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes successIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+  .success-icon{width:72px;height:72px;border-radius:50%;background:rgba(52,211,153,0.15);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--green);margin:0 auto 20px}
+  .success-modal h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:10px}
+  .success-modal p{font-size:13.5px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+  .toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:14px 20px;border-radius:12px;background:var(--card2);border:1px solid var(--border2);font-size:13.5px;color:var(--text);box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{border-color:rgba(52,211,153,.3)}
+  .toast.error{border-color:rgba(248,113,113,.3)}
+  @media(max-width:640px){
+    nav{padding:0 16px}
+    .page{padding:88px 16px 60px}
+    .checkout-left,.checkout-right{padding:30px 24px}
+  }
+</style>
+</head>
+<body>
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+  window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
+  window.RAZORPAY_KEY_ID = "rzp_live_T3zb7E7ZTvAM9K";
+  window.IQ_PRICE_INR = 199;
+  window.IQ_PRICE_PAISE = 19900;
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="gate-screen" id="gateScreen" style="display:none">
+  <div class="gate-card">
+    <i class="ti ti-star"></i>
+    <h2>Sign in to continue</h2>
+    <p>Sign in to unlock Important Questions - premium, curated content for serious exam prep.</p>
+    <a href="index.html?login=1" class="btn-primary"><i class="ti ti-login"></i> Sign In</a>
+  </div>
+</div>
+<nav id="mainNav" style="display:none">
+  <a href="index.html" class="back-link"><i class="ti ti-arrow-left"></i> <span>Back</span></a>
+  <a href="index.html" class="nav-logo">
+    <img src="studyhub-icon.svg" style="width:34px;height:34px;border-radius:9px;object-fit:cover" alt="StudyHub"/>
+    StudyHub
+  </a>
+  <div class="nav-right" id="navRight"></div>
+</nav>
+<div class="page" id="mainPage" style="display:none">
+  <div class="page-header">
+    <div class="page-badge"><i class="ti ti-star-filled" style="font-size:13px"></i> Premium Content</div>
+    <h1>Important Questions</h1>
+    <p>Hand-picked, high-yield questions curated for exam success - unlock once, access forever.</p>
+  </div>
+  <div id="loadingState" style="text-align:center;padding:60px;color:var(--text3)">
+    <i class="ti ti-loader spin" style="font-size:30px"></i>
+  </div>
+  <div id="lockedView" style="display:none">
+    <div class="checkout-wrap">
+      <div class="checkout-left">
+        <div class="lock-icon-big"><i class="ti ti-lock"></i></div>
+        <h2>Unlock Important Questions</h2>
+        <p class="sub">A single one-time payment gives you permanent access to every curated question set - past, present, and future additions.</p>
+        <div class="feature-list">
+          <div class="feature-row">
+            <div class="fchk"><i class="ti ti-check"></i></div>
+            <span><b>Pay once, own forever</b> - no subscriptions, no recurring charges</span>
+          </div>
+          <div class="feature-row">
+            <div class="fchk"><i class="ti ti-check"></i></div>
+            <span><b>All future additions included</b> - new question sets unlock automatically</span>
+          </div>
+          <div class="feature-row">
+            <div class="fchk"><i class="ti ti-check"></i></div>
+            <span><b>Curated by top performers</b> - high-yield, exam-focused selections</span>
+          </div>
+        </div>
+        <div class="preview-list" id="previewList"></div>
+      </div>
+      <div class="checkout-right">
+        <div class="price-row">
+          <span class="amount" id="priceAmount">Rs199</span>
+          <span class="currency">one-time</span>
+        </div>
+        <div class="price-note"><i class="ti ti-infinity" style="font-size:13px;color:var(--green)"></i> Lifetime access, no renewal</div>
+        <div class="order-summary">
+          <div class="order-row"><span>Important Questions - Full Access</span><span id="orderPrice">Rs199</span></div>
+          <div class="order-row"><span>Platform fee</span><span>Rs0</span></div>
+          <div class="order-row total"><span>Total</span><span id="orderTotal">Rs199</span></div>
+        </div>
+        <button class="pay-btn" id="payBtn" onclick="startPayment()">
+          <i class="ti ti-credit-card"></i> Unlock Now
+        </button>
+        <div class="secure-note"><i class="ti ti-shield-check"></i> Secured by Razorpay - 256-bit encryption</div>
+        <div class="pay-methods">
+          <span class="pm-chip">UPI</span>
+          <span class="pm-chip">Cards</span>
+          <span class="pm-chip">Netbanking</span>
+          <span class="pm-chip">Wallets</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="unlockedView" style="display:none">
+    <div class="unlocked-grid" id="unlockedGrid"></div>
+  </div>
+</div>
+<div class="modal-backdrop" id="successModal">
+  <div class="success-modal">
+    <div class="success-icon"><i class="ti ti-check"></i></div>
+    <h2>Unlocked!</h2>
+    <p>Your payment was successful. You now have permanent access to all Important Questions.</p>
+    <button class="btn-primary" onclick="closeSuccessModal()" style="width:100%;justify-content:center">Start Exploring</button>
+  </div>
+</div>
+<div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
+<style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}.spin{animation:spin 1s linear infinite}</style>
+<script>
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let currentUser = null;
+const ITEM_ID = 'important_questions_bundle';
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function isAdminUser(u){ return u && window.ADMIN_EMAILS.includes(u.email); }
+auth.onAuthStateChanged(async user => {
+  currentUser = user;
+  if(!user){
+    document.getElementById('gateScreen').style.display = 'flex';
+    document.getElementById('mainNav').style.display = 'none';
+    document.getElementById('mainPage').style.display = 'none';
+    return;
+  }
+  document.getElementById('gateScreen').style.display = 'none';
+  document.getElementById('mainNav').style.display = 'flex';
+  document.getElementById('mainPage').style.display = 'block';
+  buildNav(user);
+  document.getElementById('priceAmount').textContent = 'Rs' + window.IQ_PRICE_INR;
+  document.getElementById('orderPrice').textContent = 'Rs' + window.IQ_PRICE_INR;
+  document.getElementById('orderTotal').textContent = 'Rs' + window.IQ_PRICE_INR;
+  await checkAccess(user);
+});
+function buildNav(user){
+  const nr = document.getElementById('navRight');
+  const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  nr.innerHTML = '<div class="user-pill"><div class="user-av">' + initials + '</div><span style="font-size:12px;color:var(--text2)">' + escHtml(user.displayName||user.email.split('@')[0]) + '</span></div>';
+}
+async function checkAccess(user){
+  document.getElementById('loadingState').style.display = 'block';
+  if (isAdminUser(user)) {
+    showUnlocked();
+    return;
+  }
+  try {
+    const purchaseId = user.uid + '_' + ITEM_ID;
+    const snap = await db.collection('purchases').doc(purchaseId).get();
+    if (snap.exists && snap.data().status === 'completed') {
+      showUnlocked();
+    } else {
+      showLocked();
+    }
+  } catch(e) {
+    console.error('checkAccess error:', e);
+    showLocked();
+  }
+}
+function showLocked(){
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('lockedView').style.display = 'block';
+  document.getElementById('unlockedView').style.display = 'none';
+  renderPreviewTeaser();
+}
+async function showUnlocked(){
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('lockedView').style.display = 'none';
+  document.getElementById('unlockedView').style.display = 'block';
+  await loadQuestionSets();
+}
+function renderPreviewTeaser(){
+  const items = [
+    {icon:'ti-math-function', label:'Mathematics - High Yield Set'},
+    {icon:'ti-atom', label:'Physics - Frequently Asked'},
+    {icon:'ti-code', label:'CS & Tech - Exam Predictions'}
+  ];
+  document.getElementById('previewList').innerHTML = items.map(function(i){
+    return '<div class="preview-item"><i class="ti ' + i.icon + '"></i><span class="blur-text">' + escHtml(i.label) + ' - Q1, Q2, Q3...</span><i class="ti ti-lock" style="font-size:12px"></i></div>';
+  }).join('');
+}
+async function loadQuestionSets(){
+  const grid = document.getElementById('unlockedGrid');
+  try {
+    const snap = await db.collection('importantQuestions').orderBy('createdAt','desc').get();
+    if(snap.empty){
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--text3)"><i class="ti ti-folder-open" style="font-size:36px;display:block;margin-bottom:12px"></i>No question sets uploaded yet. Check back soon!</div>';
+      return;
+    }
+    grid.innerHTML = snap.docs.map(function(d){
+      const q = d.data();
+      return '<div class="iq-card"><div class="iq-card-icon"><i class="ti ' + (q.icon||'ti-file-text') + '"></i></div><h3>' + escHtml(q.title||'Untitled Set') + '</h3><p>' + escHtml(q.description||'') + '</p><button class="iq-open-btn" onclick="window.open(\'' + escHtml(q.fileUrl||'#') + '\',\'_blank\')"><i class="ti ti-eye"></i> View</button></div>';
+    }).join('');
+  } catch(e){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--red)">Error loading content: ' + escHtml(e.message) + '</div>';
+  }
+}
+async function startPayment(){
+  if(!currentUser){ showToast('Please sign in first', 'error'); return; }
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader spin"></i> Preparing checkout...';
+  try {
+    const orderRes = await fetch('/api/create-order', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        amount: window.IQ_PRICE_PAISE,
+        itemId: ITEM_ID,
+        firebaseUid: currentUser.uid
+      })
+    });
+    if(!orderRes.ok){
+      const err = await orderRes.json();
+      throw new Error(err.error || 'Could not create order');
+    }
+    const order = await orderRes.json();
+    const options = {
+      key: window.RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: 'StudyHub',
+      description: 'Important Questions - Lifetime Access',
+      image: 'studyhub-icon.svg',
+      order_id: order.orderId,
+      prefill: {
+        name: currentUser.displayName || '',
+        email: currentUser.email || ''
+      },
+      theme: { color: '#6C63FF' },
+      handler: async function(response){
+        await verifyAndUnlock(response);
+      },
+      modal: {
+        ondismiss: function(){
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-credit-card"></i> Unlock Now';
+        }
+      }
+    };
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(response){
+      showToast('Payment failed: ' + (response.error && response.error.description ? response.error.description : 'Please try again'), 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-credit-card"></i> Unlock Now';
+    });
+    rzp.open();
+    btn.innerHTML = '<i class="ti ti-credit-card"></i> Unlock Now';
+    btn.disabled = false;
+  } catch(e){
+    console.error('startPayment error:', e);
+    showToast('Error: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-credit-card"></i> Unlock Now';
+  }
+}
+async function verifyAndUnlock(razorpayResponse){
+  showToast('Verifying payment...', 'success');
+  try {
+    const verifyRes = await fetch('/api/verify-payment', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        razorpay_order_id: razorpayResponse.razorpay_order_id,
+        razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+        razorpay_signature: razorpayResponse.razorpay_signature,
+        firebaseUid: currentUser.uid,
+        firebaseEmail: currentUser.email,
+        itemId: ITEM_ID,
+        amount: window.IQ_PRICE_PAISE
+      })
+    });
+    if(!verifyRes.ok){
+      const err = await verifyRes.json();
+      throw new Error(err.error || 'Verification failed');
+    }
+    document.getElementById('successModal').classList.add('show');
+    await showUnlocked();
+  } catch(e){
+    console.error('verifyAndUnlock error:', e);
+    showToast('Payment received but verification failed - contact support with your payment ID: ' + razorpayResponse.razorpay_payment_id, 'error');
+  }
+}
+function closeSuccessModal(){
+  document.getElementById('successModal').classList.remove('show');
+}
+function showToast(msg, type){
+  type = type || 'success';
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').className = type==='success' ? 'ti ti-check' : 'ti ti-alert-circle';
+  t.className = 'toast ' + type + ' show';
+  setTimeout(function(){ t.classList.remove('show'); }, 4000);
+}
+</script>
+<script src="notifications.js"></script>
+</body>
+</html>
