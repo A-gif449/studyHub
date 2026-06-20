@@ -657,51 +657,94 @@ async function handleLogout(){ await auth.signOut(); window.location.href='index
 // ── Load Profile ──
 async function loadProfile(uid, viewer){
   try {
-    const viewsSnap = await db.collection('views')
-      .where('userId','==',uid).orderBy('viewedAt','desc').limit(50).get();
-    const dlSnap = await db.collection('downloads')
-      .where('userId','==',uid).orderBy('downloadedAt','desc').limit(50).get();
-
-    const views     = viewsSnap.docs.map(d=>({id:d.id,...d.data()}));
-    const downloads = dlSnap.docs.map(d=>({id:d.id,...d.data()}));
-
-    let displayName = 'Unknown User';
-    let email       = '—';
+    // ── STEP 1: Always try userProfiles FIRST — this is the
+    //    reliable source of truth, written on every login,
+    //    regardless of whether the user has any activity. ──
+    let displayName = null;
+    let email       = null;
     let createdAt   = null;
     let adminFlag   = false;
-
-    // ── FIXED: always use auth user data when viewing own profile ──
-    if(viewer && viewer.uid === uid){
+ 
+    try {
+      const profSnap = await db.collection('userProfiles').doc(uid).get();
+      if (profSnap.exists) {
+        const pd = profSnap.data();
+        displayName = pd.displayName || null;
+        email       = pd.email || null;
+        createdAt   = pd.createdAt ? new Date(pd.createdAt.seconds * 1000) : null;
+        adminFlag   = window.ADMIN_EMAILS.includes(email);
+      }
+    } catch(e) { /* ignore, fall through to other sources */ }
+ 
+    // ── STEP 2: Pull activity (views/downloads) for STATS only,
+    //    never as the identity source anymore. ──
+    let views = [];
+    let downloads = [];
+    try {
+      const viewsSnap = await db.collection('views')
+        .where('userId','==',uid).orderBy('viewedAt','desc').limit(50).get();
+      views = viewsSnap.docs.map(d=>({id:d.id,...d.data()}));
+    } catch(e) {}
+    try {
+      const dlSnap = await db.collection('downloads')
+        .where('userId','==',uid).orderBy('downloadedAt','desc').limit(50).get();
+      downloads = dlSnap.docs.map(d=>({id:d.id,...d.data()}));
+    } catch(e) {}
+ 
+    // ── STEP 3: If viewing own profile, auth data always wins
+    //    (freshest possible — overrides userProfiles in case
+    //    it hasn't synced yet). ──
+    if (viewer && viewer.uid === uid) {
       displayName = viewer.displayName || viewer.email.split('@')[0];
       email       = viewer.email;
       createdAt   = viewer.metadata?.creationTime
-                      ? new Date(viewer.metadata.creationTime) : null;
+                      ? new Date(viewer.metadata.creationTime) : createdAt;
       adminFlag   = isAdmin(viewer);
-    } else if(views.length > 0){
-      displayName = views[0].userName  || '—';
-      email       = views[0].userEmail || '—';
-      adminFlag   = window.ADMIN_EMAILS.includes(email);
-    } else if(downloads.length > 0){
-      displayName = downloads[0].userName  || '—';
-      email       = downloads[0].userEmail || '—';
-      adminFlag   = window.ADMIN_EMAILS.includes(email);
-    } else if(viewer && viewer.uid === uid){
-      // ── Fallback: own profile, zero activity — still show it ──
-      displayName = viewer.displayName || viewer.email.split('@')[0];
-      email       = viewer.email;
-    } else {
+    }
+ 
+    // ── STEP 4: Last-resort fallback to views/downloads identity
+    //    (covers any legacy users who logged in before this fix
+    //    shipped and haven't logged in again yet). ──
+    if (!displayName && views.length > 0) {
+      displayName = views[0].userName  || null;
+      email       = email || views[0].userEmail || null;
+    }
+    if (!displayName && downloads.length > 0) {
+      displayName = downloads[0].userName  || null;
+      email       = email || downloads[0].userEmail || null;
+    }
+    if (email && !adminFlag) {
+      adminFlag = window.ADMIN_EMAILS.includes(email);
+    }
+ 
+    // ── STEP 5: Truly nothing found anywhere → not found ──
+    if (!displayName) {
       showState('notFoundState');
       return;
     }
-
-    profileData = { uid, displayName, email, createdAt, adminFlag, views, downloads };
+ 
+    profileData = { uid, displayName, email: email || '—', createdAt, adminFlag, views, downloads };
     renderProfile(profileData, viewer);
     showState('mainPage');
-
+ 
+    // ── STEP 6: Log this view + notify the profile owner
+    //    (only if someone OTHER than the owner is looking) ──
+    if (viewer && viewer.uid !== uid) {
+      try {
+        await db.collection('profileViews').add({
+          viewerUid: viewer.uid,
+          viewerName: viewer.displayName || viewer.email.split('@')[0],
+          viewerEmail: viewer.email,
+          profileOwnerUid: uid,
+          viewedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch(e) {
+        console.warn('profileView log error:', e);
+      }
+    }
+ 
   } catch(err){
     console.error(err);
-    // ── FIXED: if Firestore query fails (e.g. missing index),
-    //    still show own profile using auth data ──
     if(viewer && viewer.uid === uid){
       profileData = {
         uid,

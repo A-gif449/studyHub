@@ -9,7 +9,8 @@
   /* ─── state ─── */
   let unread     = [];   // array of new PDF objects
   let allRecent  = []; 
-  let friendRequestNotifs = [];  // last MAX_SHOW PDFs (for the list)
+  let friendRequestNotifs = [];
+  let profileViewNotifs = [];  // last MAX_SHOW PDFs (for the list)
   let panelOpen  = false;
 
   /* ─── wait for DOM + Firebase ─── */
@@ -428,8 +429,16 @@ function subscribeToFirestore() {
       );
 
     // Listen to incoming friend requests for the current user
+        // Listen to incoming friend requests for the current user
     auth.onAuthStateChanged(function (user) {
       if (!user) return;
+ 
+      // ── Sync this user's identity into userProfiles ──
+      // Runs on every login / page load so EVERY registered user
+      // has a permanent, reliable profile record — regardless of
+      // whether they've ever viewed/downloaded a PDF.
+      syncUserProfile(user);
+ 
       db.collection("friendRequests")
         .where("to", "==", user.uid)
         .where("status", "==", "pending")
@@ -443,7 +452,35 @@ function subscribeToFirestore() {
         }, function (err) {
           console.warn("[StudyHub Notif] friendRequests error:", err.message);
         });
+ 
+      // ── Listen for profile views (notify when someone viewed you) ──
+      db.collection("profileViews")
+        .where("profileOwnerUid", "==", user.uid)
+        .orderBy("viewedAt", "desc")
+        .limit(MAX_SHOW)
+        .onSnapshot(function (snap) {
+          profileViewNotifs = snap.docs.map(function (d) {
+            return Object.assign({ id: d.id, _type: "profileView" }, d.data());
+          });
+          computeUnread();
+          renderList();
+          updateBadge();
+        }, function (err) {
+          console.warn("[StudyHub Notif] profileViews error:", err.message);
+        });
     });
+ 
+  function syncUserProfile(user) {
+    db.collection("userProfiles").doc(user.uid).set({
+      uid: user.uid,
+      displayName: user.displayName || user.email.split("@")[0],
+      email: user.email,
+      lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(function(err) {
+      console.warn("[StudyHub] userProfile sync error:", err.message);
+    });
+  }
   }
 
   /* ══════════════════════════════════════════════════════════
@@ -454,15 +491,20 @@ function subscribeToFirestore() {
     return v ? new Date(v) : new Date(0); // epoch = first ever visit
   }
 
-function computeUnread() {
+  function computeUnread() {
     const lastSeen = getLastSeen();
     const unreadPdfs = allRecent.filter(function (pdf) {
       if (!pdf.uploadedAt) return false;
       const ts = pdf.uploadedAt.toDate ? pdf.uploadedAt.toDate() : new Date(pdf.uploadedAt);
       return ts > lastSeen;
     });
+    const unreadProfileViews = profileViewNotifs.filter(function (pv) {
+      if (!pv.viewedAt) return false;
+      const ts = pv.viewedAt.toDate ? pv.viewedAt.toDate() : new Date(pv.viewedAt);
+      return ts > lastSeen;
+    });
     // All pending friend requests are always "unread" until accepted/declined
-    unread = [...unreadPdfs, ...friendRequestNotifs];
+    unread = [...unreadPdfs, ...friendRequestNotifs, ...unreadProfileViews];
   }
 
   function markAllRead() {
@@ -578,6 +620,25 @@ function computeUnread() {
     }).join("");
 
     // Render PDF notifications
+   // Render profile view notifications
+    const profileViewHtml = profileViewNotifs.map(function (pv) {
+      const ts = pv.viewedAt ? (pv.viewedAt.toDate ? pv.viewedAt.toDate() : new Date(pv.viewedAt)) : new Date();
+      const ago = timeAgo(ts);
+      return `
+        <div class="sh-item sh-new" onclick="window._shOpenProfileViewer('${esc(pv.viewerUid)}')">
+          <div class="sh-emoji">👀</div>
+          <div class="sh-item-body">
+            <div class="sh-item-title">${esc(pv.viewerName || "Someone")} viewed your profile recently</div>
+            <div class="sh-item-meta">
+              <span class="sh-tag">Profile View</span>
+              <span>· ${ago}</span>
+            </div>
+          </div>
+          <div class="sh-dot"></div>
+        </div>`;
+    }).join("");
+
+    // Render PDF notifications
     const pdfHtml = allRecent.map(function (pdf) {
       const emoji = subjectEmoji[pdf.subject] || subjectEmoji["Default"];
       const _new  = isNew(pdf);
@@ -602,7 +663,7 @@ function computeUnread() {
         </div>`;
     }).join("");
 
-    list.innerHTML = friendReqHtml + pdfHtml;
+    list.innerHTML = friendReqHtml + profileViewHtml + pdfHtml;
   }
 
   /* ── open a PDF ── */
@@ -610,6 +671,11 @@ function computeUnread() {
   window._shOpenFriends = function () {
     closePanel();
     window.location.href = "friends.html?tab=requests";
+  };
+
+  window._shOpenProfileViewer = function (uid) {
+    closePanel();
+    window.location.href = "profile.html?uid=" + encodeURIComponent(uid);
   };
 
   window._shOpenPdf = function (id) {
