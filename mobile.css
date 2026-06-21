@@ -93,13 +93,27 @@
 .sh-drawer-nav {
   flex: 1 1 auto;
   padding: 14px 14px 6px;
-  position: relative !important;
+  /* position: relative !important; */
   display: flex;
   flex-direction: column;
   gap: 7px;
   overflow-y: auto;
   min-height: 0;
 }
+
+#sh-drawer-panel nav.sh-drawer-nav {
+  position: relative !important;
+  height: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: auto !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  border-bottom: none !important;
+  padding: 14px 14px 6px !important;
+}
+
 @keyframes drawerSlideIn {
   from { transform: translateX(105%) }
   to   { transform: translateX(0) }
