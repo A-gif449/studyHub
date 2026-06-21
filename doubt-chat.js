@@ -264,14 +264,22 @@
         flex-shrink: 0;
       }
 
-      @media (max-width: 480px) {
-        #sh-doubt-panel {
-          bottom: 0; right: 0; left: 0;
-          width: 100%; border-radius: 24px 24px 0 0;
-          height: 70vh;
-        }
-        #sh-doubt-fab { bottom: 16px; right: 16px; }
-      }
+    @media (max-width: 480px) {
+  #sh-doubt-panel {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    border-radius: 24px 24px 0 0;
+    height: 70vh;
+  }
+  #sh-doubt-fab {
+    bottom: 16px;
+    right: 16px;
+    /* Hide FAB when panel is open */
+    display: none;
+  }
+}
     `;
     document.head.appendChild(style);
 
@@ -347,14 +355,17 @@
   /* ─── PANEL TOGGLE ─────────────────────────────────────────── */
   function togglePanel() { isOpen ? closePanel() : openPanel(); }
   function openPanel() {
-    isOpen = true;
-    document.getElementById("sh-doubt-panel").classList.add("open");
-    setTimeout(function () { document.getElementById("sh-doubt-input").focus(); }, 250);
-  }
-  function closePanel() {
-    isOpen = false;
-    document.getElementById("sh-doubt-panel").classList.remove("open");
-  }
+  isOpen = true;
+  document.getElementById("sh-doubt-panel").classList.add("open");
+  document.getElementById("sh-doubt-fab").style.display = "none"; // ← add
+  setTimeout(function () { document.getElementById("sh-doubt-input").focus(); }, 250);
+}
+  
+function closePanel() {
+  isOpen = false;
+  document.getElementById("sh-doubt-panel").classList.remove("open");
+  document.getElementById("sh-doubt-fab").style.display = "flex"; // ← add
+}
 
   /* ─── SEND MESSAGE ─────────────────────────────────────────── */
   function sendMessage() {
