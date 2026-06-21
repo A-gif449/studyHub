@@ -184,6 +184,14 @@
   @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
   @media(max-width:768px){.hero-float{display:none}}
   @media(max-width:640px){nav{padding:0 20px}.nav-links{display:none}section{padding:60px 20px}.cta-banner{padding:36px 28px}footer{padding:50px 20px 30px}}
+  .nav-divider{width:1px;height:18px;background:var(--border2);margin:0 4px;flex-shrink:0}
+  .nav-links{display:flex;align-items:center;gap:4px}
+  .nav-link-icon{display:inline-flex;align-items:center;gap:5px;color:var(--text2);text-decoration:none;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;transition:all .2s}
+  .nav-link-icon i{font-size:15px}
+  .nav-link-icon:hover{color:var(--text);background:rgba(255,255,255,0.05)}
+  .nav-link-highlight{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--gold);background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);text-decoration:none;transition:all .2s}
+  .nav-link-highlight i{font-size:14px}
+  .nav-link-highlight:hover{background:rgba(251,191,36,0.14);border-color:rgba(251,191,36,0.35)}
 </style>
 <link rel="stylesheet" href="mobile.css"/>
 </head>
@@ -236,13 +244,13 @@
   <div class="nav-links">
     <a href="#materials">Materials</a>
     <a href="#categories">Categories</a>
-    <a href="organizers.html">📘 Organizers</a>
-    <a href="codespace.html">💻 Codespace</a>
-     <a href="important-questions.html">⭐ Important Questions</a>
     <a href="#features">Features</a>
-    <a href="#reviews">Reviews</a>
-    <a href="chat.html">💬 Community Chat</a>
-    <a href="friends.html">👥 Friends</a>
+    <div class="nav-divider"></div>
+    <a href="organizers.html" class="nav-link-icon"><i class="ti ti-notebook"></i> Organizers</a>
+    <a href="codespace.html" class="nav-link-icon"><i class="ti ti-code"></i> Codespace</a>
+    <a href="chat.html" class="nav-link-icon"><i class="ti ti-messages"></i> Chat</a>
+    <a href="friends.html" class="nav-link-icon"><i class="ti ti-users"></i> Friends</a>
+    <a href="important-questions.html" class="nav-link-highlight"><i class="ti ti-star"></i> Important Qs</a>
   </div>
   <!-- <div class="nav-right" id="navRight">
     <button class="btn-ghost" onclick="openModal('login')">Sign In</button>
