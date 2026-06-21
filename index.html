@@ -217,25 +217,6 @@
     footer{padding:48px 20px 28px}
   }
 
-  <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0E0F12;--bg2:#13141A;--bg3:#181A21;--card:#15161C;--card2:#1B1D25;
-  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
-  --accent:#5B7FFF;--accent2:#8FA3D6;--accent3:#3FA9CC;
-  --gold:#C9A356;--green:#4E9E78;--red:#C2564F;
-  --text:#ECEDF1;--text2:#9498A6;--text3:#62656F;
-  --r:10px;--r2:14px;--r3:18px;
-}
-body{
-  font-family:'Inter',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
- 
 /* ══════════════════════════════════════════
    VIDEO SHOWCASE SECTION
 ══════════════════════════════════════════ */
@@ -600,8 +581,6 @@ body{
   color: var(--accent2);
   font-family: monospace;
 }
-</style>
-
 </style>
 <link rel="stylesheet" href="mobile.css"/>
 </head>
@@ -1261,7 +1240,7 @@ if (new URLSearchParams(location.search).get('login') === '1') {
      ⚙️  CONFIGURATION — paste your Pexels key here
      Get one free at: https://www.pexels.com/api/
   ══════════════════════════════════════════════ */
-  const PEXELS_API_KEY = "YOUR_PEXELS_API_KEY_HERE";
+  const PEXELS_API_KEY = "IQkl8ehpw8Tky3Z7bYIHFJ8XwCizd0ej5IMkHpBkFw8JxzqkwaVBD4Sr";
  
   /* Search queries — Pexels will return real footage for each */
   const SEARCHES = [
@@ -1399,7 +1378,7 @@ if (new URLSearchParams(location.search).get('login') === '1') {
  
   /* ── Main: fetch all videos then populate rows ── */
   async function initVideoShowcase() {
-    if (!PEXELS_API_KEY || PEXELS_API_KEY === "IQkl8ehpw8Tky3Z7bYIHFJ8XwCizd0ej5IMkHpBkFw8JxzqkwaVBD4Sr") {
+    if (!PEXELS_API_KEY || PEXELS_API_KEY === "YOUR_PEXELS_API_KEY_HERE") {
       showError();
       return;
     }
