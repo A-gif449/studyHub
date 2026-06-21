@@ -1,0 +1,54 @@
+<!-- ════════════════════════════════════════
+         IMPORTANT QUESTIONS — UPLOAD SECTION
+         ════════════════════════════════════════ -->
+    <div class="panel" style="margin-top:24px">
+      <div class="panel-title"><i class="ti ti-star"></i> Important Questions (Paid Content)</div>
+      <div class="upload-error" id="iqUploadError"></div>
+      <div class="upload-success" id="iqUploadSuccess"><i class="ti ti-circle-check"></i><span id="iqUploadSuccessMsg"></span></div>
+
+      <div class="grid-2" style="grid-template-columns:420px 1fr">
+        <div>
+          <div class="drop-zone" id="iqDropZone">
+            <input type="file" id="iqFile" accept="image/*" onchange="handleIqFileSelect(this)"/>
+            <div class="drop-icon"><i class="ti ti-star"></i></div>
+            <h4>Drop file here or click to browse</h4>
+            <p>Maximum file size: 50 MB</p>
+          </div>
+
+          <div class="progress-wrap" id="iqProgressWrap">
+            <div class="progress-label">
+              <span id="iqProgressText">Uploading to Cloudinary…</span>
+              <span id="iqProgressPct">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="iqProgressFill"></div></div>
+          </div>
+
+          <div class="form-group">
+            <label>Title *</label>
+            <input type="text" id="iqTitle" placeholder="e.g. Mathematics – Semester 5 Important Questions"/>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="iqDesc" placeholder="Brief description shown on the card…"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Icon (Tabler icon name)</label>
+            <input type="text" id="iqIcon" placeholder="e.g. ti-math-function, ti-atom, ti-flask"/>
+          </div>
+
+          <button class="form-submit" id="iqUploadBtn" onclick="handleIqUpload()">
+            <i class="ti ti-upload"></i> Upload & Publish Question Set
+          </button>
+        </div>
+
+        <div>
+          <div class="search-bar">
+            <input type="text" id="iqSearchInput" placeholder="Search question sets…" oninput="filterIqList()"/>
+            <button class="btn-ghost" onclick="document.getElementById('iqSearchInput').value='';filterIqList()"><i class="ti ti-x"></i></button>
+          </div>
+          <div class="pdf-list" id="iqList">
+            <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
