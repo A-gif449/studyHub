@@ -377,21 +377,18 @@
     const pdfTitle = getCurrentPdfTitle();
    const apiKey = null; // handled server-side via /api/claude
 
-    fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // "x-api-key": apiKey,
-        // "anthropic-version": "2023-06-01",
-        // "anthropic-dangerous-direct-browser-calls": "true"
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: MAX_TOKENS,
-        system: buildSystemPrompt(pdfTitle),
-        messages: messages
-      })
-    })
+    fetch("/api/claude", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+    model: MODEL,
+    max_tokens: MAX_TOKENS,
+    system: buildSystemPrompt(pdfTitle),
+    messages: messages
+  })
+})
     .then(function (res) { return res.json(); })
     .then(function (data) {
       removeTyping(typingEl);
