@@ -69,7 +69,24 @@
   }
 
   /* avatar */
-  .profile-avatar-wrap{position:relative;flex-shrink:0}
+  .profile-avatar-wrap{position:relative;flex-shrink:0;cursor:pointer}
+  .story-ring{
+    position:absolute;inset:-5px;border-radius:18px;
+    border:2px solid transparent;pointer-events:none;
+    transition:border-color .25s,opacity .25s;
+    opacity:0;
+  }
+  .story-ring.active{
+    border-color:var(--accent);
+    opacity:1;
+  }
+  .story-ring.active::after{
+    content:'';position:absolute;top:-7px;right:-7px;
+    width:14px;height:14px;border-radius:50%;
+    background:var(--accent);border:2px solid var(--card);
+    display:flex;
+  }
+  .profile-avatar-wrap:hover .story-ring.active{border-color:var(--accent2)}
   .profile-avatar{
     width:104px;height:104px;border-radius:14px;
     background:var(--bg3);
@@ -186,6 +203,49 @@
     margin-bottom:16px;display:flex;align-items:center;gap:7px;color:var(--text3);
   }
   .card-heading i{color:var(--text3);font-size:13px}
+
+  /* status card */
+  .status-current{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:12px;border-radius:var(--r);
+    background:var(--bg3);border:1px solid var(--border2);
+    margin-bottom:12px;
+  }
+  .status-ring{
+    width:38px;height:38px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--accent);position:relative;
+  }
+  .status-ring i{font-size:15px;color:var(--accent2)}
+  .status-text{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:4px;word-break:break-word}
+  .status-time{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px}
+  .status-empty{font-size:13px;color:var(--text3);line-height:1.6;padding:4px 0}
+  .status-compose{display:flex;flex-direction:column;gap:10px}
+  .status-input{
+    width:100%;resize:none;min-height:64px;padding:10px 12px;
+    border-radius:8px;border:1px solid var(--border2);background:var(--bg3);
+    color:var(--text);font-family:inherit;font-size:13px;line-height:1.5;
+  }
+  .status-input:focus{outline:none;border-color:var(--accent)}
+  .status-row-btns{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .status-charcount{font-size:11px;color:var(--text3)}
+  .btn-status-post{
+    padding:8px 18px;border-radius:7px;background:var(--accent);color:#fff;
+    border:none;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;
+    transition:background .2s;
+  }
+  .btn-status-post:hover{background:#4D6FE0}
+  .btn-status-post:disabled{opacity:.5;cursor:not-allowed}
+  .btn-status-clear{
+    font-size:11.5px;color:var(--text3);background:none;border:none;cursor:pointer;
+    font-family:inherit;text-decoration:underline;padding:0;
+  }
+  .btn-status-clear:hover{color:var(--red)}
+  .status-locked{
+    display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text3);
+    padding:4px 0;
+  }
+  .status-locked i{font-size:16px}
 
   /* about list */
   .about-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
@@ -368,7 +428,8 @@
   <!-- PROFILE HERO -->
   <div class="profile-hero">
     <!-- Avatar -->
-    <div class="profile-avatar-wrap">
+    <div class="profile-avatar-wrap" id="avatarWrap" onclick="focusStatusCard()">
+      <div class="story-ring" id="storyRing"></div>
       <div class="profile-avatar" id="profileAvatar">?</div>
       <div class="avatar-badge" id="profileBadge" title="Active member"><i class="ti ti-check"></i></div>
     </div>
@@ -427,6 +488,14 @@
 
     <!-- LEFT SIDEBAR -->
     <div class="profile-sidebar">
+
+      <!-- Status -->
+      <div class="sidebar-card" id="statusCard">
+        <div class="card-heading"><i class="ti ti-message-2"></i> Status</div>
+        <div id="statusContent">
+          <span style="font-size:13px;color:var(--text3)">Loading…</span>
+        </div>
+      </div>
 
       <!-- About -->
       <div class="sidebar-card">
@@ -860,6 +929,183 @@ if (typeof SHFriends !== 'undefined') {
 
   // Render activity
   renderActivityFeed('views');
+
+  // Status
+  loadStatusCard(p, viewer, isOwn);
+}
+
+/* ── STATUS FEATURE ──
+   Firestore: statuses/{uid}  { text, createdAt, userName }
+   A status is visible for 24h (like WhatsApp), then treated as expired.
+   Followers-only: a viewer must follow the profile owner to see it.
+   The owner always sees + manages their own status. */
+const STATUS_TTL_MS = 24 * 60 * 60 * 1000;
+
+function statusTimeLeft(createdAt){
+  const created = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
+  const msLeft = STATUS_TTL_MS - (Date.now() - created.getTime());
+  return msLeft;
+}
+
+function formatTimeLeft(ms){
+  if(ms <= 0) return 'Expired';
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  if(h > 0) return h + 'h ' + m + 'm left';
+  return m + 'm left';
+}
+
+function toggleStoryRing(active){
+  const ring = document.getElementById('storyRing');
+  if(ring) ring.classList.toggle('active', !!active);
+}
+
+function focusStatusCard(){
+  const card = document.getElementById('statusCard');
+  if(card){
+    card.scrollIntoView({behavior:'smooth', block:'center'});
+    card.style.borderColor = 'var(--accent)';
+    setTimeout(()=>{ card.style.borderColor = ''; }, 900);
+  }
+}
+
+async function loadStatusCard(p, viewer, isOwn){
+  const el = document.getElementById('statusContent');
+  if(!el) return;
+
+  if(isOwn){
+    // Owner view: composer + current status (if any)
+    try{
+      const doc = await db.collection('statuses').doc(p.uid).get();
+      let current = null;
+      if(doc.exists){
+        const d = doc.data();
+        const msLeft = statusTimeLeft(d.createdAt);
+        if(msLeft > 0) current = { text: d.text, msLeft };
+      }
+      el.innerHTML = renderOwnStatusHtml(current);
+      toggleStoryRing(!!current);
+    }catch(e){
+      el.innerHTML = renderOwnStatusHtml(null);
+      toggleStoryRing(false);
+    }
+    return;
+  }
+
+  // Viewer looking at someone else's profile
+  if(!viewer){
+    el.innerHTML = `<div class="status-locked"><i class="ti ti-lock"></i> Sign in to view status updates.</div>`;
+    toggleStoryRing(false);
+    return;
+  }
+
+  try{
+    const followSnap = await db.collection('follows')
+      .where('followerId','==',viewer.uid)
+      .where('followingId','==',p.uid)
+      .limit(1).get();
+    const isFollowing = !followSnap.empty;
+
+    if(!isFollowing){
+      el.innerHTML = `<div class="status-locked"><i class="ti ti-lock"></i> Follow ${escHtml(p.displayName)} to see their status.</div>`;
+      toggleStoryRing(false);
+      return;
+    }
+
+    const doc = await db.collection('statuses').doc(p.uid).get();
+    if(!doc.exists){
+      el.innerHTML = `<div class="status-empty">No active status right now.</div>`;
+      toggleStoryRing(false);
+      return;
+    }
+    const d = doc.data();
+    const msLeft = statusTimeLeft(d.createdAt);
+    if(msLeft <= 0){
+      el.innerHTML = `<div class="status-empty">No active status right now.</div>`;
+      toggleStoryRing(false);
+      return;
+    }
+    el.innerHTML = `
+      <div class="status-current">
+        <div class="status-ring"><i class="ti ti-message-2"></i></div>
+        <div style="flex:1;min-width:0">
+          <div class="status-text">${escHtml(d.text)}</div>
+          <div class="status-time"><i class="ti ti-clock" style="font-size:12px"></i> ${formatTimeLeft(msLeft)}</div>
+        </div>
+      </div>`;
+    toggleStoryRing(true);
+  }catch(e){
+    el.innerHTML = `<div class="status-empty">Couldn't load status.</div>`;
+    toggleStoryRing(false);
+  }
+}
+
+function renderOwnStatusHtml(current){
+  const currentBlock = current ? `
+    <div class="status-current">
+      <div class="status-ring"><i class="ti ti-message-2"></i></div>
+      <div style="flex:1;min-width:0">
+        <div class="status-text">${escHtml(current.text)}</div>
+        <div class="status-time">
+          <i class="ti ti-clock" style="font-size:12px"></i> ${formatTimeLeft(current.msLeft)}
+          <button class="btn-status-clear" onclick="clearStatus()" style="margin-left:8px">Remove</button>
+        </div>
+      </div>
+    </div>` : `<div class="status-empty">No active status. Followers will see what you post here for 24 hours.</div>`;
+
+  return `
+    ${currentBlock}
+    <div class="status-compose">
+      <textarea class="status-input" id="statusInput" maxlength="150" placeholder="Share what you're studying…"></textarea>
+      <div class="status-row-btns">
+        <span class="status-charcount" id="statusCharCount">150 left</span>
+        <button class="btn-status-post" id="statusPostBtn" onclick="postStatus()" disabled>Post status</button>
+      </div>
+    </div>`;
+}
+
+document.addEventListener('input', function(e){
+  if(e.target && e.target.id === 'statusInput'){
+    const len = e.target.value.trim().length;
+    const countEl = document.getElementById('statusCharCount');
+    const btn = document.getElementById('statusPostBtn');
+    if(countEl) countEl.textContent = (150 - e.target.value.length) + ' left';
+    if(btn) btn.disabled = len === 0;
+  }
+});
+
+async function postStatus(){
+  if(!currentUser) return;
+  const input = document.getElementById('statusInput');
+  const text = input ? input.value.trim() : '';
+  if(!text) return;
+  const btn = document.getElementById('statusPostBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Posting…'; }
+  try{
+    await db.collection('statuses').doc(currentUser.uid).set({
+      text,
+      userName: currentUser.displayName || currentUser.email.split('@')[0],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Status posted','success');
+    document.getElementById('statusContent').innerHTML = renderOwnStatusHtml({ text, msLeft: STATUS_TTL_MS });
+    toggleStoryRing(true);
+  }catch(e){
+    showToast('Could not post status','error');
+    if(btn){ btn.disabled = false; btn.textContent = 'Post status'; }
+  }
+}
+
+async function clearStatus(){
+  if(!currentUser) return;
+  try{
+    await db.collection('statuses').doc(currentUser.uid).delete();
+    showToast('Status removed','success');
+    document.getElementById('statusContent').innerHTML = renderOwnStatusHtml(null);
+    toggleStoryRing(false);
+  }catch(e){
+    showToast('Could not remove status','error');
+  }
 }
 
 // ── Activity Feed ──
