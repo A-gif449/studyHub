@@ -375,15 +375,7 @@
     document.getElementById("sh-doubt-send").disabled = true;
 
     const pdfTitle = getCurrentPdfTitle();
-    const apiKey = window.CLAUDE_API_KEY;
-
-    if (!apiKey) {
-      removeTyping(typingEl);
-      appendMessage("assistant", "⚠️ API key not configured. Please set window.CLAUDE_API_KEY before using the doubt assistant.");
-      isLoading = false;
-      document.getElementById("sh-doubt-send").disabled = false;
-      return;
-    }
+   const apiKey = null; // handled server-side via /api/claude
 
     fetch(API_URL, {
       method: "POST",
