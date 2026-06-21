@@ -408,6 +408,20 @@
         </div>
       </div>
     </div>
+
+    <!-- ════════════════════════════════════════
+     PAYMENT APPROVALS — paste right after the
+     Important Questions panel in admin.html
+     (after its closing </div>, before the
+     final </div></div> that closes page-wrap)
+     ════════════════════════════════════════ -->
+    <div class="panel" style="margin-top:24px">
+      <div class="panel-title"><i class="ti ti-receipt"></i> Payment Approvals</div>
+      <div id="pendingPaymentsList" style="display:flex;flex-direction:column;gap:10px;max-height:600px;overflow-y:auto">
+    <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+  </div>
+</div>
+
   </div>
 </div>
 
@@ -513,6 +527,7 @@ function showAdmin(user){
   loadViews();
   loadDownloads();
   loadIqSets();
+  loadPendingPayments(); 
 }
 
 // ── Gate Login ──
@@ -1131,6 +1146,95 @@ function clearIqUploadMessages(){
 
 // // ── Initialize: call this alongside your existing loadPdfs()/loadViews()/loadDownloads() ──
 // loadIqSets();
+
+// ════════════════════════════════════════
+// PAYMENT APPROVALS — ADMIN SCRIPT
+// Paste this into admin.html's <script>, anywhere
+// after the Important Questions admin script block.
+// Also add loadPendingPayments(); inside showAdmin(user)
+// alongside your other load___() calls.
+// ════════════════════════════════════════
+
+function loadPendingPayments(){
+  db.collection('pendingPayments').orderBy('submittedAt','desc').onSnapshot(snap => {
+    renderPendingPayments(snap.docs.map(d => ({id:d.id, ...d.data()})));
+  }, err => {
+    document.getElementById('pendingPaymentsList').innerHTML =
+      `<div class="empty-list"><i class="ti ti-alert-circle"></i><p>Error: ${err.message}</p></div>`;
+  });
+}
+
+function renderPendingPayments(items){
+  const el = document.getElementById('pendingPaymentsList');
+  if(!items.length){
+    el.innerHTML = `<div class="empty-list"><i class="ti ti-receipt-off"></i><p>No payment submissions yet.</p></div>`;
+    return;
+  }
+  el.innerHTML = items.map(p => {
+    const time = p.submittedAt ? new Date(p.submittedAt.seconds*1000).toLocaleString() : 'Just now';
+    const statusColor = p.status === 'approved' ? 'var(--green)' : p.status === 'rejected' ? 'var(--red)' : 'var(--gold)';
+    const statusBg = p.status === 'approved' ? 'rgba(52,211,153,0.1)' : p.status === 'rejected' ? 'rgba(248,113,113,0.1)' : 'rgba(251,191,36,0.1)';
+    return `
+      <div class="pdf-item" style="flex-wrap:wrap;align-items:flex-start">
+        <div class="pdf-emoji">${p.status==='approved'?'✅':p.status==='rejected'?'❌':'⏳'}</div>
+        <div class="pdf-info">
+          <div class="pdf-title">${escHtml(p.userName||'Unknown')} — ₹${p.amount||'—'}</div>
+          <div class="pdf-meta">
+            <span>${escHtml(p.userEmail||'')}</span>
+            <span>· UTR: <strong style="color:var(--accent2)">${escHtml(p.utr||'—')}</strong></span>
+            <span>· ${time}</span>
+          </div>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="tag" style="background:${statusBg};color:${statusColor}">${escHtml(p.status||'pending')}</span>
+            ${p.screenshotUrl ? `<a href="${escHtml(p.screenshotUrl)}" target="_blank" style="font-size:11px;color:var(--accent2)"><i class="ti ti-photo"></i> View screenshot</a>` : ''}
+          </div>
+        </div>
+        ${p.status === 'pending' ? `
+        <div class="pdf-actions">
+          <button class="icon-btn" title="Approve" style="border-color:rgba(52,211,153,0.4);color:var(--green)" onclick="approvePayment('${p.id}','${p.userId}','${p.itemId}','${escHtml(p.userEmail||'')}')"><i class="ti ti-check"></i></button>
+          <button class="icon-btn del" title="Reject" onclick="rejectPayment('${p.id}')"><i class="ti ti-x"></i></button>
+        </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+async function approvePayment(pendingId, userId, itemId, userEmail){
+  if(!confirm('Confirm you have verified this payment in your UPI app before approving?')) return;
+  try {
+    const purchaseId = userId + '_' + itemId;
+    await db.collection('purchases').doc(purchaseId).set({
+      userId: userId,
+      userEmail: userEmail || null,
+      itemId: itemId,
+      status: 'completed',
+      method: 'manual_upi',
+      approvedBy: auth.currentUser.email,
+      purchasedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection('pendingPayments').doc(pendingId).update({
+      status: 'approved',
+      approvedBy: auth.currentUser.email,
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Payment approved — access unlocked! ✅', 'success');
+  } catch(e){
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+async function rejectPayment(pendingId){
+  if(!confirm('Reject this payment submission?')) return;
+  try {
+    await db.collection('pendingPayments').doc(pendingId).update({
+      status: 'rejected',
+      rejectedBy: auth.currentUser.email,
+      rejectedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Payment rejected.', 'success');
+  } catch(e){
+    showToast('Error: ' + e.message, 'error');
+  }
+}
 
 
 // ── Helpers ──
