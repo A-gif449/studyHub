@@ -268,21 +268,17 @@
   text-align: left;
   opacity: 1;
   transform: translateX(0);
-  animation: shItemIn .38s ease forwards;
-  -webkit-animation: shItemIn .38s ease forwards;
-  animation-fill-mode: forwards;
-  -webkit-animation-fill-mode: forwards;
 }
 /* staggered entrance — signature motion moment */
-.sh-drawer-item:nth-child(1)  { animation-delay: .04s }
+/* .sh-drawer-item:nth-child(1)  { animation-delay: .04s }
 .sh-drawer-item:nth-child(2)  { animation-delay: .07s }
 .sh-drawer-item:nth-child(3)  { animation-delay: .10s }
 .sh-drawer-item:nth-child(4)  { animation-delay: .13s }
-.sh-drawer-item:nth-child(5)  { animation-delay: .16s }
+.sh-drawer-item:nth-child(5)  { aimation-delay: .16s }
 .sh-drawer-item:nth-child(6)  { animation-delay: .19s }
 .sh-drawer-item:nth-child(7)  { animation-delay: .22s }
 .sh-drawer-item:nth-child(8)  { animation-delay: .25s }
-@keyframes shItemIn { to { opacity: 1; transform: translateX(0) } }
+@keyframes shItemIn { to { opacity: 1; transform: translateX(0) } } */
 
 .sh-drawer-item:hover { background: rgba(255,255,255,0.07); }
 .sh-drawer-item:active { transform: scale(.97); }
