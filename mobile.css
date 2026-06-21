@@ -86,19 +86,18 @@
   box-shadow: -24px 0 70px rgba(0,0,0,0.45);
   display: flex;
   flex-direction: column;
-  overflow: hidden;        /* fixed: was "overflow: overflow" (invalid) */
-  min-height: 0;            /* fixed: needed so flex children can scroll */
+  overflow: hidden;
   animation: drawerSlideIn .38s cubic-bezier(.25,.85,.35,1.15);
 }
 
 .sh-drawer-nav {
-  flex: 1 1 auto;
-  min-height: 0;            /* fixed: without this, flex:1 children won't scroll, they get pushed/collapsed */
+  flex: 1;
   padding: 14px 14px 6px;
   display: flex;
   flex-direction: column;
   gap: 7px;
   overflow-y: auto;
+  min-height: 0;
 }
 @keyframes drawerSlideIn {
   from { transform: translateX(105%) }
@@ -269,16 +268,11 @@
   opacity: 1;
   transform: translateX(0);
 }
-/* staggered entrance — signature motion moment */
-/* .sh-drawer-item:nth-child(1)  { animation-delay: .04s }
-.sh-drawer-item:nth-child(2)  { animation-delay: .07s }
-.sh-drawer-item:nth-child(3)  { animation-delay: .10s }
-.sh-drawer-item:nth-child(4)  { animation-delay: .13s }
-.sh-drawer-item:nth-child(5)  { aimation-delay: .16s }
-.sh-drawer-item:nth-child(6)  { animation-delay: .19s }
-.sh-drawer-item:nth-child(7)  { animation-delay: .22s }
-.sh-drawer-item:nth-child(8)  { animation-delay: .25s }
-@keyframes shItemIn { to { opacity: 1; transform: translateX(0) } } */
+
+@keyframes shItemIn { 
+  from { opacity: 1; transform: translateX(0) } 
+  to { opacity: 1; transform: translateX(0) } 
+}
 
 .sh-drawer-item:hover { background: rgba(255,255,255,0.07); }
 .sh-drawer-item:active { transform: scale(.97); }
