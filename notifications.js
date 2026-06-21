@@ -1,19 +1,61 @@
-//notifications.js
 (function () {
   "use strict";
 
   /* ─── constants ─── */
-  const LS_KEY   = "studyhub_last_seen";   // localStorage key
-  const MAX_SHOW = 20;                      // max items in dropdown list
+  const LS_READ_IDS = "studyhub_read_ids";   // stores Set of read item IDs
+  const MAX_SHOW    = 20;
 
   /* ─── state ─── */
-  let unread     = [];   // array of new PDF objects
-  let allRecent  = []; 
+  let allRecent         = [];
   let friendRequestNotifs = [];
-  let profileViewNotifs = [];  // last MAX_SHOW PDFs (for the list)
-  let panelOpen  = false;
+  let profileViewNotifs = [];
+  let panelOpen         = false;
+  let prevUnreadCount   = 0;
 
-  /* ─── wait for DOM + Firebase ─── */
+  /* ─── helpers: read-state uses a persistent ID set ─── */
+  function getReadIds() {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(LS_READ_IDS) || "[]"));
+    } catch (e) { return new Set(); }
+  }
+
+  function saveReadIds(set) {
+    try {
+      localStorage.setItem(LS_READ_IDS, JSON.stringify([...set]));
+    } catch (e) {}
+  }
+
+  function markItemRead(id) {
+    const ids = getReadIds();
+    ids.add(id);
+    saveReadIds(ids);
+  }
+
+  function markAllRead() {
+    const ids = getReadIds();
+    allRecent.forEach(p => ids.add(p.id));
+    friendRequestNotifs.forEach(r => ids.add(r.id));
+    profileViewNotifs.forEach(v => ids.add(v.id));
+    saveReadIds(ids);
+    updateBadge();
+    renderList();
+    const btn = document.getElementById("sh-bell-btn");
+    if (btn) btn.classList.remove("sh-bell-active");
+  }
+
+  function isUnread(id) {
+    return !getReadIds().has(id);
+  }
+
+  function getUnreadItems() {
+    return [
+      ...allRecent.filter(p => isUnread(p.id)),
+      ...friendRequestNotifs.filter(r => isUnread(r.id)),
+      ...profileViewNotifs.filter(v => isUnread(v.id)),
+    ];
+  }
+
+  /* ─── init ─── */
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
@@ -23,11 +65,11 @@
   }
 
   /* ══════════════════════════════════════════════════════════
-     1.  INJECT STYLES
+     1.  STYLES
      ══════════════════════════════════════════════════════════ */
   function injectStyles() {
     const css = `
-      /* ── Bell wrapper ── */
+      /* ── Wrapper ── */
       #sh-notif-wrap {
         position: relative;
         display: inline-flex;
@@ -36,297 +78,349 @@
 
       /* ── Bell button ── */
       #sh-bell-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,0.12);
-        background: transparent;
-        color: #A09DC0;
-        font-size: 17px;
+        position: relative;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.03);
+        color: #7C7A9A;
+        font-size: 16px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: color .2s, border-color .2s, background .2s;
-        position: relative;
+        transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
         font-family: inherit;
         flex-shrink: 0;
+        outline: none;
       }
       #sh-bell-btn:hover {
-        color: #F0EFF8;
-        border-color: rgba(255,255,255,0.22);
-        background: rgba(255,255,255,0.04);
+        color: #E8E6F8;
+        border-color: rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.06);
       }
-      #sh-bell-btn.active {
-        color: #A78BFA;
-        border-color: rgba(108,99,255,0.4);
-        background: rgba(108,99,255,0.1);
+      #sh-bell-btn.sh-bell-active {
+        color: #9B8EFF;
+        border-color: rgba(108,99,255,0.35);
+        background: rgba(108,99,255,0.08);
       }
 
-      /* ── Badge counter ── */
+      /* ── Badge ── */
       #sh-badge {
         position: absolute;
-        top: -5px;
-        right: -5px;
-        min-width: 18px;
-        height: 18px;
-        padding: 0 5px;
+        top: -4px;
+        right: -4px;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 4px;
         border-radius: 99px;
-        background: linear-gradient(135deg, #F87171, #EF4444);
+        background: #E8445A;
         color: #fff;
-        font-size: 10px;
+        font-size: 9.5px;
         font-weight: 700;
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         display: flex;
         align-items: center;
         justify-content: center;
         border: 2px solid #0A0A12;
         line-height: 1;
-        transform: scale(0);
-        transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+        opacity: 0;
+        transform: scale(0.6);
+        transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34,1.4,0.64,1);
         pointer-events: none;
         z-index: 2;
+        letter-spacing: -0.3px;
       }
-      #sh-badge.visible {
+      #sh-badge.sh-badge-visible {
+        opacity: 1;
         transform: scale(1);
       }
-      /* shake when new item arrives */
-      @keyframes sh-shake {
-        0%,100%{ transform: scale(1) rotate(0deg) }
-        20%    { transform: scale(1.15) rotate(-12deg) }
-        40%    { transform: scale(1.15) rotate(12deg) }
-        60%    { transform: scale(1.1) rotate(-8deg) }
-        80%    { transform: scale(1.1) rotate(8deg) }
+
+      /* Bell ring on new item */
+      @keyframes sh-ring {
+        0%   { transform: rotate(0deg); }
+        10%  { transform: rotate(-14deg); }
+        25%  { transform: rotate(14deg); }
+        40%  { transform: rotate(-10deg); }
+        55%  { transform: rotate(10deg); }
+        70%  { transform: rotate(-5deg); }
+        85%  { transform: rotate(5deg); }
+        100% { transform: rotate(0deg); }
       }
-      #sh-bell-btn.shake {
-        animation: sh-shake .55s ease;
+      #sh-bell-btn.sh-ring i {
+        display: inline-block;
+        animation: sh-ring 0.6s ease;
+        transform-origin: 50% 0%;
       }
 
       /* ── Dropdown panel ── */
       #sh-panel {
         display: none;
         position: absolute;
-        top: calc(100% + 10px);
+        top: calc(100% + 8px);
         right: 0;
-        width: 340px;
-        max-height: 480px;
-        background: #1A1A2E;
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 20px;
-        box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+        width: 348px;
+        max-height: 460px;
+        background: #111118;
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 14px;
+        box-shadow:
+          0 0 0 1px rgba(0,0,0,0.4),
+          0 8px 24px rgba(0,0,0,0.4),
+          0 32px 64px rgba(0,0,0,0.35);
         z-index: 9999;
-        overflow: hidden;
         flex-direction: column;
-        animation: sh-drop .22s ease;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-6px) scale(0.985);
+        pointer-events: none;
+        transition:
+          opacity 0.18s ease,
+          transform 0.18s ease;
       }
-      #sh-panel.open {
+      #sh-panel.sh-open {
         display: flex;
-      }
-      @keyframes sh-drop {
-        from { opacity:0; transform: translateY(-8px) scale(.97) }
-        to   { opacity:1; transform: translateY(0)   scale(1)    }
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
       }
 
-      /* panel header */
+      /* Panel header */
       .sh-panel-head {
-        padding: 16px 18px 12px;
+        padding: 14px 16px 12px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border-bottom: 1px solid rgba(255,255,255,0.07);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
         flex-shrink: 0;
       }
-      .sh-panel-head h4 {
-        font-family: 'Syne', sans-serif;
-        font-size: 15px;
-        font-weight: 800;
-        color: #F0EFF8;
+      .sh-panel-head-left {
         display: flex;
         align-items: center;
         gap: 8px;
       }
-      .sh-head-badge {
-        padding: 2px 8px;
-        border-radius: 99px;
-        background: rgba(108,99,255,0.2);
-        color: #A78BFA;
-        font-size: 11px;
+      .sh-panel-title {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-size: 13.5px;
         font-weight: 700;
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #E8E6F8;
+        letter-spacing: -0.1px;
       }
-      .sh-mark-all {
+      .sh-count-pill {
+        padding: 2px 7px;
+        border-radius: 99px;
+        font-size: 10.5px;
+        font-weight: 700;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        letter-spacing: 0.1px;
+        transition: background 0.2s, color 0.2s;
+      }
+      .sh-count-pill.has-new {
+        background: rgba(155,142,255,0.15);
+        color: #9B8EFF;
+      }
+      .sh-count-pill.all-read {
+        background: rgba(52,211,153,0.10);
+        color: #34D399;
+      }
+      .sh-mark-all-btn {
         font-size: 11px;
-        color: #6B6880;
+        font-weight: 500;
+        color: #524F6E;
         background: none;
         border: none;
         cursor: pointer;
         font-family: inherit;
-        transition: color .2s;
         padding: 4px 8px;
         border-radius: 6px;
+        transition: color 0.15s, background 0.15s;
+        letter-spacing: 0.1px;
       }
-      .sh-mark-all:hover {
-        color: #A09DC0;
-        background: rgba(255,255,255,0.04);
+      .sh-mark-all-btn:hover {
+        color: #9B8EFF;
+        background: rgba(155,142,255,0.08);
       }
 
-      /* scrollable list */
+      /* Scrollable list */
       .sh-list {
         overflow-y: auto;
         flex: 1;
-        padding: 8px;
+        padding: 6px;
         scrollbar-width: thin;
-        scrollbar-color: #6C63FF #0F0F1C;
+        scrollbar-color: rgba(108,99,255,0.4) transparent;
       }
-      .sh-list::-webkit-scrollbar { width: 4px; }
-      .sh-list::-webkit-scrollbar-track { background: #0F0F1C; }
-      .sh-list::-webkit-scrollbar-thumb { background: #6C63FF; border-radius: 99px; }
+      .sh-list::-webkit-scrollbar { width: 3px; }
+      .sh-list::-webkit-scrollbar-track { background: transparent; }
+      .sh-list::-webkit-scrollbar-thumb {
+        background: rgba(108,99,255,0.4);
+        border-radius: 99px;
+      }
 
-      /* individual notification row */
+      /* Divider label */
+      .sh-divider {
+        padding: 8px 10px 4px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #3E3C56;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      }
+
+      /* Notification row */
       .sh-item {
         display: flex;
         align-items: flex-start;
-        gap: 12px;
-        padding: 11px 12px;
-        border-radius: 12px;
+        gap: 10px;
+        padding: 10px 10px;
+        border-radius: 8px;
         cursor: pointer;
-        transition: background .15s;
+        transition: background 0.12s ease;
         position: relative;
       }
       .sh-item:hover {
-        background: rgba(255,255,255,0.04);
+        background: rgba(255,255,255,0.03);
       }
-      .sh-item.sh-new {
-        background: rgba(108,99,255,0.08);
+      .sh-item.sh-unread {
+        background: rgba(108,99,255,0.06);
       }
-      .sh-item.sh-new:hover {
-        background: rgba(108,99,255,0.14);
+      .sh-item.sh-unread:hover {
+        background: rgba(108,99,255,0.10);
       }
-      .sh-emoji {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        background: rgba(108,99,255,0.12);
+
+      /* Icon box */
+      .sh-icon-box {
+        width: 34px;
+        height: 34px;
+        border-radius: 7px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        flex-shrink: 0;
+        font-size: 15px;
       }
+      .sh-icon-box.type-pdf    { background: rgba(108,99,255,0.12); }
+      .sh-icon-box.type-friend { background: rgba(52,211,153,0.10); }
+      .sh-icon-box.type-view   { background: rgba(56,189,248,0.10); }
+
+      /* Text block */
       .sh-item-body {
         flex: 1;
         min-width: 0;
       }
       .sh-item-title {
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 600;
-        color: #F0EFF8;
-        line-height: 1.35;
+        color: #D8D6F0;
+        line-height: 1.4;
         margin-bottom: 3px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        letter-spacing: -0.1px;
+      }
+      .sh-item.sh-unread .sh-item-title {
+        color: #ECEAF8;
       }
       .sh-item-meta {
         font-size: 11px;
-        color: #6B6880;
+        color: #4A4866;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         flex-wrap: wrap;
       }
       .sh-tag {
-        padding: 1px 7px;
-        border-radius: 99px;
-        background: rgba(108,99,255,0.12);
-        color: #A78BFA;
+        padding: 1px 6px;
+        border-radius: 4px;
+        background: rgba(255,255,255,0.05);
+        color: #6B6880;
         font-size: 10px;
         font-weight: 600;
+        letter-spacing: 0.1px;
       }
-      /* unread dot */
-      .sh-dot {
-        width: 7px;
-        height: 7px;
+
+      /* Unread indicator dot */
+      .sh-unread-dot {
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
         background: #6C63FF;
         flex-shrink: 0;
-        margin-top: 5px;
-      }
-      .sh-item:not(.sh-new) .sh-dot {
+        margin-top: 6px;
         opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .sh-item.sh-unread .sh-unread-dot {
+        opacity: 1;
       }
 
-      /* empty state */
+      /* Empty state */
       .sh-empty {
-        padding: 36px 20px;
+        padding: 40px 20px;
         text-align: center;
-        color: #6B6880;
+        color: #3E3C56;
         font-size: 13px;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         line-height: 1.6;
       }
       .sh-empty-icon {
-        font-size: 32px;
-        margin-bottom: 10px;
+        font-size: 28px;
+        margin-bottom: 12px;
         display: block;
-        color: #6B6880;
+        opacity: 0.5;
+      }
+      .sh-empty p {
+        color: #4A4866;
+        font-size: 12.5px;
       }
 
-      /* panel footer */
+      /* Panel footer */
       .sh-panel-foot {
-        padding: 10px 14px;
-        border-top: 1px solid rgba(255,255,255,0.07);
+        padding: 8px;
+        border-top: 1px solid rgba(255,255,255,0.05);
         flex-shrink: 0;
       }
       .sh-foot-link {
         display: block;
         text-align: center;
         font-size: 12px;
-        color: #A09DC0;
+        font-weight: 500;
+        color: #524F6E;
         text-decoration: none;
         padding: 8px;
-        border-radius: 8px;
-        transition: background .2s, color .2s;
+        border-radius: 7px;
+        transition: background 0.15s, color 0.15s;
+        letter-spacing: 0.1px;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       }
       .sh-foot-link:hover {
         background: rgba(255,255,255,0.04);
-        color: #F0EFF8;
+        color: #9B8EFF;
       }
 
-      /* loading state */
+      /* Loading */
       .sh-loading {
-        padding: 30px 20px;
+        padding: 32px 20px;
         text-align: center;
-        color: #6B6880;
-        font-size: 13px;
-      }
-      @keyframes sh-spin {
-        from { transform: rotate(0deg) }
-        to   { transform: rotate(360deg) }
-      }
-      .sh-spin-icon {
-        display: inline-block;
-        animation: sh-spin .9s linear infinite;
-        font-size: 22px;
-        margin-bottom: 8px;
-        color: #A78BFA;
+        color: #3E3C56;
+        font-size: 12.5px;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       }
 
-      /* mobile tweaks */
-        @media (max-width: 768px) {
+      /* Mobile */
+      @media (max-width: 768px) {
         #sh-panel {
-        position: fixed !important;
-        top: 60px !important;
-        left: 8px !important;
-        right: 8px !important;
-        width: calc(100vw - 16px) !important;
-        max-height: 70vh !important;
-        border-radius: 16px !important;
-        z-index: 9999 !important;
-        overflow-y: auto !important;
+          position: fixed !important;
+          top: 64px !important;
+          left: 10px !important;
+          right: 10px !important;
+          width: calc(100vw - 20px) !important;
+          max-height: 68vh !important;
+          border-radius: 12px !important;
+        }
       }
-    }
-      
-  
     `;
     const style = document.createElement("style");
     style.textContent = css;
@@ -334,9 +428,9 @@
   }
 
   /* ══════════════════════════════════════════════════════════
-     2.  BUILD THE BELL BUTTON + PANEL
+     2.  BUILD BELL
      ══════════════════════════════════════════════════════════ */
-function buildBell() {
+  function buildBell() {
     const nav = document.querySelector("nav");
     if (!nav) return;
 
@@ -346,52 +440,42 @@ function buildBell() {
     const btn = document.createElement("button");
     btn.id = "sh-bell-btn";
     btn.title = "Notifications";
+    btn.setAttribute("aria-label", "Notifications");
     btn.innerHTML = `<i class="ti ti-bell"></i>`;
-    // btn.innerHTML = `<img src="1781704084645_bell.png" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);opacity:.75" alt="bell" onerror="this.outerHTML='<i class=\\'ti ti-bell\\'></i>'"/>`;
     btn.addEventListener("click", togglePanel);
 
     const badge = document.createElement("span");
     badge.id = "sh-badge";
-    badge.textContent = "0";
     btn.appendChild(badge);
 
     const panel = document.createElement("div");
     panel.id = "sh-panel";
     panel.innerHTML = `
       <div class="sh-panel-head">
-        <h4>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#A78BFA"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Notifications
-          <span class="sh-head-badge" id="sh-unread-count">0 new</span>
-        </h4>
-        <button class="sh-mark-all" onclick="window._shMarkAll()">Mark all read</button>
+        <div class="sh-panel-head-left">
+          <span class="sh-panel-title">Notifications</span>
+          <span class="sh-count-pill has-new" id="sh-count-pill">0 new</span>
+        </div>
+        <button class="sh-mark-all-btn" onclick="window._shMarkAll()">Mark all read</button>
       </div>
       <div class="sh-list" id="sh-list">
-        <div class="sh-loading">
-          <div class="sh-spin-icon">◌</div><br/>Loading…
-        </div>
+        <div class="sh-loading">Loading…</div>
       </div>
       <div class="sh-panel-foot">
-        <a href="index.html#materials" class="sh-foot-link">View all materials →</a>
+        <a href="index.html#materials" class="sh-foot-link">Browse all materials →</a>
       </div>`;
 
     wrap.appendChild(btn);
     wrap.appendChild(panel);
 
-    // Insert into dedicated bellSlot if available, otherwise fallback
     const bellSlot = document.getElementById("bellSlot");
     if (bellSlot) {
       bellSlot.appendChild(wrap);
     } else {
       const navRight = nav.querySelector(".nav-right");
-      if (navRight) {
-        navRight.insertBefore(wrap, navRight.firstChild);
-      } else {
-        nav.appendChild(wrap);
-      }
+      navRight ? navRight.insertBefore(wrap, navRight.firstChild) : nav.appendChild(wrap);
     }
 
-    // close panel when clicking outside
     document.addEventListener("click", function (e) {
       if (!wrap.contains(e.target)) closePanel();
     });
@@ -400,9 +484,9 @@ function buildBell() {
   }
 
   /* ══════════════════════════════════════════════════════════
-     3.  FIRESTORE LISTENER
+     3.  FIRESTORE SUBSCRIPTIONS
      ══════════════════════════════════════════════════════════ */
-function subscribeToFirestore() {
+  function subscribeToFirestore() {
     if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
       setTimeout(subscribeToFirestore, 300);
       return;
@@ -410,263 +494,224 @@ function subscribeToFirestore() {
 
     const db = firebase.firestore();
 
-    // Listen to new PDFs
     db.collection("pdfs")
       .orderBy("uploadedAt", "desc")
       .limit(MAX_SHOW)
-      .onSnapshot(
-        function (snap) {
-          allRecent = snap.docs.map(function (d) {
-            return Object.assign({ id: d.id }, d.data());
-          });
-          computeUnread();
-          renderList();
-          updateBadge();
-        },
-        function (err) {
-          console.warn("[StudyHub Notif] Firestore error:", err.message);
-        }
-      );
+      .onSnapshot(function (snap) {
+        allRecent = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+        pruneReadIds();
+        updateBadge();
+        renderList();
+      }, function (err) {
+        console.warn("[StudyHub Notif] pdfs error:", err.message);
+      });
 
-    // Listen to incoming friend requests for the current user
-        // Listen to incoming friend requests for the current user
     auth.onAuthStateChanged(function (user) {
       if (!user) return;
- 
-      // ── Sync this user's identity into userProfiles ──
-      // Runs on every login / page load so EVERY registered user
-      // has a permanent, reliable profile record — regardless of
-      // whether they've ever viewed/downloaded a PDF.
       syncUserProfile(user);
- 
+
       db.collection("friendRequests")
         .where("to", "==", user.uid)
         .where("status", "==", "pending")
         .onSnapshot(function (snap) {
-          friendRequestNotifs = snap.docs.map(function (d) {
-            return Object.assign({ id: d.id, _type: "friendRequest" }, d.data());
-          });
-          computeUnread();
-          renderList();
+          friendRequestNotifs = snap.docs.map(d => Object.assign({ id: d.id, _type: "friendRequest" }, d.data()));
+          pruneReadIds();
           updateBadge();
+          renderList();
         }, function (err) {
           console.warn("[StudyHub Notif] friendRequests error:", err.message);
         });
- 
-      // ── Listen for profile views (notify when someone viewed you) ──
+
       db.collection("profileViews")
         .where("profileOwnerUid", "==", user.uid)
         .orderBy("viewedAt", "desc")
         .limit(MAX_SHOW)
         .onSnapshot(function (snap) {
-          profileViewNotifs = snap.docs.map(function (d) {
-            return Object.assign({ id: d.id, _type: "profileView" }, d.data());
-          });
-          computeUnread();
-          renderList();
+          profileViewNotifs = snap.docs.map(d => Object.assign({ id: d.id, _type: "profileView" }, d.data()));
+          pruneReadIds();
           updateBadge();
+          renderList();
         }, function (err) {
           console.warn("[StudyHub Notif] profileViews error:", err.message);
         });
     });
- 
+  }
+
   function syncUserProfile(user) {
+    const db = firebase.firestore();
     db.collection("userProfiles").doc(user.uid).set({
       uid: user.uid,
       displayName: user.displayName || user.email.split("@")[0],
       email: user.email,
       lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true }).catch(function(err) {
+    }, { merge: true }).catch(err => {
       console.warn("[StudyHub] userProfile sync error:", err.message);
     });
   }
+
+  /* Remove stale IDs from localStorage so it doesn't grow forever */
+  function pruneReadIds() {
+    const allIds = new Set([
+      ...allRecent.map(p => p.id),
+      ...friendRequestNotifs.map(r => r.id),
+      ...profileViewNotifs.map(v => v.id),
+    ]);
+    const current = getReadIds();
+    const pruned  = new Set([...current].filter(id => allIds.has(id)));
+    saveReadIds(pruned);
   }
 
   /* ══════════════════════════════════════════════════════════
-     4.  UNREAD LOGIC
+     4.  BADGE UPDATE
      ══════════════════════════════════════════════════════════ */
-  function getLastSeen() {
-    const v = localStorage.getItem(LS_KEY);
-    return v ? new Date(v) : new Date(0); // epoch = first ever visit
-  }
-
-  function computeUnread() {
-    const lastSeen = getLastSeen();
-    const unreadPdfs = allRecent.filter(function (pdf) {
-      if (!pdf.uploadedAt) return false;
-      const ts = pdf.uploadedAt.toDate ? pdf.uploadedAt.toDate() : new Date(pdf.uploadedAt);
-      return ts > lastSeen;
-    });
-    const unreadProfileViews = profileViewNotifs.filter(function (pv) {
-      if (!pv.viewedAt) return false;
-      const ts = pv.viewedAt.toDate ? pv.viewedAt.toDate() : new Date(pv.viewedAt);
-      return ts > lastSeen;
-    });
-    // All pending friend requests are always "unread" until accepted/declined
-    unread = [...unreadPdfs, ...friendRequestNotifs, ...unreadProfileViews];
-  }
-
-  function markAllRead() {
-    localStorage.setItem(LS_KEY, new Date().toISOString());
-    unread = [];
-    updateBadge();
-    renderList();
-    // remove 'active' tint from bell
-    const btn = document.getElementById("sh-bell-btn");
-    if (btn) btn.classList.remove("active");
-  }
-
-  /* ══════════════════════════════════════════════════════════
-     5.  BADGE
-     ══════════════════════════════════════════════════════════ */
-  let prevUnreadCount = 0;
-
   function updateBadge() {
-    const badge  = document.getElementById("sh-badge");
-    const btn    = document.getElementById("sh-bell-btn");
-    const countEl= document.getElementById("sh-unread-count");
+    const badge   = document.getElementById("sh-badge");
+    const btn     = document.getElementById("sh-bell-btn");
+    const pill    = document.getElementById("sh-count-pill");
     if (!badge || !btn) return;
 
-    const count = unread.length;
+    const count = getUnreadItems().length;
 
-    // update count label
-    if (countEl) {
-      countEl.textContent = count > 0 ? count + " new" : "All read";
-      countEl.style.background = count > 0
-        ? "rgba(108,99,255,0.2)" : "rgba(52,211,153,0.1)";
-      countEl.style.color = count > 0 ? "#A78BFA" : "#34D399";
+    if (pill) {
+      pill.textContent = count > 0 ? count + " new" : "All read";
+      pill.className = "sh-count-pill " + (count > 0 ? "has-new" : "all-read");
     }
 
     if (count > 0) {
       badge.textContent = count > 99 ? "99+" : String(count);
-      badge.classList.add("visible");
-      btn.classList.add("active");
+      badge.classList.add("sh-badge-visible");
+      btn.classList.add("sh-bell-active");
 
-      // shake if new items arrived since last render
-      if (count > prevUnreadCount && prevUnreadCount >= 0 && document.visibilityState !== "hidden") {
-        btn.classList.remove("shake");
-        // force reflow to restart animation
+      /* ring bell if count increased */
+      if (count > prevUnreadCount && document.visibilityState !== "hidden") {
+        btn.classList.remove("sh-ring");
         void btn.offsetWidth;
-        btn.classList.add("shake");
-        btn.addEventListener("animationend", function () {
-          btn.classList.remove("shake");
-        }, { once: true });
+        btn.classList.add("sh-ring");
+        btn.addEventListener("animationend", () => btn.classList.remove("sh-ring"), { once: true });
       }
     } else {
-      badge.classList.remove("visible");
-      btn.classList.remove("active");
+      badge.classList.remove("sh-badge-visible");
+      btn.classList.remove("sh-bell-active");
     }
     prevUnreadCount = count;
   }
 
   /* ══════════════════════════════════════════════════════════
-     6.  RENDER LIST
+     5.  RENDER LIST
      ══════════════════════════════════════════════════════════ */
   const subjectEmoji = {
-    Mathematics: "🧮", Physics: "⚛️", Chemistry: "⚗️", Biology: "🧬",
-    "CS & Tech": "💻", Economics: "📈", Literature: "📚", History: "📜",
-    Psychology: "🧠", Engineering: "⚙️", Default: "📄"
+    Mathematics:"🧮", Physics:"⚛️", Chemistry:"⚗️", Biology:"🧬",
+    "CS & Tech":"💻", Economics:"📈", Literature:"📚", History:"📜",
+    Psychology:"🧠", Engineering:"⚙️", Default:"📄"
   };
 
   function timeAgo(date) {
     const diff = Math.floor((Date.now() - date.getTime()) / 1000);
-    if (diff < 60)   return "just now";
-    if (diff < 3600) return Math.floor(diff / 60) + "m ago";
-    if (diff < 86400)return Math.floor(diff / 3600) + "h ago";
-    if (diff < 604800)return Math.floor(diff / 86400) + "d ago";
+    if (diff < 60)     return "just now";
+    if (diff < 3600)   return Math.floor(diff / 60) + "m ago";
+    if (diff < 86400)  return Math.floor(diff / 3600) + "h ago";
+    if (diff < 604800) return Math.floor(diff / 86400) + "d ago";
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   }
 
   function esc(str) {
     return String(str || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
-
-  function isNew(pdf) {
-    return unread.some(function (u) { return u.id === pdf.id; });
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
   function renderList() {
     const list = document.getElementById("sh-list");
     if (!list) return;
 
-    if (!allRecent.length) {
+    const hasFriends  = friendRequestNotifs.length > 0;
+    const hasViews    = profileViewNotifs.length > 0;
+    const hasPdfs     = allRecent.length > 0;
+
+    if (!hasFriends && !hasViews && !hasPdfs) {
       list.innerHTML = `
         <div class="sh-empty">
           <span class="sh-empty-icon">📭</span>
-          No study materials yet.<br/>Check back soon!
+          <p>Nothing here yet.<br/>Check back when materials are uploaded.</p>
         </div>`;
       return;
     }
 
-    // Render friend request notifications first
-    const friendReqHtml = friendRequestNotifs.map(function (req) {
-      return `
-        <div class="sh-item sh-new" onclick="window._shOpenFriends()">
-          <div class="sh-emoji">👋</div>
+    let html = "";
+
+    if (hasFriends) {
+      html += `<div class="sh-divider">Friend Requests</div>`;
+      html += friendRequestNotifs.map(req => `
+        <div class="sh-item ${isUnread(req.id) ? "sh-unread" : ""}"
+             onclick="window._shOpenFriends(); window._shReadItem('${esc(req.id)}')">
+          <div class="sh-icon-box type-friend">🤝</div>
           <div class="sh-item-body">
             <div class="sh-item-title">${esc(req.fromName || "Someone")} sent you a friend request</div>
             <div class="sh-item-meta">
               <span class="sh-tag">Friend Request</span>
-              <span>· Tap to respond</span>
+              <span>Tap to respond</span>
             </div>
           </div>
-          <div class="sh-dot"></div>
-        </div>`;
-    }).join("");
+          <div class="sh-unread-dot"></div>
+        </div>`).join("");
+    }
 
-    // Render PDF notifications
-   // Render profile view notifications
-    const profileViewHtml = profileViewNotifs.map(function (pv) {
-      const ts = pv.viewedAt ? (pv.viewedAt.toDate ? pv.viewedAt.toDate() : new Date(pv.viewedAt)) : new Date();
-      const ago = timeAgo(ts);
-      return `
-        <div class="sh-item sh-new" onclick="window._shOpenProfileViewer('${esc(pv.viewerUid)}')">
-          <div class="sh-emoji">👀</div>
-          <div class="sh-item-body">
-            <div class="sh-item-title">${esc(pv.viewerName || "Someone")} viewed your profile recently</div>
-            <div class="sh-item-meta">
-              <span class="sh-tag">Profile View</span>
-              <span>· ${ago}</span>
+    if (hasViews) {
+      html += `<div class="sh-divider">Profile Views</div>`;
+      html += profileViewNotifs.map(pv => {
+        const ts = pv.viewedAt ? (pv.viewedAt.toDate ? pv.viewedAt.toDate() : new Date(pv.viewedAt)) : new Date();
+        return `
+          <div class="sh-item ${isUnread(pv.id) ? "sh-unread" : ""}"
+               onclick="window._shOpenProfileViewer('${esc(pv.viewerUid)}'); window._shReadItem('${esc(pv.id)}')">
+            <div class="sh-icon-box type-view">👤</div>
+            <div class="sh-item-body">
+              <div class="sh-item-title">${esc(pv.viewerName || "Someone")} viewed your profile</div>
+              <div class="sh-item-meta">
+                <span class="sh-tag">Profile View</span>
+                <span>${timeAgo(ts)}</span>
+              </div>
             </div>
-          </div>
-          <div class="sh-dot"></div>
-        </div>`;
-    }).join("");
+            <div class="sh-unread-dot"></div>
+          </div>`;
+      }).join("");
+    }
 
-    // Render PDF notifications
-    const pdfHtml = allRecent.map(function (pdf) {
-      const emoji = subjectEmoji[pdf.subject] || subjectEmoji["Default"];
-      const _new  = isNew(pdf);
-      let ago = "";
-      if (pdf.uploadedAt) {
-        const d = pdf.uploadedAt.toDate ? pdf.uploadedAt.toDate() : new Date(pdf.uploadedAt);
-        ago = timeAgo(d);
-      }
-      return `
-        <div class="sh-item ${_new ? "sh-new" : ""}"
-             onclick="window._shOpenPdf('${esc(pdf.id)}')">
-          <div class="sh-emoji">${emoji}</div>
-          <div class="sh-item-body">
-            <div class="sh-item-title">${esc(pdf.title || "Untitled")}</div>
-            <div class="sh-item-meta">
-              <span class="sh-tag">${esc(pdf.subject || "General")}</span>
-              ${pdf.level ? `<span>${esc(pdf.level)}</span>` : ""}
-              ${ago ? `<span>· ${ago}</span>` : ""}
+    if (hasPdfs) {
+      html += `<div class="sh-divider">Study Materials</div>`;
+      html += allRecent.map(pdf => {
+        const emoji = subjectEmoji[pdf.subject] || subjectEmoji.Default;
+        let ago = "";
+        if (pdf.uploadedAt) {
+          const d = pdf.uploadedAt.toDate ? pdf.uploadedAt.toDate() : new Date(pdf.uploadedAt);
+          ago = timeAgo(d);
+        }
+        return `
+          <div class="sh-item ${isUnread(pdf.id) ? "sh-unread" : ""}"
+               onclick="window._shOpenPdf('${esc(pdf.id)}')">
+            <div class="sh-icon-box type-pdf">${emoji}</div>
+            <div class="sh-item-body">
+              <div class="sh-item-title">${esc(pdf.title || "Untitled")}</div>
+              <div class="sh-item-meta">
+                <span class="sh-tag">${esc(pdf.subject || "General")}</span>
+                ${pdf.level ? `<span>${esc(pdf.level)}</span>` : ""}
+                ${ago ? `<span>· ${ago}</span>` : ""}
+              </div>
             </div>
-          </div>
-          <div class="sh-dot"></div>
-        </div>`;
-    }).join("");
+            <div class="sh-unread-dot"></div>
+          </div>`;
+      }).join("");
+    }
 
-    list.innerHTML = friendReqHtml + profileViewHtml + pdfHtml;
+    list.innerHTML = html;
   }
 
-  /* ── open a PDF ── */
+  /* ── Global click handlers ── */
+  window._shReadItem = function (id) {
+    markItemRead(id);
+    updateBadge();
+    renderList();
+  };
 
   window._shOpenFriends = function () {
     closePanel();
@@ -679,13 +724,13 @@ function subscribeToFirestore() {
   };
 
   window._shOpenPdf = function (id) {
+    markItemRead(id);
     closePanel();
-    markAllRead();
     window.location.href = "viewer.html?id=" + encodeURIComponent(id);
   };
 
   /* ══════════════════════════════════════════════════════════
-     7.  PANEL OPEN / CLOSE
+     6.  PANEL OPEN / CLOSE
      ══════════════════════════════════════════════════════════ */
   function togglePanel(e) {
     e.stopPropagation();
@@ -695,13 +740,27 @@ function subscribeToFirestore() {
   function openPanel() {
     panelOpen = true;
     const panel = document.getElementById("sh-panel");
-    if (panel) panel.classList.add("open");
+    if (!panel) return;
+    /* Use requestAnimationFrame so display:flex is applied before transition fires */
+    panel.style.display = "flex";
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        panel.classList.add("sh-open");
+      });
+    });
+    renderList();
   }
 
   function closePanel() {
     panelOpen = false;
     const panel = document.getElementById("sh-panel");
-    if (panel) panel.classList.remove("open");
+    if (!panel) return;
+    panel.classList.remove("sh-open");
+    /* Hide after transition */
+    panel.addEventListener("transitionend", function hide() {
+      if (!panelOpen) panel.style.display = "";
+      panel.removeEventListener("transitionend", hide);
+    });
   }
 
 })();
