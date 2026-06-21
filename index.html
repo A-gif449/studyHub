@@ -1406,6 +1406,7 @@ if (new URLSearchParams(location.search).get('login') === '1') {
       /* Duplicate for seamless infinite scroll */
       row1.innerHTML = [...row1Items, ...row1Items].map(({src, i}) => buildVideoCard(src, i)).join('');
       row2.innerHTML = [...row2Items, ...row2Items].map(({src, i}) => buildVideoCard(src, i)).join('');
+ 
       initLazyVideos();
  
     } catch (err) {
