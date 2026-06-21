@@ -364,6 +364,9 @@
   </div>
 
   <div id="adm-views" style="display:none"></div>
+    </div><!-- closes adm-views -->
+
+    <div id="adm-downloads" style="display:none">
     <div class="panel" style="margin-top:24px">
       <div class="panel-title"><i class="ti ti-download"></i> Recent Downloads</div>
       <div id="downloadsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
@@ -371,6 +374,7 @@
       </div>
     </div>
 
+    <div id="adm-premium" style="display:none"></div>
     <!-- ════════════════════════════════════════
          IMPORTANT QUESTIONS — UPLOAD SECTION
          ════════════════════════════════════════ -->
@@ -432,16 +436,19 @@
      (after its closing </div>, before the
      final </div></div> that closes page-wrap)
      ════════════════════════════════════════ -->
+    </div><!-- closes adm-premium -->
+
     <div id="adm-payments" style="display:none">
     <div class="panel" style="margin-top:24px">
       <div class="panel-title"><i class="ti ti-receipt"></i> Payment Approvals</div>
       <div id="pendingPaymentsList" style="display:flex;flex-direction:column;gap:10px;max-height:600px;overflow-y:auto">
-    <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
-  </div>
-</div>
+        <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+      </div>
+    </div>
+    </div><!-- closes adm-payments -->
 
-  </div>
-</div>
+  </div><!-- closes page-wrap -->
+</div><!-- closes adminUI -->
 
 <!-- EDIT MODAL -->
 <!-- <div class="modal-backdrop" id="editModal">
