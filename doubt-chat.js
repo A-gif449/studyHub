@@ -277,7 +277,6 @@
     bottom: 16px;
     right: 16px;
     /* Hide FAB when panel is open */
-    display: none;
   }
 }
     `;
