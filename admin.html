@@ -150,6 +150,10 @@
   .modal-close:hover{border-color:var(--border2);color:var(--text)}
   .modal h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:20px}
   @media(max-width:640px){.page-wrap{padding:78px 20px 50px}.form-row{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.gate-card{padding:28px}}
+  .admin-section-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+  .adm-pill{padding:9px 18px;border-radius:99px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s}
+  .adm-pill.active{background:rgba(108,99,255,0.15);border-color:rgba(108,99,255,0.5);color:var(--accent2)}
+  .adm-pill:hover:not(.active){border-color:rgba(255,255,255,0.2);color:var(--text)}
 </style>
 <link rel="stylesheet" href="mobile.css"/>
 </head>
@@ -258,6 +262,16 @@
       <p>Upload study materials to Cloudinary and publish them to the library.</p>
     </div>
 
+    <!-- SECTION NAV — paste here -->
+    <div class="admin-section-nav">
+      <button class="adm-pill active" data-sec="upload" onclick="admSwitch('upload')">📤 Upload PDFs</button>
+      <button class="adm-pill" data-sec="views" onclick="admSwitch('views')">👁 Views</button>
+      <button class="adm-pill" data-sec="downloads" onclick="admSwitch('downloads')">⬇️ Downloads</button>
+      <button class="adm-pill" data-sec="premium" onclick="admSwitch('premium')">⭐ Premium</button>
+      <button class="adm-pill" data-sec="payments" onclick="admSwitch('payments')">💳 Payments</button>
+    </div>
+
+    <div id="adm-upload">
     <div class="stats-row" id="statsRow">
       <div class="stat-card"><div class="s-val" id="statTotal">—</div><div class="s-lbl">Total PDFs</div></div>
       <div class="stat-card"><div class="s-val" id="statBeginner">—</div><div class="s-lbl">Beginner</div></div>
@@ -339,14 +353,17 @@
         </div>
       </div>
     </div>
+  </div>
 
+  <div id="adm-views" style="display:none">
     <div class="panel" style="margin-top:24px">
       <div class="panel-title"><i class="ti ti-eye"></i> Recent Views</div>
       <div id="viewsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
-        <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
-      </div>
+      <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
     </div>
+  </div>
 
+  <div id="adm-views" style="display:none"></div>
     <div class="panel" style="margin-top:24px">
       <div class="panel-title"><i class="ti ti-download"></i> Recent Downloads</div>
       <div id="downloadsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
@@ -415,6 +432,7 @@
      (after its closing </div>, before the
      final </div></div> that closes page-wrap)
      ════════════════════════════════════════ -->
+    <div id="adm-payments" style="display:none">
     <div class="panel" style="margin-top:24px">
       <div class="panel-title"><i class="ti ti-receipt"></i> Payment Approvals</div>
       <div id="pendingPaymentsList" style="display:flex;flex-direction:column;gap:10px;max-height:600px;overflow-y:auto">
@@ -1253,6 +1271,14 @@ function showToast(msg, type='success'){
   document.getElementById('toastIcon').className = type==='success' ? 'ti ti-check' : 'ti ti-alert-circle';
   t.className = `toast ${type} show`;
   setTimeout(()=> t.classList.remove('show'), 3500);
+}
+
+function admSwitch(sec){
+  ['upload','views','downloads','premium','payments'].forEach(s=>{
+    document.getElementById('adm-'+s).style.display = s===sec?'block':'none';
+    document.querySelector(`.adm-pill[data-sec="${s}"]`)
+      .classList.toggle('active', s===sec);
+  });
 }
 
 document.getElementById('editModal').addEventListener('click', e=>{
