@@ -355,6 +355,57 @@
   }
   .edit-hint:hover{color:var(--text);border-color:rgba(255,255,255,0.25)}
 
+  /* ── PRIVACY LOCK SYSTEM ── */
+  .privacy-toggle-row{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:13px 14px;border-radius:var(--r);
+    background:var(--bg3);border:1px solid var(--border2);
+    margin-top:10px;
+  }
+  .privacy-toggle-info{display:flex;align-items:flex-start;gap:10px;min-width:0}
+  .privacy-toggle-info i{font-size:16px;color:var(--text2);margin-top:1px;flex-shrink:0}
+  .privacy-toggle-info .ptt-title{font-size:12.5px;font-weight:600;color:var(--text)}
+  .privacy-toggle-info .ptt-sub{font-size:11.5px;color:var(--text3);line-height:1.5;margin-top:2px}
+  .privacy-switch{
+    position:relative;width:40px;height:23px;flex-shrink:0;cursor:pointer;
+  }
+  .privacy-switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+  .privacy-switch .track{
+    position:absolute;inset:0;border-radius:99px;
+    background:var(--bg2);border:1px solid var(--border2);
+    transition:background .2s,border-color .2s;
+  }
+  .privacy-switch .thumb{
+    position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;
+    background:var(--text2);transition:transform .2s,background .2s;
+  }
+  .privacy-switch input:checked ~ .track{background:rgba(91,127,255,0.18);border-color:var(--accent)}
+  .privacy-switch input:checked ~ .thumb{transform:translateX(17px);background:var(--accent)}
+
+  .locked-screen{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+    padding:64px 24px;text-align:center;
+  }
+  .locked-screen .lock-circle{
+    width:62px;height:62px;border-radius:50%;margin:0 auto 20px;
+    background:var(--bg3);border:1px solid var(--border2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;color:var(--text2);
+  }
+  .locked-screen h3{
+    font-family:'Source Serif 4',serif;font-size:19px;font-weight:700;
+    margin-bottom:8px;color:var(--text);
+  }
+  .locked-screen p{font-size:13.5px;color:var(--text2);line-height:1.7;max-width:340px;margin:0 auto}
+  .private-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:4px 10px;border-radius:5px;
+    background:rgba(255,255,255,0.04);border:1px solid var(--border2);
+    font-size:10.5px;font-weight:600;color:var(--text2);
+    text-transform:uppercase;letter-spacing:.8px;
+  }
+  .private-badge i{font-size:11px}
+
   /* ── RESPONSIVE ── */
   @media(max-width:960px){
     .profile-grid{grid-template-columns:1fr}
@@ -441,7 +492,7 @@
         <span id="profileRoleLabel">Member</span>
       </div>
       <h1 class="profile-name" id="profileName">—</h1>
-      <div class="profile-email">
+      <div class="profile-email" id="profileEmailRow">
         <i class="ti ti-mail"></i>
         <span id="profileEmail">—</span>
       </div>
@@ -459,8 +510,15 @@
     </div>
   </div>
 
+  <!-- LOCKED STATE (shown instead of stats/grid when profile is private and viewer isn't the owner) -->
+  <div class="locked-screen" id="lockedScreen" style="display:none">
+    <div class="lock-circle"><i class="ti ti-lock"></i></div>
+    <h3>This profile is private</h3>
+    <p id="lockedScreenText">Only <span id="lockedScreenName">this user</span> can see their full profile, activity, and stats.</p>
+  </div>
+
   <!-- STATS STRIP -->
-  <div class="stats-strip">
+  <div class="stats-strip" id="statsStrip">
     <div class="stat-tile">
       <div class="tile-icon"><i class="ti ti-eye"></i></div>
       <div class="tile-val" id="statViews">—</div>
@@ -484,7 +542,7 @@
   </div>
 
   <!-- MAIN GRID -->
-  <div class="profile-grid">
+  <div class="profile-grid" id="profileGrid">
 
     <!-- LEFT SIDEBAR -->
     <div class="profile-sidebar">
@@ -528,10 +586,26 @@
             <div class="val" id="aboutLocation">Earth</div>
           </div>
         </div>
+
+        <!-- Privacy toggle: only shown/populated on own profile -->
+        <div class="privacy-toggle-row" id="privacyToggleRow" style="display:none">
+          <div class="privacy-toggle-info">
+            <i class="ti ti-lock"></i>
+            <div>
+              <div class="ptt-title">Private profile</div>
+              <div class="ptt-sub">Hide your stats, activity, and details from everyone but you.</div>
+            </div>
+          </div>
+          <label class="privacy-switch">
+            <input type="checkbox" id="privacyCheckbox" onchange="togglePrivacy(this.checked)"/>
+            <span class="track"></span>
+            <span class="thumb"></span>
+          </label>
+        </div>
       </div>
 
       <!-- Subjects of Interest -->
-      <div class="sidebar-card">
+      <div class="sidebar-card" id="subjectsCard">
         <div class="card-heading"><i class="ti ti-book"></i> Subjects Explored</div>
         <div class="subject-chips" id="subjectChips">
           <span style="font-size:13px;color:var(--text3)">Loading…</span>
@@ -539,7 +613,7 @@
       </div>
 
       <!-- Followers -->
-      <div class="sidebar-card">
+      <div class="sidebar-card" id="followersCard">
         <div class="card-heading"><i class="ti ti-users"></i> Community</div>
         <div class="followers-row">
           <div>
@@ -685,6 +759,7 @@ async function loadProfile(uid, viewer){
     let email       = null;
     let createdAt   = null;
     let adminFlag   = false;
+    let isPrivate   = false;
  
     try {
       const profSnap = await db.collection('userProfiles').doc(uid).get();
@@ -694,6 +769,7 @@ async function loadProfile(uid, viewer){
         email       = pd.email || null;
         createdAt   = pd.createdAt ? new Date(pd.createdAt.seconds * 1000) : null;
         adminFlag   = window.ADMIN_EMAILS.includes(email);
+        isPrivate   = !!pd.isPrivate;
       }
     } catch(e) { /* ignore, fall through to other sources */ }
  
@@ -744,7 +820,7 @@ async function loadProfile(uid, viewer){
       return;
     }
  
-    profileData = { uid, displayName, email: email || '—', createdAt, adminFlag, views, downloads };
+    profileData = { uid, displayName, email: email || '—', createdAt, adminFlag, isPrivate, views, downloads };
     renderProfile(profileData, viewer);
     showState('mainPage');
  
@@ -774,6 +850,7 @@ async function loadProfile(uid, viewer){
         createdAt:   viewer.metadata?.creationTime
                        ? new Date(viewer.metadata.creationTime) : null,
         adminFlag:   isAdmin(viewer),
+        isPrivate:   false,
         views:       [],
         downloads:   []
       };
@@ -800,6 +877,7 @@ function showState(id){
 function renderProfile(p, viewer){
   const isOwn   = viewer && viewer.uid === p.uid;
   const initials= p.displayName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
+  const locked  = p.isPrivate && !isOwn;
 
   // Avatar
   const avEl = document.getElementById('profileAvatar');
@@ -812,11 +890,57 @@ function renderProfile(p, viewer){
     document.getElementById('profileRoleLabel').textContent = 'Admin';
   }
 
-  // Name / email
+  // Name always visible (per spec: name/avatar stay visible even when locked)
   document.getElementById('profileName').textContent  = p.displayName;
-  document.getElementById('profileEmail').textContent = p.email;
   document.getElementById('aboutName').textContent    = p.displayName;
   document.getElementById('aboutRole').textContent    = p.adminFlag ? 'Admin' : 'Member';
+
+  // Role tag shows Private badge when locked
+  if(locked){
+    document.getElementById('profileRoleLabel').innerHTML = 'Private <i class="ti ti-lock" style="font-size:10px;margin-left:2px"></i>';
+  }
+
+  if(locked){
+    // ── LOCKED VIEW: hide everything except avatar + name ──
+    document.getElementById('profileEmailRow').style.display = 'none';
+    document.getElementById('profileBio').style.display      = 'none';
+    document.getElementById('profileTagsRow').style.display  = 'none';
+    document.getElementById('statsStrip').style.display      = 'none';
+    document.getElementById('profileGrid').style.display     = 'none';
+    document.getElementById('lockedScreen').style.display    = 'block';
+    document.getElementById('lockedScreenName').textContent  = p.displayName;
+    toggleStoryRing(false);
+
+    // Actions: just a message/follow option, no edit/stat access
+    const actionsEl = document.getElementById('profileActions');
+    actionsEl.innerHTML = `
+      <div id="shFriendsBtnWrap"></div>
+      <button class="btn-message" onclick="window.location.href='chat.html'">
+        <i class="ti ti-message-circle"></i> Message
+      </button>
+      <span class="private-badge"><i class="ti ti-lock"></i> Private profile</span>`;
+
+    if (typeof SHFriends !== 'undefined' && viewer) {
+      SHFriends.init(viewer);
+      SHFriends.renderButton(
+        p.uid,
+        p.displayName,
+        p.email,
+        document.getElementById('shFriendsBtnWrap')
+      );
+    }
+    return; // stop here — nothing else renders while locked
+  }
+
+  // ── UNLOCKED VIEW (own profile, or public profile) ──
+  document.getElementById('profileEmailRow').style.display = '';
+  document.getElementById('profileBio').style.display      = '';
+  document.getElementById('profileTagsRow').style.display  = '';
+  document.getElementById('statsStrip').style.display      = '';
+  document.getElementById('profileGrid').style.display     = '';
+  document.getElementById('lockedScreen').style.display    = 'none';
+
+  document.getElementById('profileEmail').textContent = p.email;
 
   // Joined
   if(p.createdAt){
@@ -904,6 +1028,12 @@ if (typeof SHFriends !== 'undefined') {
         <i class="ti ti-settings"></i> Settings
       </button>
       <div class="profile-joined"><i class="ti ti-eye"></i> Viewing your public profile</div>`;
+
+    // Show + wire up the privacy toggle (own profile only)
+    const toggleRow = document.getElementById('privacyToggleRow');
+    const checkbox  = document.getElementById('privacyCheckbox');
+    toggleRow.style.display = 'flex';
+    checkbox.checked = !!p.isPrivate;
   } else {
     // Render the friend/follow buttons via SHFriends
     actionsEl.innerHTML = `
@@ -932,6 +1062,25 @@ if (typeof SHFriends !== 'undefined') {
 
   // Status
   loadStatusCard(p, viewer, isOwn);
+}
+
+// ── Privacy toggle handler (owner only) ──
+async function togglePrivacy(isChecked){
+  if(!currentUser || !profileData || currentUser.uid !== profileData.uid) return;
+  const checkbox = document.getElementById('privacyCheckbox');
+  checkbox.disabled = true;
+  try{
+    await db.collection('userProfiles').doc(currentUser.uid).set({
+      isPrivate: isChecked
+    }, { merge: true });
+    profileData.isPrivate = isChecked;
+    showToast(isChecked ? 'Profile is now private' : 'Profile is now public', 'success');
+  }catch(e){
+    console.error(e);
+    checkbox.checked = !isChecked; // revert UI on failure
+    showToast('Could not update privacy setting', 'error');
+  }
+  checkbox.disabled = false;
 }
 
 /* ── STATUS FEATURE ──
