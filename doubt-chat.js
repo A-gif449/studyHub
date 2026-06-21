@@ -14,7 +14,7 @@
   /* ─── CONFIG ───────────────────────────────────────────────── */
   const MODEL = "claude-sonnet-4-6";
   const MAX_TOKENS = 1024;
-  const API_URL = "https://api.anthropic.com/v1/messages";
+  const API_URL = "/api/claude";
 
   /* System prompt — scoped to study assistant */
   function buildSystemPrompt(pdfTitle) {
@@ -389,9 +389,9 @@
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-calls": "true"
+        // "x-api-key": apiKey,
+        // "anthropic-version": "2023-06-01",
+        // "anthropic-dangerous-direct-browser-calls": "true"
       },
       body: JSON.stringify({
         model: MODEL,
