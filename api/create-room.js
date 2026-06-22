@@ -25,7 +25,7 @@ export default async function handler(req, res) {
           start_video_off: true,
           start_audio_off: true,
           exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8, // 8 hour expiry
-          max_participants: 50
+          // max_participants: 10
         }
       })
     });
