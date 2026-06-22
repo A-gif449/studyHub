@@ -520,7 +520,7 @@
   window.CLOUDINARY_CONFIG = { cloudName: "dwmvn4kj3", uploadPreset: "preupload" };
 
   /* ── Daily.co config ── */
-  window.DAILY_API_KEY   = "3b49cabc634059e6a695ba5d63a8c9549744f18e7e2b0d32699138eff1ba5ef9";
+  // window.DAILY_API_KEY   = "3b49cabc634059e6a695ba5d63a8c9549744f18e7e2b0d32699138eff1ba5ef9";
   window.DAILY_DOMAIN    = "study-hub-team"; /* your subdomain */
 </script>
 
@@ -1178,42 +1178,21 @@ async function joinRoom() {
   const roomName = `studyhub-${selectedRoomSlug}`;
 
   try {
-    /* Create or retrieve the room via Daily REST API */
-    const res = await fetch('https://api.daily.co/v1/rooms', {
+    /* Create or retrieve the room via our own serverless function (keeps API key off the client) */
+    const res = await fetch('/api/create-room', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${window.DAILY_API_KEY}`
-      },
-      body: JSON.stringify({
-        name: roomName,
-        properties: {
-          enable_chat: true,
-          enable_screenshare: true,
-          start_video_off: true,   /* camera off by default */
-          start_audio_off: true,   /* mic off by default */
-          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8, /* 8hr expiry */
-          max_participants: 50,
-        }
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roomName })
     });
 
     const data = await res.json();
 
-    /* Daily returns error.type if room already exists — that's fine, use it */
-    let roomUrl;
-    if (data.url) {
-      roomUrl = data.url;
-    } else if (data.error && data.error.includes('already exists')) {
-      roomUrl = `https://${window.DAILY_DOMAIN}.daily.co/${roomName}`;
-    } else if (res.status === 200 || res.status === 201) {
-      roomUrl = data.url;
-    } else {
-      throw new Error(data.info || data.error || 'Could not create room');
+    if (!data.url) {
+      throw new Error(data.error || 'Could not create room');
     }
 
-    activeRoomUrl = roomUrl;
-    launchCall(roomUrl);
+    activeRoomUrl = data.url;
+    launchCall(data.url);
 
   } catch (err) {
     console.error('[StudyHub Room]', err);
