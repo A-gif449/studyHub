@@ -1,4 +1,3 @@
-//index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<!-- Daily.co prebuilt UI -->
+<script crossorigin src="https://unpkg.com/@daily-co/daily-js"></script>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
@@ -56,6 +57,11 @@
   .nav-link-highlight{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--gold);background:transparent;border:1px solid rgba(201,163,86,0.3);text-decoration:none;transition:all .2s}
   .nav-link-highlight i{font-size:14px}
   .nav-link-highlight:hover{background:rgba(201,163,86,0.08)}
+  /* Study Room nav button */
+  .nav-room-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;background:var(--accent);border:none;cursor:pointer;font-family:inherit;transition:all .2s;position:relative}
+  .nav-room-btn:hover{background:#4D6FE0}
+  .nav-room-btn .live-dot{width:6px;height:6px;border-radius:50%;background:#4EE4A0;flex-shrink:0;animation:pulse-dot 1.8s ease infinite}
+  @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
 
   /* ── HERO ── */
   .hero{min-height:92vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:120px 5% 70px;position:relative}
@@ -75,9 +81,7 @@
   .hero-stat .lbl{font-size:12px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
   .stat-div{width:1px;height:36px;background:var(--border2)}
   .hero-float{position:absolute;display:flex;align-items:center;gap:10px;padding:11px 15px;border-radius:10px;background:var(--card);border:1px solid var(--border2);font-size:13px;color:var(--text);pointer-events:none}
-  .hf1{top:24%;left:5%}
-  .hf2{top:28%;right:6%}
-  .hf3{bottom:26%;left:7%}
+  .hf1{top:24%;left:5%}.hf2{top:28%;right:6%}.hf3{bottom:26%;left:7%}
   .hf-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2)}
 
   section{padding:80px 5%;position:relative}
@@ -88,7 +92,7 @@
 
   /* ── FEATURES ── */
   .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;margin-top:50px;background:var(--border);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
-  .feat-card{padding:28px;background:var(--card);transition:background .2s;position:relative}
+  .feat-card{padding:28px;background:var(--card);transition:background .2s;position:relative;cursor:default}
   .feat-card:hover{background:var(--card2)}
   .feat-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:18px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2)}
   .feat-card h3{font-size:15.5px;font-weight:700;margin-bottom:9px;color:var(--text)}
@@ -99,7 +103,6 @@
   .filter-tabs{display:flex;gap:6px;flex-wrap:wrap}
   .filter-tab{padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:600;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s}
   .filter-tab.active,.filter-tab:hover{background:var(--bg3);border-color:var(--border2);color:var(--text)}
-
   .cat-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;margin-top:40px}
   .cat-strip::-webkit-scrollbar{display:none}
   .cat-pill{flex-shrink:0;padding:11px 20px;border-radius:var(--r);background:var(--card);border:1px solid var(--border);display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
@@ -114,6 +117,54 @@
   .marquee-item{font-size:15px;font-weight:600;color:var(--text3);white-space:nowrap;letter-spacing:.2px;font-family:'Inter',sans-serif;transition:color .2s}
   .marquee-item:hover{color:var(--text2)}
   .marquee-dot{color:var(--border2)}
+
+  /* ── VIDEO SHOWCASE ── */
+  .video-showcase{padding:90px 0 100px;position:relative;overflow:hidden;background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .video-showcase::before,.video-showcase::after{content:'';position:absolute;top:0;bottom:0;width:200px;z-index:10;pointer-events:none}
+  .video-showcase::before{left:0;background:linear-gradient(90deg,var(--bg) 0%,transparent 100%)}
+  .video-showcase::after{right:0;background:linear-gradient(270deg,var(--bg) 0%,transparent 100%)}
+  .showcase-header{text-align:center;padding:0 5%;margin-bottom:52px;position:relative;z-index:2}
+  .showcase-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--text3);margin-bottom:16px}
+  .showcase-eyebrow::before,.showcase-eyebrow::after{content:'';width:24px;height:1px;background:var(--border2)}
+  .showcase-title{font-family:'Source Serif 4',serif;font-size:clamp(24px,3vw,34px);font-weight:700;color:var(--text);letter-spacing:-0.3px;line-height:1.2;margin-bottom:12px}
+  .showcase-title .accent-word{color:var(--accent2)}
+  .showcase-sub{font-size:14px;color:var(--text2);max-width:460px;margin:0 auto;line-height:1.7}
+  .video-track-wrap{position:relative;width:100%;overflow:hidden}
+  .video-row{display:flex;gap:16px;margin-bottom:16px;width:max-content;will-change:transform}
+  .video-row:last-child{margin-bottom:0}
+  .video-row-1{animation:scroll-right 55s linear infinite}
+  .video-row-2{animation:scroll-left 45s linear infinite}
+  @keyframes scroll-right{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  @keyframes scroll-left{0%{transform:translateX(-50%)}100%{transform:translateX(0)}}
+  .video-track-wrap:hover .video-row-1,.video-track-wrap:hover .video-row-2{animation-play-state:paused}
+  .vid-card{position:relative;width:320px;height:200px;border-radius:var(--r2);overflow:hidden;flex-shrink:0;border:1px solid var(--border2);background:var(--card);cursor:pointer;transition:border-color .3s ease,transform .3s ease}
+  .vid-card:hover{border-color:rgba(91,127,255,0.35);transform:scale(1.025);z-index:5}
+  .vid-card video{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease}
+  .vid-card video.loaded{opacity:1}
+  .vid-card .vid-skeleton{position:absolute;inset:0;background:linear-gradient(110deg,var(--card) 30%,rgba(255,255,255,0.03) 50%,var(--card) 70%);background-size:200% 100%;animation:vid-shimmer 1.6s ease infinite;border-radius:var(--r2);transition:opacity .4s ease}
+  .vid-card.vid-ready .vid-skeleton{opacity:0;pointer-events:none}
+  @keyframes vid-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .vid-overlay{position:absolute;inset:0;background:linear-gradient(170deg,rgba(14,15,18,0) 0%,rgba(14,15,18,0.25) 65%,rgba(14,15,18,0.65) 100%);pointer-events:none}
+  .vid-label{position:absolute;bottom:0;left:0;right:0;padding:14px 16px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  .vid-label-left{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .vid-subject{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent2);opacity:.85}
+  .vid-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+  .vid-stat{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0}
+  .vid-stat i{font-size:12px;color:var(--text3)}
+  .vid-badge{position:absolute;top:12px;right:12px;padding:3px 8px;border-radius:5px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;border:1px solid;backdrop-filter:blur(8px)}
+  .vid-badge.live{background:rgba(194,86,79,0.18);border-color:rgba(194,86,79,0.4);color:#E87070;display:flex;align-items:center;gap:5px}
+  .vid-badge.live::before{content:'';width:5px;height:5px;border-radius:50%;background:#E87070;animation:live-pulse 1.4s ease infinite}
+  @keyframes live-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+  .vid-badge.new{background:rgba(78,158,120,0.15);border-color:rgba(78,158,120,0.35);color:#5BBD95}
+  .vid-badge.trending{background:rgba(201,163,86,0.12);border-color:rgba(201,163,86,0.3);color:var(--gold)}
+  .showcase-proof{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:52px;padding:0 5%;position:relative;z-index:2}
+  .proof-item{display:flex;align-items:center;gap:12px}
+  .proof-icon{width:36px;height:36px;border-radius:9px;background:var(--card2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--accent2);flex-shrink:0}
+  .proof-text{display:flex;flex-direction:column;gap:1px}
+  .proof-num{font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;color:var(--text);line-height:1}
+  .proof-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px}
+  .proof-divider{width:1px;height:32px;background:var(--border2)}
+  @media(prefers-reduced-motion:reduce){.video-row-1,.video-row-2{animation:none}}
 
   /* ── COURSE / PDF CARDS ── */
   .courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
@@ -150,7 +201,6 @@
   .testi-info .role{font-size:11.5px;color:var(--text3);margin-top:2px}
   .stars{display:flex;gap:2px;align-items:center}
   .stars i{color:var(--gold);font-size:11px}
-  .stars span{font-size:12px;color:var(--text2);margin-left:4px}
 
   /* ── CTA BANNER ── */
   .cta-banner{margin:0 5% 70px;padding:48px 50px;border-radius:var(--r3);background:var(--card);border:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:28px;position:relative}
@@ -171,7 +221,7 @@
   .social-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:14px;cursor:pointer;transition:all .2s;text-decoration:none}
   .social-btn:hover{border-color:rgba(255,255,255,0.22);color:var(--text)}
 
-  /* ── MODAL ── */
+  /* ── AUTH MODAL ── */
   .modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(8,9,11,0.8);backdrop-filter:blur(6px);align-items:center;justify-content:center}
   .modal-backdrop.show{display:flex}
   .modal{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:36px;width:100%;max-width:420px;position:relative}
@@ -196,15 +246,249 @@
   .auth-error{background:rgba(194,86,79,0.1);border:1px solid rgba(194,86,79,0.25);border-radius:7px;padding:10px 13px;font-size:12.5px;color:var(--red);margin-bottom:14px;display:none}
   .auth-error.show{display:block}
 
+  /* ══════════════════════════════════════
+     STUDY ROOM MODAL
+  ══════════════════════════════════════ */
+  #roomBackdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(6,7,10,0.94);
+    backdrop-filter: blur(12px);
+    flex-direction: column;
+  }
+  #roomBackdrop.show { display: flex; }
+
+  /* Room header bar */
+  .room-header {
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(14,15,18,0.95);
+    gap: 16px;
+  }
+  .room-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .room-live-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    background: rgba(78,228,160,0.1);
+    border: 1px solid rgba(78,228,160,0.25);
+    font-size: 11px;
+    font-weight: 700;
+    color: #4EE4A0;
+    flex-shrink: 0;
+  }
+  .room-live-pill::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #4EE4A0;
+    animation: pulse-dot 1.8s ease infinite;
+  }
+  .room-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .room-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .room-share-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text2);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+  }
+  .room-share-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .room-close-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(194,86,79,0.3);
+    background: rgba(194,86,79,0.08);
+    color: var(--red);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+  }
+  .room-close-btn:hover { background: rgba(194,86,79,0.15); }
+
+  /* Room picker (subject selection) */
+  #roomPicker {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+  }
+  .picker-title {
+    font-family: 'Source Serif 4', serif;
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .picker-sub {
+    font-size: 14px;
+    color: var(--text2);
+    margin-bottom: 40px;
+    text-align: center;
+    max-width: 420px;
+    line-height: 1.65;
+  }
+  .room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 680px;
+    margin-bottom: 32px;
+  }
+  .room-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 22px 16px;
+    border-radius: var(--r2);
+    border: 1px solid var(--border2);
+    background: var(--card);
+    cursor: pointer;
+    transition: all .2s;
+    text-align: center;
+    position: relative;
+  }
+  .room-option:hover {
+    border-color: rgba(91,127,255,0.4);
+    background: var(--card2);
+    transform: translateY(-2px);
+  }
+  .room-option.selected {
+    border-color: var(--accent);
+    background: rgba(91,127,255,0.08);
+  }
+  .room-option-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .room-option-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .room-option-count {
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .room-join-btn {
+    padding: 13px 36px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .room-join-btn:hover { background: #4D6FE0; }
+  .room-join-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .room-join-btn .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+  .room-join-btn.loading .spinner { display: block; }
+  .room-join-btn.loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Call frame container */
+  #callFrame {
+    display: none;
+    flex: 1;
+    width: 100%;
+    background: #000;
+  }
+  #callFrame iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  /* Room error */
+  .room-error {
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: rgba(194,86,79,0.1);
+    border: 1px solid rgba(194,86,79,0.25);
+    color: var(--red);
+    font-size: 13px;
+    margin-top: 16px;
+    text-align: center;
+    display: none;
+    max-width: 400px;
+  }
+  .room-error.show { display: block; }
+
   .empty-state{grid-column:1/-1;padding:70px 20px;text-align:center;color:var(--text3)}
   .empty-state i{font-size:40px;margin-bottom:14px;display:block;color:var(--text3)}
   .empty-state p{font-size:14px}
-
-  .toast{position:fixed;bottom:26px;right:26px;z-index:999;padding:13px 18px;border-radius:9px;background:var(--card2);border:1px solid var(--border2);font-size:13.5px;color:var(--text);box-shadow:0 16px 40px rgba(0,0,0,0.45);transform:translateY(20px);opacity:0;transition:all .25s;display:flex;align-items:center;gap:10px;pointer-events:none}
+  .toast{position:fixed;bottom:26px;right:26px;z-index:9999;padding:13px 18px;border-radius:9px;background:var(--card2);border:1px solid var(--border2);font-size:13.5px;color:var(--text);box-shadow:0 16px 40px rgba(0,0,0,0.45);transform:translateY(20px);opacity:0;transition:all .25s;display:flex;align-items:center;gap:10px;pointer-events:none}
   .toast.show{transform:translateY(0);opacity:1}
   .toast.success{border-color:rgba(78,158,120,.3)}
   .toast.error{border-color:rgba(194,86,79,.3)}
-
   .skeleton{background:linear-gradient(90deg,var(--card) 25%,rgba(255,255,255,0.03) 50%,var(--card) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r2);height:240px;border:1px solid var(--border)}
   @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
@@ -215,403 +499,29 @@
     section{padding:56px 20px}
     .cta-banner{padding:32px 26px}
     footer{padding:48px 20px 28px}
+    .room-grid{grid-template-columns:repeat(2,1fr)}
   }
-
-/* ══════════════════════════════════════════
-   VIDEO SHOWCASE SECTION
-══════════════════════════════════════════ */
-.video-showcase {
-  padding: 90px 0 100px;
-  position: relative;
-  overflow: hidden;
-  background: var(--bg);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
- 
-/* Subtle side fade masks */
-.video-showcase::before,
-.video-showcase::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 200px;
-  z-index: 10;
-  pointer-events: none;
-}
-.video-showcase::before {
-  left: 0;
-  background: linear-gradient(90deg, var(--bg) 0%, transparent 100%);
-}
-.video-showcase::after {
-  right: 0;
-  background: linear-gradient(270deg, var(--bg) 0%, transparent 100%);
-}
- 
-/* Section header */
-.showcase-header {
-  text-align: center;
-  padding: 0 5%;
-  margin-bottom: 52px;
-  position: relative;
-  z-index: 2;
-}
-.showcase-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.8px;
-  color: var(--text3);
-  margin-bottom: 16px;
-}
-.showcase-eyebrow::before,
-.showcase-eyebrow::after {
-  content: '';
-  width: 24px;
-  height: 1px;
-  background: var(--border2);
-}
-.showcase-title {
-  font-family: 'Source Serif 4', serif;
-  font-size: clamp(24px, 3vw, 34px);
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.3px;
-  line-height: 1.2;
-  margin-bottom: 12px;
-}
-.showcase-title .accent-word {
-  color: var(--accent2);
-}
-.showcase-sub {
-  font-size: 14px;
-  color: var(--text2);
-  max-width: 460px;
-  margin: 0 auto;
-  line-height: 1.7;
-}
- 
-/* ── Track container ── */
-.video-track-wrap {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
- 
-/* Two rows, scroll in opposite directions */
-.video-row {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-  width: max-content;
-  will-change: transform;
-}
-.video-row:last-child {
-  margin-bottom: 0;
-}
- 
-/* Row 1: left → right (slow) */
-.video-row-1 {
-  animation: scroll-right 55s linear infinite;
-}
-/* Row 2: right → left (slightly faster) */
-.video-row-2 {
-  animation: scroll-left 45s linear infinite;
-}
- 
-@keyframes scroll-right {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-@keyframes scroll-left {
-  0%   { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
-}
- 
-/* Pause on hover */
-.video-track-wrap:hover .video-row-1,
-.video-track-wrap:hover .video-row-2 {
-  animation-play-state: paused;
-}
- 
-/* ── Individual video card ── */
-.vid-card {
-  position: relative;
-  width: 320px;
-  height: 200px;
-  border-radius: var(--r2);
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 1px solid var(--border2);
-  background: var(--card);
-  cursor: pointer;
-  transition: border-color 0.3s ease, transform 0.3s ease;
-}
-.vid-card:hover {
-  border-color: rgba(91,127,255,0.35);
-  transform: scale(1.025);
-  z-index: 5;
-}
- 
-/* The actual video */
-.vid-card video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-.vid-card video.loaded {
-  opacity: 1;
-}
- 
-/* Skeleton while loading */
-.vid-card .vid-skeleton {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    110deg,
-    var(--card) 30%,
-    rgba(255,255,255,0.03) 50%,
-    var(--card) 70%
-  );
-  background-size: 200% 100%;
-  animation: vid-shimmer 1.6s ease infinite;
-  border-radius: var(--r2);
-  transition: opacity 0.4s ease;
-}
-.vid-card.vid-ready .vid-skeleton {
-  opacity: 0;
-  pointer-events: none;
-}
-@keyframes vid-shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
- 
-/* Dark gradient overlay on each card */
-.vid-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    170deg,
-    rgba(14,15,18,0.0) 0%,
-    rgba(14,15,18,0.25) 65%,
-    rgba(14,15,18,0.65) 100%
-  );
-  pointer-events: none;
-}
- 
-/* Card label */
-.vid-label {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 14px 16px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 10px;
-}
-.vid-label-left {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-.vid-subject {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--accent2);
-  opacity: 0.85;
-}
-.vid-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
-}
-.vid-stat {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: var(--text2);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.vid-stat i {
-  font-size: 12px;
-  color: var(--text3);
-}
- 
-/* Top-right live dot or tag */
-.vid-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 3px 8px;
-  border-radius: 5px;
-  font-size: 9.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  border: 1px solid;
-  backdrop-filter: blur(8px);
-}
-.vid-badge.live {
-  background: rgba(194,86,79,0.18);
-  border-color: rgba(194,86,79,0.4);
-  color: #E87070;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.vid-badge.live::before {
-  content: '';
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #E87070;
-  animation: live-pulse 1.4s ease infinite;
-}
-@keyframes live-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.7); }
-}
-.vid-badge.new {
-  background: rgba(78,158,120,0.15);
-  border-color: rgba(78,158,120,0.35);
-  color: #5BBD95;
-}
-.vid-badge.trending {
-  background: rgba(201,163,86,0.12);
-  border-color: rgba(201,163,86,0.3);
-  color: var(--gold);
-}
- 
-/* ── Social proof bar below videos ── */
-.showcase-proof {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 40px;
-  flex-wrap: wrap;
-  margin-top: 52px;
-  padding: 0 5%;
-  position: relative;
-  z-index: 2;
-}
-.proof-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.proof-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  background: var(--card2);
-  border: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  color: var(--accent2);
-  flex-shrink: 0;
-}
-.proof-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.proof-num {
-  font-family: 'Source Serif 4', serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1;
-}
-.proof-lbl {
-  font-size: 11px;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-}
-.proof-divider {
-  width: 1px;
-  height: 32px;
-  background: var(--border2);
-}
- 
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .video-row-1,
-  .video-row-2 {
-    animation: none;
-  }
-}
- 
-/* Demo page wrapper */
-.demo-note {
-  text-align: center;
-  padding: 28px;
-  font-size: 13px;
-  color: var(--text3);
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-}
-.demo-note strong { color: var(--text2); }
-.demo-note code {
-  background: rgba(91,127,255,0.12);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  color: var(--accent2);
-  font-family: monospace;
-}
 </style>
 <link rel="stylesheet" href="mobile.css"/>
 </head>
 <script src="mobile-nav.js"></script>
 <body>
 
-<!-- ╔══════════════════════════════════════════════════════════════╗
-     ║              🔧 CONFIGURATION — EDIT THIS BLOCK             ║
-     ╚══════════════════════════════════════════════════════════════╝ -->
 <script>
-  // ─── STEP 1: Paste your Firebase project config here ───────────
-  // Get it from: Firebase Console → Project Settings → Your Apps → Config
   window.FIREBASE_CONFIG = {
-     apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
-  authDomain: "studyx-fd90c.firebaseapp.com",
-  projectId: "studyx-fd90c",
-  storageBucket: "studyx-fd90c.firebasestorage.app",
-  messagingSenderId: "520877226051",
-  appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
   };
-
-  // ─── STEP 2: Admin email(s) — these users can access admin.html ─
   window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
+  window.CLOUDINARY_CONFIG = { cloudName: "dwmvn4kj3", uploadPreset: "preupload" };
 
-  // ─── STEP 3: Cloudinary config ──────────────────────────────────
-  // Get from: Cloudinary Dashboard → Settings → API Keys
-  // Upload Preset: Settings → Upload → Add upload preset (unsigned)
-  window.CLOUDINARY_CONFIG = {
-    cloudName:    "dwmvn4kj3",
-    uploadPreset: "preupload"
-  };
+  /* ── Daily.co config ── */
+  window.DAILY_API_KEY   = "3b49cabc634059e6a695ba5d63a8c9549744f18e7e2b0d32699138eff1ba5ef9";
+  window.DAILY_DOMAIN    = "study-hub-team"; /* your subdomain */
 </script>
 
 <!-- Firebase SDKs -->
@@ -635,14 +545,19 @@
     <a href="chat.html" class="nav-link-icon"><i class="ti ti-messages"></i> Chat</a>
     <a href="friends.html" class="nav-link-icon"><i class="ti ti-users"></i> Friends</a>
     <a href="important-questions.html" class="nav-link-highlight"><i class="ti ti-star"></i> Important Qs</a>
+    <div class="nav-divider"></div>
+    <button class="nav-room-btn" onclick="openRoomModal()">
+      <span class="live-dot"></span>
+      <i class="ti ti-video"></i> Study Room
+    </button>
   </div>
   <div class="nav-right" id="navRight">
-  <div id="bellSlot"></div>
-  <div id="navUserSection">
-    <button class="btn-ghost" onclick="openModal('login')">Sign In</button>
-    <button class="btn-primary" onclick="openModal('signup')">Get Started</button>
+    <div id="bellSlot"></div>
+    <div id="navUserSection">
+      <button class="btn-ghost" onclick="openModal('login')">Sign In</button>
+      <button class="btn-primary" onclick="openModal('signup')">Get Started</button>
+    </div>
   </div>
-</div>
 </nav>
 
 <!-- HERO -->
@@ -712,58 +627,38 @@
   </div>
 </div>
 
+<!-- VIDEO SHOWCASE -->
 <section class="video-showcase" id="community">
- 
   <div class="showcase-header">
     <div class="showcase-eyebrow">Learners in action</div>
     <h2 class="showcase-title">Join a community that never<br/><span class="accent-word">stops growing</span></h2>
     <p class="showcase-sub">Students across the world study with StudyHub every day — in libraries, cafes, and everywhere in between.</p>
   </div>
- 
   <div class="video-track-wrap" id="videoTrackWrap">
- 
-    <!-- ROW 1: scrolls left → right -->
     <div class="video-row video-row-1" id="row1"></div>
- 
-    <!-- ROW 2: scrolls right → left -->
     <div class="video-row video-row-2" id="row2"></div>
- 
   </div>
- 
   <div class="showcase-proof">
     <div class="proof-item">
       <div class="proof-icon"><i class="ti ti-users"></i></div>
-      <div class="proof-text">
-        <span class="proof-num">120K+</span>
-        <span class="proof-lbl">Active learners</span>
-      </div>
+      <div class="proof-text"><span class="proof-num">120K+</span><span class="proof-lbl">Active learners</span></div>
     </div>
     <div class="proof-divider"></div>
     <div class="proof-item">
       <div class="proof-icon"><i class="ti ti-world"></i></div>
-      <div class="proof-text">
-        <span class="proof-num">48</span>
-        <span class="proof-lbl">Countries</span>
-      </div>
+      <div class="proof-text"><span class="proof-num">48</span><span class="proof-lbl">Countries</span></div>
     </div>
     <div class="proof-divider"></div>
     <div class="proof-item">
       <div class="proof-icon"><i class="ti ti-clock"></i></div>
-      <div class="proof-text">
-        <span class="proof-num">3.2M</span>
-        <span class="proof-lbl">Hours studied</span>
-      </div>
+      <div class="proof-text"><span class="proof-num">3.2M</span><span class="proof-lbl">Hours studied</span></div>
     </div>
     <div class="proof-divider"></div>
     <div class="proof-item">
       <div class="proof-icon"><i class="ti ti-file-text"></i></div>
-      <div class="proof-text">
-        <span class="proof-num">400+</span>
-        <span class="proof-lbl">PDF materials</span>
-      </div>
+      <div class="proof-text"><span class="proof-num">400+</span><span class="proof-lbl">PDF materials</span></div>
     </div>
   </div>
- 
 </section>
 
 <!-- FEATURES -->
@@ -791,6 +686,11 @@
       <div class="feat-icon"><i class="ti ti-award"></i></div>
       <h3>Expert Curated</h3>
       <p>Every piece is reviewed by qualified contributors — professors, PhDs, and top-ranked students worldwide.</p>
+    </div>
+    <div class="feat-card" onclick="openRoomModal()" style="cursor:pointer">
+      <div class="feat-icon"><i class="ti ti-video"></i></div>
+      <h3>Live Study Rooms</h3>
+      <p>Join a live video study session with other learners by subject. Camera on or off — your call. <span style="color:var(--text);font-weight:600">Join a room →</span></p>
     </div>
     <div class="feat-card" onclick="window.location.href='chat.html'" style="cursor:pointer">
       <div class="feat-icon"><i class="ti ti-messages"></i></div>
@@ -839,9 +739,7 @@
     </div>
   </div>
   <div class="courses-grid" id="pdfGrid">
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
   </div>
 </section>
 
@@ -851,34 +749,19 @@
   <div class="sec-title">Loved by learners worldwide</div>
   <div class="testi-grid">
     <div class="testi-card">
-      <div class="stars" style="margin-bottom:14px">
-        <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
-      </div>
+      <div class="stars" style="margin-bottom:14px"><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i></div>
       <p class="testi-quote"><i class="ti ti-quote"></i> StudyHub literally changed how I study. The PDF notes are clearer than any textbook I've ever read.</p>
-      <div class="testi-user">
-        <div class="testi-av">PG</div>
-        <div class="testi-info"><div class="name">Priya Gupta</div><div class="role">Engineering Student, IIT Delhi</div></div>
-      </div>
+      <div class="testi-user"><div class="testi-av">PG</div><div class="testi-info"><div class="name">Priya Gupta</div><div class="role">Engineering Student, IIT Delhi</div></div></div>
     </div>
     <div class="testi-card">
-      <div class="stars" style="margin-bottom:14px">
-        <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
-      </div>
+      <div class="stars" style="margin-bottom:14px"><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i></div>
       <p class="testi-quote"><i class="ti ti-quote"></i> The quantum mechanics material is absolutely incredible. I passed my finals with the highest score in class.</p>
-      <div class="testi-user">
-        <div class="testi-av">KA</div>
-        <div class="testi-info"><div class="name">Kwame Asante</div><div class="role">Physics Major, University of Ghana</div></div>
-      </div>
+      <div class="testi-user"><div class="testi-av">KA</div><div class="testi-info"><div class="name">Kwame Asante</div><div class="role">Physics Major, University of Ghana</div></div></div>
     </div>
     <div class="testi-card">
-      <div class="stars" style="margin-bottom:14px">
-        <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-half-filled"></i>
-      </div>
+      <div class="stars" style="margin-bottom:14px"><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-half-filled"></i></div>
       <p class="testi-quote"><i class="ti ti-quote"></i> The DSA visual guide is the best resource online. Got my Google internship after studying from it for 3 weeks.</p>
-      <div class="testi-user">
-        <div class="testi-av">SL</div>
-        <div class="testi-info"><div class="name">Sofia Liu</div><div class="role">CS Student, NUS Singapore</div></div>
-      </div>
+      <div class="testi-user"><div class="testi-av">SL</div><div class="testi-info"><div class="name">Sofia Liu</div><div class="role">CS Student, NUS Singapore</div></div></div>
     </div>
   </div>
 </section>
@@ -908,8 +791,8 @@
     <div class="footer-col">
       <h4>Community</h4>
       <a href="chat.html">Community Chat</a>
-      <a href="#">Contributors</a>
-      <a href="#">Study Groups</a>
+      <a href="#" onclick="openRoomModal();return false">Study Rooms</a>
+      <a href="friends.html">Friends</a>
     </div>
     <div class="footer-col">
       <h4>Company</h4>
@@ -940,41 +823,126 @@
       <button class="modal-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
     </div>
     <div class="auth-error" id="authError"></div>
-    <!-- Login -->
     <div id="formLogin">
       <div class="form-group"><label>Email address</label><input type="email" id="loginEmail" placeholder="you@example.com"/></div>
       <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="Enter your password"/></div>
       <button class="form-submit" id="loginBtn" onclick="handleLogin()">Sign In</button>
       <div class="modal-divider"><span>or continue with</span></div>
-      <button class="btn-ghost" onclick="handleGoogleLogin()" style="width:100%;justify-content:center;display:flex;align-items:center;gap:8px;padding:11px">
-        <i class="ti ti-brand-google"></i> Google
-      </button>
+      <button class="btn-ghost" onclick="handleGoogleLogin()" style="width:100%;justify-content:center;display:flex;align-items:center;gap:8px;padding:11px"><i class="ti ti-brand-google"></i> Google</button>
     </div>
-    <!-- Signup -->
     <div id="formSignup" style="display:none">
       <div class="form-group"><label>Full Name</label><input type="text" id="signupName" placeholder="Your name"/></div>
       <div class="form-group"><label>Email address</label><input type="email" id="signupEmail" placeholder="you@example.com"/></div>
       <div class="form-group"><label>Password</label><input type="password" id="signupPass" placeholder="Create a password (min 6 chars)"/></div>
       <button class="form-submit" id="signupBtn" onclick="handleSignup()">Create Free Account</button>
       <div class="modal-divider"><span>or continue with</span></div>
-      <button class="btn-ghost" onclick="handleGoogleLogin()" style="width:100%;justify-content:center;display:flex;align-items:center;gap:8px;padding:11px">
-        <i class="ti ti-brand-google"></i> Google
+      <button class="btn-ghost" onclick="handleGoogleLogin()" style="width:100%;justify-content:center;display:flex;align-items:center;gap:8px;padding:11px"><i class="ti ti-brand-google"></i> Google</button>
+    </div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════════════╗
+     ║              STUDY ROOM MODAL                               ║
+     ╚══════════════════════════════════════════════════════════════╝ -->
+<div id="roomBackdrop">
+  <!-- Header (shown during call) -->
+  <div class="room-header" id="roomHeader" style="display:none">
+    <div class="room-header-left">
+      <span class="room-live-pill">Live</span>
+      <span class="room-name" id="roomHeaderName">Study Room</span>
+    </div>
+    <div class="room-header-right">
+      <button class="room-share-btn" onclick="copyRoomLink()">
+        <i class="ti ti-link"></i> Copy invite link
+      </button>
+      <button class="room-close-btn" onclick="leaveRoom()">
+        <i class="ti ti-phone-off"></i> Leave room
       </button>
     </div>
   </div>
+
+  <!-- Room picker -->
+  <div id="roomPicker">
+    <p class="picker-title">Choose a Study Room</p>
+    <p class="picker-sub">Pick a subject room to join. Your camera and mic are off by default — turn them on when you're ready.</p>
+
+    <div class="room-grid">
+      <div class="room-option" data-room="mathematics" onclick="selectRoom(this)">
+        <div class="room-option-icon">🧮</div>
+        <div class="room-option-name">Mathematics</div>
+        <div class="room-option-count">Calculus · Algebra · Stats</div>
+      </div>
+      <div class="room-option" data-room="physics" onclick="selectRoom(this)">
+        <div class="room-option-icon">⚛️</div>
+        <div class="room-option-name">Physics</div>
+        <div class="room-option-count">Mechanics · Quantum · Waves</div>
+      </div>
+      <div class="room-option" data-room="chemistry" onclick="selectRoom(this)">
+        <div class="room-option-icon">⚗️</div>
+        <div class="room-option-name">Chemistry</div>
+        <div class="room-option-count">Organic · Inorganic · Physical</div>
+      </div>
+      <div class="room-option" data-room="biology" onclick="selectRoom(this)">
+        <div class="room-option-icon">🧬</div>
+        <div class="room-option-name">Biology</div>
+        <div class="room-option-count">Genetics · Ecology · Cell Bio</div>
+      </div>
+      <div class="room-option" data-room="cs-tech" onclick="selectRoom(this)">
+        <div class="room-option-icon">💻</div>
+        <div class="room-option-name">CS & Tech</div>
+        <div class="room-option-count">DSA · Web · AI/ML</div>
+      </div>
+      <div class="room-option" data-room="economics" onclick="selectRoom(this)">
+        <div class="room-option-icon">📈</div>
+        <div class="room-option-name">Economics</div>
+        <div class="room-option-count">Micro · Macro · Finance</div>
+      </div>
+      <div class="room-option" data-room="literature" onclick="selectRoom(this)">
+        <div class="room-option-icon">📚</div>
+        <div class="room-option-name">Literature</div>
+        <div class="room-option-count">Essays · Poetry · Analysis</div>
+      </div>
+      <div class="room-option" data-room="engineering" onclick="selectRoom(this)">
+        <div class="room-option-icon">⚙️</div>
+        <div class="room-option-name">Engineering</div>
+        <div class="room-option-count">Mech · Electrical · Civil</div>
+      </div>
+      <div class="room-option" data-room="general" onclick="selectRoom(this)">
+        <div class="room-option-icon">🎯</div>
+        <div class="room-option-name">General Study</div>
+        <div class="room-option-count">Any subject · Open room</div>
+      </div>
+    </div>
+
+    <button class="room-join-btn" id="joinRoomBtn" onclick="joinRoom()" disabled>
+      <div class="spinner"></div>
+      <span class="btn-text"><i class="ti ti-video"></i> &nbsp;Join Room</span>
+    </button>
+    <div class="room-error" id="roomError"></div>
+
+    <button onclick="closeRoomModal()" style="margin-top:18px;background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;font-family:inherit;padding:8px">
+      Cancel
+    </button>
+  </div>
+
+  <!-- Daily call iframe renders here -->
+  <div id="callFrame"></div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i> <span id="toastMsg"></span></div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════════════ -->
 <script>
-// ── Init Firebase ──
+/* ── Firebase init ── */
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-let currentUser   = null;
-let allPdfs       = [];
+let currentUser    = null;
+let allPdfs        = [];
 let activeCategory = 'All';
 let activeFilter   = 'all';
 
@@ -984,24 +952,20 @@ const subjectIcon = {
   'Psychology':'ti-brain','Engineering':'ti-building-bridge','Default':'ti-file-text'
 };
 
-// ── Auth state ──
 auth.onAuthStateChanged(user => {
   currentUser = user;
   updateNav(user);
   renderCurrentPdfs();
 });
 
-function isAdmin(user) {
-  return user && window.ADMIN_EMAILS.includes(user.email);
-}
+function isAdmin(u) { return u && window.ADMIN_EMAILS.includes(u.email); }
 
 function updateNav(user) {
   const section = document.getElementById('navUserSection');
   if (user) {
     const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     const adminLink = isAdmin(user)
-      ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>`
-      : '';
+      ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>` : '';
     section.innerHTML = `
       <div class="dropdown" id="userDropdown">
         <div class="user-pill" onclick="toggleDropdown()">
@@ -1025,154 +989,91 @@ function updateNav(user) {
   }
 }
 
-function toggleDropdown() {
-  document.getElementById('userDropdown')?.classList.toggle('open');
-}
+function toggleDropdown() { document.getElementById('userDropdown')?.classList.toggle('open'); }
 document.addEventListener('click', e => {
   if (!e.target.closest('#userDropdown')) document.getElementById('userDropdown')?.classList.remove('open');
 });
 
-// ── Load PDFs from Firestore ──
 db.collection('pdfs').orderBy('uploadedAt','desc').onSnapshot(snap => {
   allPdfs = snap.docs.map(d => ({id:d.id,...d.data()}));
   document.getElementById('statMaterials').textContent = allPdfs.length + '+';
   renderCurrentPdfs();
 }, err => {
-  console.error(err);
   document.getElementById('pdfGrid').innerHTML =
-    `<div class="empty-state"><i class="ti ti-wifi-off"></i><p>Could not load materials. Check your Firebase config.</p></div>`;
+    `<div class="empty-state"><i class="ti ti-wifi-off"></i><p>Could not load materials.</p></div>`;
 });
 
 function renderCurrentPdfs() {
-  let filtered = allPdfs;
-  if (activeCategory !== 'All') filtered = filtered.filter(p => p.subject === activeCategory);
-  if (activeFilter !== 'all')   filtered = filtered.filter(p => p.level === activeFilter);
-  renderPdfGrid(filtered);
+  let f = allPdfs;
+  if (activeCategory !== 'All') f = f.filter(p => p.subject === activeCategory);
+  if (activeFilter !== 'all')   f = f.filter(p => p.level === activeFilter);
+  renderPdfGrid(f);
 }
 
 function renderPdfGrid(pdfs) {
   const grid = document.getElementById('pdfGrid');
   if (!pdfs.length) {
-    grid.innerHTML = `<div class="empty-state"><i class="ti ti-file-off"></i><p>No materials found in this category yet.<br/>Check back soon!</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><i class="ti ti-file-off"></i><p>No materials found. Check back soon!</p></div>`;
     return;
   }
-  grid.innerHTML = pdfs.map(pdf => buildCard(pdf)).join('');
+  grid.innerHTML = pdfs.map(buildCard).join('');
 }
 
 function buildCard(pdf) {
   const icon = subjectIcon[pdf.subject] || subjectIcon['Default'];
   const locked = !currentUser;
-  const levelColor = pdf.level === 'Advanced' ? 'var(--red)' : pdf.level === 'Intermediate' ? 'var(--gold)' : 'var(--green)';
-
-  const lockOverlay = locked ? `
-    <div class="lock-overlay">
-      <i class="ti ti-lock lock-icon"></i>
-      <div class="lock-msg">Sign in to view</div>
-      <button class="lock-btn" onclick="openModal('signup')">Get Access</button>
-    </div>` : '';
-
+  const lc = pdf.level === 'Advanced' ? 'var(--red)' : pdf.level === 'Intermediate' ? 'var(--gold)' : 'var(--green)';
+  const lockOverlay = locked ? `<div class="lock-overlay"><i class="ti ti-lock lock-icon"></i><div class="lock-msg">Sign in to view</div><button class="lock-btn" onclick="openModal('signup')">Get Access</button></div>` : '';
   const actionBtn = locked
     ? `<button class="view-btn" onclick="openModal('login')"><i class="ti ti-lock" style="font-size:11px"></i> Unlock</button>`
     : `<button class="view-btn" onclick="viewPdf('${pdf.id}')">View PDF →</button>`;
-
-  return `
-    <div class="course-card">
-      <div class="course-thumb">
-        <i class="ti ${icon}" style="position:relative;z-index:1"></i>
-        <div class="badge">${escHtml(pdf.subject || 'General')}</div>
-        ${lockOverlay}
-      </div>
-      <div class="course-body">
-        <div class="course-meta">
-          <span class="course-cat">${escHtml(pdf.subject || 'General')}</span>
-          <span class="course-lvl" style="color:${levelColor}">• ${escHtml(pdf.level || 'All levels')}</span>
-        </div>
-        <h3>${escHtml(pdf.title)}</h3>
-        ${pdf.description ? `<p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px">${escHtml(pdf.description.slice(0,80))}${pdf.description.length>80?'…':''}</p>` : ''}
-        <div class="course-footer">
-          <div class="course-stats">
-            <div class="c-stat"><i class="ti ti-file-text"></i> ${pdf.pages||'—'} pages</div>
-            <div class="c-stat"><i class="ti ti-clock"></i> ${pdf.readTime||'—'} read</div>
-          </div>
-          ${actionBtn}
-        </div>
-      </div>
-    </div>`;
+  return `<div class="course-card">
+    <div class="course-thumb"><i class="ti ${icon}" style="position:relative;z-index:1"></i><div class="badge">${escHtml(pdf.subject||'General')}</div>${lockOverlay}</div>
+    <div class="course-body">
+      <div class="course-meta"><span class="course-cat">${escHtml(pdf.subject||'General')}</span><span class="course-lvl" style="color:${lc}">• ${escHtml(pdf.level||'All levels')}</span></div>
+      <h3>${escHtml(pdf.title)}</h3>
+      ${pdf.description?`<p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px">${escHtml(pdf.description.slice(0,80))}${pdf.description.length>80?'…':''}</p>`:''}
+      <div class="course-footer"><div class="course-stats"><div class="c-stat"><i class="ti ti-file-text"></i> ${pdf.pages||'—'} pages</div><div class="c-stat"><i class="ti ti-clock"></i> ${pdf.readTime||'—'} read</div></div>${actionBtn}</div>
+    </div></div>`;
 }
 
-function escHtml(str) {
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function viewPdf(id) { if(!currentUser){openModal('login');return;} window.location.href=`viewer.html?id=${id}`; }
 
-function viewPdf(id) {
-  if (!currentUser) { openModal('login'); return; }
-  window.location.href = `viewer.html?id=${id}`;
-}
+document.querySelectorAll('.cat-pill').forEach(p => p.addEventListener('click', () => {
+  document.querySelectorAll('.cat-pill').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active'); activeCategory=p.dataset.cat; renderCurrentPdfs();
+}));
+document.querySelectorAll('.filter-tab').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.filter-tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); activeFilter=b.dataset.filter; renderCurrentPdfs();
+}));
 
-// ── Category & filter filters ──
-document.querySelectorAll('.cat-pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
-    pill.classList.add('active');
-    activeCategory = pill.dataset.cat;
-    renderCurrentPdfs();
-  });
-});
-document.querySelectorAll('.filter-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter = btn.dataset.filter;
-    renderCurrentPdfs();
-  });
-});
-
-// ── Auth ──
+/* ── Auth ── */
 async function handleLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass  = document.getElementById('loginPass').value;
-  if (!email || !pass) { showAuthError('Please fill in all fields.'); return; }
-  setLoading('loginBtn', true);
-  try {
-    await auth.signInWithEmailAndPassword(email, pass);
-    closeModal();
-    showToast('Welcome back!', 'success');
-  } catch(e) { showAuthError(friendlyError(e.code)); }
-  setLoading('loginBtn', false);
+  const email=document.getElementById('loginEmail').value.trim(), pass=document.getElementById('loginPass').value;
+  if(!email||!pass){showAuthError('Please fill in all fields.');return;}
+  setLoading('loginBtn',true);
+  try{await auth.signInWithEmailAndPassword(email,pass);closeModal();showToast('Welcome back!','success');}
+  catch(e){showAuthError(friendlyError(e.code));}
+  setLoading('loginBtn',false);
 }
-
 async function handleSignup() {
-  const name  = document.getElementById('signupName').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const pass  = document.getElementById('signupPass').value;
-  if (!name || !email || !pass) { showAuthError('Please fill in all fields.'); return; }
-  if (pass.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
-  setLoading('signupBtn', true);
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    await cred.user.updateProfile({displayName: name});
-    closeModal();
-    showToast('Account created! Welcome to StudyHub', 'success');
-  } catch(e) { showAuthError(friendlyError(e.code)); }
-  setLoading('signupBtn', false);
+  const name=document.getElementById('signupName').value.trim(),email=document.getElementById('signupEmail').value.trim(),pass=document.getElementById('signupPass').value;
+  if(!name||!email||!pass){showAuthError('Please fill in all fields.');return;}
+  if(pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
+  setLoading('signupBtn',true);
+  try{const c=await auth.createUserWithEmailAndPassword(email,pass);await c.user.updateProfile({displayName:name});closeModal();showToast('Account created! Welcome to StudyHub','success');}
+  catch(e){showAuthError(friendlyError(e.code));}
+  setLoading('signupBtn',false);
 }
-
 async function handleGoogleLogin() {
-  try {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    await auth.signInWithPopup(provider);
-    closeModal();
-    showToast('Signed in with Google!', 'success');
-  } catch(e) { showAuthError(friendlyError(e.code)); }
+  try{const p=new firebase.auth.GoogleAuthProvider();await auth.signInWithPopup(p);closeModal();showToast('Signed in with Google!','success');}
+  catch(e){showAuthError(friendlyError(e.code));}
 }
-
-async function handleLogout() {
-  await auth.signOut();
-  showToast('Signed out. See you soon!', 'success');
-}
-
-function friendlyError(code) {
-  const map = {
+async function handleLogout(){await auth.signOut();showToast('Signed out. See you soon!','success');}
+function friendlyError(code){
+  return({
     'auth/user-not-found':'No account found with this email.',
     'auth/wrong-password':'Incorrect password.',
     'auth/email-already-in-use':'An account with this email already exists.',
@@ -1181,247 +1082,294 @@ function friendlyError(code) {
     'auth/popup-closed-by-user':'Sign-in popup was closed.',
     'auth/network-request-failed':'Network error. Check your connection.',
     'auth/invalid-credential':'Incorrect email or password.',
-  };
-  return map[code] || 'Something went wrong. Please try again.';
+  })[code]||'Something went wrong. Please try again.';
 }
 
-// ── Modal helpers ──
-function openModal(tab) {
-  document.getElementById('authModal').classList.add('show');
-  switchTab(tab || 'login');
+function openModal(tab){document.getElementById('authModal').classList.add('show');switchTab(tab||'login');document.body.style.overflow='hidden';clearAuthError();}
+function closeModal(){document.getElementById('authModal').classList.remove('show');document.body.style.overflow='';}
+function switchTab(tab){
+  const l=tab==='login';
+  document.getElementById('tabLogin').classList.toggle('active',l);
+  document.getElementById('tabSignup').classList.toggle('active',!l);
+  document.getElementById('formLogin').style.display=l?'block':'none';
+  document.getElementById('formSignup').style.display=l?'none':'block';
+  document.getElementById('modalTitle').textContent=l?'Welcome back':'Join StudyHub';
+  document.getElementById('modalSub').textContent=l?'Sign in to access all your study materials':'Create your free account — no card required';
+  clearAuthError();
+}
+document.getElementById('authModal').addEventListener('click',e=>{if(e.target===document.getElementById('authModal'))closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeRoomModal();}});
+function showAuthError(m){const el=document.getElementById('authError');el.textContent=m;el.classList.add('show');}
+function clearAuthError(){document.getElementById('authError').classList.remove('show');}
+function setLoading(id,v){const b=document.getElementById(id);if(b)b.disabled=v;}
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast'),icon=document.getElementById('toastIcon');
+  document.getElementById('toastMsg').textContent=msg;
+  icon.className=type==='success'?'ti ti-check':'ti ti-alert-circle';
+  t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+if(new URLSearchParams(location.search).get('login')==='1')setTimeout(()=>openModal('login'),500);
+</script>
+
+<!-- ══════════════════════════════════════════════
+     STUDY ROOM LOGIC (Daily.co)
+══════════════════════════════════════════════ -->
+<script>
+let selectedRoomSlug = null;
+let callInstance     = null;
+let activeRoomUrl    = null;
+
+const ROOM_NAMES = {
+  'mathematics': 'Mathematics Room',
+  'physics':     'Physics Room',
+  'chemistry':   'Chemistry Room',
+  'biology':     'Biology Room',
+  'cs-tech':     'CS & Tech Room',
+  'economics':   'Economics Room',
+  'literature':  'Literature Room',
+  'engineering': 'Engineering Room',
+  'general':     'General Study Room',
+};
+
+function openRoomModal() {
+  if (!currentUser) {
+    openModal('login');
+    showToast('Sign in to join a study room', 'error');
+    return;
+  }
+  document.getElementById('roomBackdrop').classList.add('show');
   document.body.style.overflow = 'hidden';
-  clearAuthError();
 }
-function closeModal() {
-  document.getElementById('authModal').classList.remove('show');
-  document.body.style.overflow = '';
-}
-function switchTab(tab) {
-  const isLogin = tab === 'login';
-  document.getElementById('tabLogin').classList.toggle('active', isLogin);
-  document.getElementById('tabSignup').classList.toggle('active', !isLogin);
-  document.getElementById('formLogin').style.display  = isLogin ? 'block' : 'none';
-  document.getElementById('formSignup').style.display = isLogin ? 'none'  : 'block';
-  document.getElementById('modalTitle').textContent   = isLogin ? 'Welcome back' : 'Join StudyHub';
-  document.getElementById('modalSub').textContent     = isLogin
-    ? 'Sign in to access all your study materials'
-    : 'Create your free account — no card required';
-  clearAuthError();
-}
-document.getElementById('authModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('authModal')) closeModal();
-});
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-function showAuthError(msg) {
-  const el = document.getElementById('authError');
+function closeRoomModal() {
+  if (callInstance) leaveRoom();
+  document.getElementById('roomBackdrop').classList.remove('show');
+  document.body.style.overflow = '';
+  resetRoomPicker();
+}
+
+function resetRoomPicker() {
+  selectedRoomSlug = null;
+  document.querySelectorAll('.room-option').forEach(o => o.classList.remove('selected'));
+  document.getElementById('joinRoomBtn').disabled = true;
+  document.getElementById('joinRoomBtn').classList.remove('loading');
+  document.getElementById('roomError').classList.remove('show');
+  document.getElementById('roomPicker').style.display = 'flex';
+  document.getElementById('callFrame').style.display = 'none';
+  document.getElementById('roomHeader').style.display = 'none';
+}
+
+function selectRoom(el) {
+  document.querySelectorAll('.room-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRoomSlug = el.dataset.room;
+  document.getElementById('joinRoomBtn').disabled = false;
+  document.getElementById('roomError').classList.remove('show');
+}
+
+async function joinRoom() {
+  if (!selectedRoomSlug) return;
+
+  const btn = document.getElementById('joinRoomBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  const roomName = `studyhub-${selectedRoomSlug}`;
+
+  try {
+    /* Create or retrieve the room via Daily REST API */
+    const res = await fetch('https://api.daily.co/v1/rooms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${window.DAILY_API_KEY}`
+      },
+      body: JSON.stringify({
+        name: roomName,
+        properties: {
+          enable_chat: true,
+          enable_screenshare: true,
+          start_video_off: true,   /* camera off by default */
+          start_audio_off: true,   /* mic off by default */
+          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8, /* 8hr expiry */
+          max_participants: 50,
+        }
+      })
+    });
+
+    const data = await res.json();
+
+    /* Daily returns error.type if room already exists — that's fine, use it */
+    let roomUrl;
+    if (data.url) {
+      roomUrl = data.url;
+    } else if (data.error && data.error.includes('already exists')) {
+      roomUrl = `https://${window.DAILY_DOMAIN}.daily.co/${roomName}`;
+    } else if (res.status === 200 || res.status === 201) {
+      roomUrl = data.url;
+    } else {
+      throw new Error(data.info || data.error || 'Could not create room');
+    }
+
+    activeRoomUrl = roomUrl;
+    launchCall(roomUrl);
+
+  } catch (err) {
+    console.error('[StudyHub Room]', err);
+    showRoomError('Could not connect to the room. Please try again.');
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+function launchCall(roomUrl) {
+  /* Hide picker, show call area */
+  document.getElementById('roomPicker').style.display = 'none';
+  document.getElementById('callFrame').style.display = 'block';
+  document.getElementById('roomHeader').style.display = 'flex';
+  document.getElementById('roomHeaderName').textContent = ROOM_NAMES[selectedRoomSlug] || 'Study Room';
+
+  const container = document.getElementById('callFrame');
+
+  /* Use Daily prebuilt iframe UI */
+  callInstance = window.DailyIframe
+    ? DailyIframe.createFrame(container, {
+        iframeStyle: {
+          width: '100%',
+          height: '100%',
+          border: 'none',
+          background: '#0A0A10',
+        },
+        showLeaveButton: false,  /* we have our own leave button */
+        showFullscreenButton: true,
+        theme: {
+          colors: {
+            accent: '#5B7FFF',
+            accentText: '#FFFFFF',
+            background: '#0E0F12',
+            backgroundAccent: '#13141A',
+            baseText: '#ECEDF1',
+            border: 'rgba(255,255,255,0.08)',
+            mainAreaBg: '#0A0B0E',
+            mainAreaBgAccent: '#13141A',
+            mainAreaText: '#ECEDF1',
+            supportiveText: '#9498A6',
+          }
+        }
+      })
+    : null;
+
+  if (callInstance) {
+    /* Set user name from Firebase auth */
+    const userName = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Learner';
+    callInstance.join({ url: roomUrl, userName });
+    callInstance.on('left-meeting', () => leaveRoom());
+  } else {
+    /* Fallback: plain iframe if Daily SDK not loaded */
+    container.innerHTML = `<iframe src="${roomUrl}" allow="camera;microphone;fullscreen;display-capture" style="width:100%;height:100%;border:none;background:#0A0A10"></iframe>`;
+  }
+}
+
+function leaveRoom() {
+  if (callInstance) {
+    try { callInstance.leave(); callInstance.destroy(); } catch(e) {}
+    callInstance = null;
+  }
+  activeRoomUrl = null;
+  document.getElementById('callFrame').innerHTML = '';
+  resetRoomPicker();
+}
+
+function copyRoomLink() {
+  if (!activeRoomUrl) return;
+  navigator.clipboard.writeText(activeRoomUrl).then(() => {
+    showToast('Room link copied — share it to invite friends!', 'success');
+  }).catch(() => {
+    showToast(activeRoomUrl, 'success'); /* fallback: show URL in toast */
+  });
+}
+
+function showRoomError(msg) {
+  const el = document.getElementById('roomError');
   el.textContent = msg;
   el.classList.add('show');
 }
-function clearAuthError() { document.getElementById('authError').classList.remove('show'); }
-function setLoading(id, v) { const b = document.getElementById(id); if(b) b.disabled = v; }
-
-// ── Toast ──
-function showToast(msg, type='success') {
-  const t    = document.getElementById('toast');
-  const icon = document.getElementById('toastIcon');
-  document.getElementById('toastMsg').textContent = msg;
-  icon.className = type === 'success' ? 'ti ti-check' : 'ti ti-alert-circle';
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3500);
-}
-
-if (new URLSearchParams(location.search).get('login') === '1') {
-  setTimeout(() => openModal('login'), 500);
-}
 </script>
+
+<!-- ══════════════════════════════════════════════
+     PEXELS VIDEO SHOWCASE
+══════════════════════════════════════════════ -->
 <script>
-  /* ══════════════════════════════════════════════
-     ⚙️  CONFIGURATION — paste your Pexels key here
-     Get one free at: https://www.pexels.com/api/
-  ══════════════════════════════════════════════ */
-  const PEXELS_API_KEY = "IQkl8ehpw8Tky3Z7bYIHFJ8XwCizd0ej5IMkHpBkFw8JxzqkwaVBD4Sr";
- 
-  /* Search queries — Pexels will return real footage for each */
-  const SEARCHES = [
-    { query: "student studying",     subject: "Focus",      badge: { type: "live",     label: "Live" } },
-    { query: "university library",   subject: "Library",    badge: { type: "live",     label: "Live" } },
-    { query: "science laboratory",   subject: "Science",    badge: { type: "trending", label: "Trending" } },
-    { query: "coding computer",      subject: "CS & Tech",  badge: { type: "new",      label: "New" } },
-    { query: "mathematics classroom",subject: "Mathematics",badge: { type: "live",     label: "Live" } },
-    { query: "writing notes",        subject: "Notes",      badge: { type: "trending", label: "Trending" } },
-    { query: "group study team",     subject: "Group Study",badge: { type: "live",     label: "Live" } },
-    { query: "book reading",         subject: "Literature", badge: { type: "new",      label: "New" } },
-    { query: "engineering design",   subject: "Engineering",badge: { type: "live",     label: "Live" } },
-    { query: "economics business",   subject: "Economics",  badge: { type: "trending", label: "Trending" } },
-    { query: "chemistry experiment", subject: "Chemistry",  badge: { type: "new",      label: "New" } },
-    { query: "biology microscope",   subject: "Biology",    badge: { type: "live",     label: "Live" } },
-  ];
- 
-  const VIEWER_COUNTS = [
-    "2.4K studying now","840 views","1.1K studying now","3.8K views",
-    "560 studying now","2.1K views","980 studying now","1.6K views",
-    "720 studying now","4.2K views","390 studying now","1.9K views"
-  ];
- 
-  const TITLES = [
-    "Deep work session","Silent study hour","Lab experiments","Coding marathon",
-    "Problem sets","Handwritten revision","Collaborative session","Essay writing",
-    "Design review","Chart analysis","Reaction studies","Microscope lab"
-  ];
- 
-  /* ── Fetch one video per search query from Pexels ── */
-  async function fetchPexelsVideo(query) {
-    const url = `https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape`;
-    const res = await fetch(url, {
-      headers: { Authorization: PEXELS_API_KEY }
-    });
-    if (!res.ok) throw new Error(`Pexels error: ${res.status}`);
-    const data = await res.json();
-    if (!data.videos || !data.videos.length) return null;
- 
-    /* Pick a random result from the top 5 for variety */
-    const video = data.videos[Math.floor(Math.random() * data.videos.length)];
- 
-    /* Prefer HD (1280) file, fall back to whatever is available */
-    const file =
-      video.video_files.find(f => f.quality === "hd" && f.width <= 1280) ||
-      video.video_files.find(f => f.quality === "sd") ||
-      video.video_files[0];
- 
-    return file ? file.link : null;
-  }
- 
-  /* ── Build one card HTML ── */
-  function buildVideoCard(src, index) {
-    const meta = SEARCHES[index % SEARCHES.length];
-    const title = TITLES[index % TITLES.length];
-    const stat  = VIEWER_COUNTS[index % VIEWER_COUNTS.length];
-    const badge = meta.badge;
- 
-    return `
-      <div class="vid-card">
-        <div class="vid-skeleton"></div>
-        <video muted autoplay loop playsinline preload="none" data-src="${src}"></video>
-        <div class="vid-overlay"></div>
-        <div class="vid-badge ${badge.type}">${badge.label}</div>
-        <div class="vid-label">
-          <div class="vid-label-left">
-            <span class="vid-subject">${meta.subject}</span>
-            <span class="vid-title">${title}</span>
-          </div>
-          <div class="vid-stat">
-            <i class="ti ti-eye"></i> ${stat}
-          </div>
-        </div>
-      </div>`;
-  }
- 
-  /* ── Show skeleton placeholder rows while loading ── */
-  function showSkeletons() {
-    const skeletonCard = `
-      <div class="vid-card">
-        <div class="vid-skeleton"></div>
-      </div>`;
-    const skeletons = Array(6).fill(skeletonCard).join('');
-    document.getElementById('row1').innerHTML = skeletons;
-    document.getElementById('row2').innerHTML = skeletons;
-  }
- 
-  /* ── Show error state ── */
-  function showError() {
-    const wrap = document.getElementById('videoTrackWrap');
-    wrap.innerHTML = `
-      <div style="text-align:center;padding:48px 20px;color:#62656F;font-size:14px;font-family:'Inter',sans-serif">
-        <i class="ti ti-video-off" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.4"></i>
-        Add your Pexels API key to load live videos.<br/>
-        <a href="https://www.pexels.com/api/" target="_blank"
-           style="color:#5B7FFF;text-decoration:none;font-size:13px;margin-top:8px;display:inline-block">
-          Get a free key at pexels.com/api →
-        </a>
-      </div>`;
-  }
- 
-  /* ── Lazy-load videos as they scroll into view ── */
-  function initLazyVideos() {
-    const videos = document.querySelectorAll('.vid-card video[data-src]');
- 
-    if (!('IntersectionObserver' in window)) {
-      videos.forEach(loadVideo);
-      return;
-    }
- 
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          loadVideo(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { rootMargin: '0px 300px 0px 300px', threshold: 0 });
- 
-    videos.forEach(v => observer.observe(v));
-  }
- 
-  function loadVideo(videoEl) {
-    const src = videoEl.dataset.src;
-    if (!src || videoEl.src) return;
-    videoEl.src = src;
-    videoEl.load();
-    videoEl.addEventListener('canplay', () => {
-      videoEl.classList.add('loaded');
-      const card = videoEl.closest('.vid-card');
-      if (card) card.classList.add('vid-ready');
-      videoEl.play().catch(() => {});
-    }, { once: true });
-  }
- 
-  /* ── Main: fetch all videos then populate rows ── */
-  async function initVideoShowcase() {
-    if (!PEXELS_API_KEY || PEXELS_API_KEY === "YOUR_PEXELS_API_KEY_HERE") {
-      showError();
-      return;
-    }
- 
-    showSkeletons();
- 
-    try {
-      /* Fetch all 12 videos in parallel */
-      const srcs = await Promise.all(
-        SEARCHES.map((s, i) => fetchPexelsVideo(s.query).catch(() => null))
-      );
- 
-      /* Filter out any failed fetches */
-      const valid = srcs.map((src, i) => src ? { src, i } : null).filter(Boolean);
- 
-      if (!valid.length) { showError(); return; }
- 
-      /* Split into two rows of 6 */
-      const row1Items = valid.slice(0, 6);
-      const row2Items = valid.slice(6, 12);
- 
-      const row1 = document.getElementById('row1');
-      const row2 = document.getElementById('row2');
- 
-      /* Duplicate for seamless infinite scroll */
-      row1.innerHTML = [...row1Items, ...row1Items].map(({src, i}) => buildVideoCard(src, i)).join('');
-      row2.innerHTML = [...row2Items, ...row2Items].map(({src, i}) => buildVideoCard(src, i)).join('');
- 
-      initLazyVideos();
- 
-    } catch (err) {
-      console.error('[StudyHub Videos]', err);
-      showError();
-    }
-  }
- 
-  /* Start when DOM is ready */
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initVideoShowcase);
-  } else {
-    initVideoShowcase();
-  }
+const PEXELS_API_KEY = "IQkl8ehpw8Tky3Z7bYIHFJ8XwCizd0ej5IMkHpBkFw8JxzqkwaVBD4Sr";
+
+const SEARCHES = [
+  {query:"student studying",    subject:"Focus",       badge:{type:"live",     label:"Live"}},
+  {query:"university library",  subject:"Library",     badge:{type:"live",     label:"Live"}},
+  {query:"science laboratory",  subject:"Science",     badge:{type:"trending", label:"Trending"}},
+  {query:"coding computer",     subject:"CS & Tech",   badge:{type:"new",      label:"New"}},
+  {query:"mathematics classroom",subject:"Mathematics",badge:{type:"live",     label:"Live"}},
+  {query:"writing notes",       subject:"Notes",       badge:{type:"trending", label:"Trending"}},
+  {query:"group study team",    subject:"Group Study", badge:{type:"live",     label:"Live"}},
+  {query:"book reading",        subject:"Literature",  badge:{type:"new",      label:"New"}},
+  {query:"engineering design",  subject:"Engineering", badge:{type:"live",     label:"Live"}},
+  {query:"economics business",  subject:"Economics",   badge:{type:"trending", label:"Trending"}},
+  {query:"chemistry experiment",subject:"Chemistry",   badge:{type:"new",      label:"New"}},
+  {query:"biology microscope",  subject:"Biology",     badge:{type:"live",     label:"Live"}},
+];
+const VIEWER_COUNTS=["2.4K studying now","840 views","1.1K studying now","3.8K views","560 studying now","2.1K views","980 studying now","1.6K views","720 studying now","4.2K views","390 studying now","1.9K views"];
+const TITLES=["Deep work session","Silent study hour","Lab experiments","Coding marathon","Problem sets","Handwritten revision","Collaborative session","Essay writing","Design review","Chart analysis","Reaction studies","Microscope lab"];
+
+async function fetchPexelsVideo(query) {
+  const res = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape`,{headers:{Authorization:PEXELS_API_KEY}});
+  if(!res.ok) throw new Error(`Pexels ${res.status}`);
+  const data = await res.json();
+  if(!data.videos?.length) return null;
+  const video = data.videos[Math.floor(Math.random()*data.videos.length)];
+  const file  = video.video_files.find(f=>f.quality==="hd"&&f.width<=1280)||video.video_files.find(f=>f.quality==="sd")||video.video_files[0];
+  return file?.link||null;
+}
+
+function buildVideoCard(src,index){
+  const meta=SEARCHES[index%SEARCHES.length],title=TITLES[index%TITLES.length],stat=VIEWER_COUNTS[index%VIEWER_COUNTS.length],badge=meta.badge;
+  return `<div class="vid-card"><div class="vid-skeleton"></div><video muted autoplay loop playsinline preload="none" data-src="${src}"></video><div class="vid-overlay"></div><div class="vid-badge ${badge.type}">${badge.label}</div><div class="vid-label"><div class="vid-label-left"><span class="vid-subject">${meta.subject}</span><span class="vid-title">${title}</span></div><div class="vid-stat"><i class="ti ti-eye"></i> ${stat}</div></div></div>`;
+}
+
+function showSkeletons(){
+  const s=`<div class="vid-card"><div class="vid-skeleton"></div></div>`;
+  document.getElementById('row1').innerHTML=s.repeat(6);
+  document.getElementById('row2').innerHTML=s.repeat(6);
+}
+
+function initLazyVideos(){
+  const videos=document.querySelectorAll('.vid-card video[data-src]');
+  if(!('IntersectionObserver' in window)){videos.forEach(loadVid);return;}
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){loadVid(e.target);obs.unobserve(e.target);}});},{rootMargin:'0px 300px 0px 300px',threshold:0});
+  videos.forEach(v=>obs.observe(v));
+}
+
+function loadVid(v){
+  const src=v.dataset.src;if(!src||v.src)return;
+  v.src=src;v.load();
+  v.addEventListener('canplay',()=>{v.classList.add('loaded');v.closest('.vid-card')?.classList.add('vid-ready');v.play().catch(()=>{});},{once:true});
+}
+
+async function initVideoShowcase(){
+  showSkeletons();
+  try{
+    const srcs=await Promise.all(SEARCHES.map(s=>fetchPexelsVideo(s.query).catch(()=>null)));
+    const valid=srcs.map((src,i)=>src?{src,i}:null).filter(Boolean);
+    if(!valid.length){document.getElementById('videoTrackWrap').innerHTML='';return;}
+    const r1=valid.slice(0,6),r2=valid.slice(6,12);
+    document.getElementById('row1').innerHTML=[...r1,...r1].map(({src,i})=>buildVideoCard(src,i)).join('');
+    document.getElementById('row2').innerHTML=[...r2,...r2].map(({src,i})=>buildVideoCard(src,i)).join('');
+    initLazyVideos();
+  }catch(e){console.error('[Videos]',e);}
+}
+
+document.readyState==='loading'?document.addEventListener('DOMContentLoaded',initVideoShowcase):initVideoShowcase();
 </script>
+
 <script src="notifications.js"></script>
 <script src="doubt-chat.js" defer></script>
 </body>
