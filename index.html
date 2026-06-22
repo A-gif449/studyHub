@@ -739,6 +739,7 @@
       <button class="filter-tab" data-filter="Advanced">Advanced</button>
     </div>
   </div>
+  <div id="searchBarSlot" style="margin-bottom: 20px;"></div> 
   <div class="courses-grid" id="pdfGrid">
     <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
   </div>
@@ -957,6 +958,16 @@ auth.onAuthStateChanged(user => {
   currentUser = user;
   updateNav(user);
   renderCurrentPdfs();
+
+  // Init search after auth is known
+  SHSearch.mountBar(document.getElementById('searchBarSlot'));
+  SHSearch.init({
+    getPdfs: () => allPdfs,
+    onResults: (filtered, query) => {
+      renderPdfGrid(filtered);
+    },
+    currentUser: user,
+  });
 });
 
 function isAdmin(u) { return u && window.ADMIN_EMAILS.includes(u.email); }
@@ -1350,6 +1361,7 @@ async function initVideoShowcase(){
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',initVideoShowcase):initVideoShowcase();
 </script>
 
+<script src="search.js"></script> 
 <script src="notifications.js"></script>
 <script src="doubt-chat.js" defer></script>
 </body>
