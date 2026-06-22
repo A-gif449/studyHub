@@ -528,9 +528,12 @@ function buildPersonCard(u, status) {
         <button class="btn-add ${followClass}" style="${isFollowing ? 'background:rgba(63,169,204,0.1);color:var(--accent3);border:1px solid rgba(63,169,204,0.3)' : 'background:rgba(255,255,255,0.04);color:var(--text2);border:1px solid var(--border2)'}" onclick="${followOnclick}">
           ${followLabel}
         </button>
-        <a class="btn-view" href="profile.html?uid=${u.uid}" title="View profile">
-          <i class="ti ti-eye"></i>
-        </a>
+        <a class="btn-view" href="messages.html?uid=${u.uid}&name=${encodeURIComponent(u.name)}&email=${encodeURIComponent(u.email)}" title="Message">
+  <i class="ti ti-message-circle"></i>
+</a>
+      <a class="btn-view" href="profile.html?uid=${u.uid}" title="View profile">
+        <i class="ti ti-eye"></i>
+      </a>
       </div>
     </div>`;
 }
