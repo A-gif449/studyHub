@@ -29,8 +29,8 @@
   .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Source Serif 4',serif;font-size:19px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:.2px}
   .nav-logo .logo-icon{width:30px;height:30px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--accent2)}
   .nav-links{display:flex;align-items:center;gap:4px;margin-right:16px}
-  .nav-links a{color:var(--text2);text-decoration:none;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;transition:all .2s}
-  .nav-links a:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+  .nav-links>a{color:var(--text2);text-decoration:none;padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:500;transition:all .2s}
+  .nav-links>a:hover{color:var(--text);background:rgba(255,255,255,0.04)}
   .nav-right{display:flex;align-items:center;gap:10px}
   .btn-ghost{padding:8px 18px;border-radius:8px;border:1px solid var(--border2);color:var(--text2);background:transparent;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s}
   .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.03)}
@@ -48,13 +48,13 @@
   .dropdown-item.danger:hover{background:rgba(194,86,79,0.1);color:var(--red)}
   .dropdown-divider{height:1px;background:var(--border);margin:5px 0}
   .nav-divider{width:1px;height:18px;background:var(--border2);margin:0 4px;flex-shrink:0}
-  .nav-link-icon{display:inline-flex;align-items:center;gap:5px;color:var(--text2);text-decoration:none;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:500;transition:all .2s}
+  .nav-link-icon{display:inline-flex;align-items:center;gap:5px;color:var(--text2);text-decoration:none;padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:500;transition:all .2s;cursor:pointer}
   .nav-link-icon i{font-size:15px}
   .nav-link-icon:hover{color:var(--text);background:rgba(255,255,255,0.04)}
   .nav-link-highlight{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--gold);background:transparent;border:1px solid rgba(201,163,86,0.3);text-decoration:none;transition:all .2s}
   .nav-link-highlight i{font-size:14px}
   .nav-link-highlight:hover{background:rgba(201,163,86,0.08)}
-  .nav-room-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;background:var(--accent);border:none;cursor:pointer;font-family:inherit;transition:all .2s;position:relative}
+  .nav-room-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;font-size:12.5px;font-weight:600;color:#fff;background:var(--accent);border:none;cursor:pointer;font-family:inherit;transition:all .2s;position:relative}
   .nav-room-btn:hover{background:#4D6FE0}
   .nav-room-btn .live-dot{width:6px;height:6px;border-radius:50%;background:#4EE4A0;flex-shrink:0;animation:pulse-dot 1.8s ease infinite}
   @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
@@ -299,15 +299,24 @@
     StudyHub
   </a>
   <div class="nav-links">
-    <a href="#materials">Materials</a>
-    <a href="#categories">Categories</a>
-    <a href="#features">Features</a>
-    <div class="nav-divider"></div>
-    <a href="organizers.html" class="nav-link-icon"><i class="ti ti-notebook"></i> Organizers</a>
-    <a href="codespace.html" class="nav-link-icon"><i class="ti ti-code"></i> Codespace</a>
     <a href="chat.html" class="nav-link-icon"><i class="ti ti-messages"></i> Chat</a>
-    <a href="friends.html" class="nav-link-icon"><i class="ti ti-users"></i> Friends</a>
     <a href="important-questions.html" class="nav-link-highlight"><i class="ti ti-star"></i> Important Qs</a>
+
+    <div class="dropdown" id="navMoreDropdown">
+      <div class="nav-link-icon" onclick="toggleDropdown('navMoreDropdown')">
+        More <i class="ti ti-chevron-down" style="font-size:11px;margin-left:1px"></i>
+      </div>
+      <div class="dropdown-menu" style="right:auto;left:0;min-width:200px">
+        <a class="dropdown-item" href="#materials"><i class="ti ti-books"></i> Materials</a>
+        <a class="dropdown-item" href="#categories"><i class="ti ti-layout-grid"></i> Categories</a>
+        <a class="dropdown-item" href="#features"><i class="ti ti-sparkles"></i> Features</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="organizers.html"><i class="ti ti-notebook"></i> Organizers</a>
+        <a class="dropdown-item" href="codespace.html"><i class="ti ti-code"></i> Codespace</a>
+        <a class="dropdown-item" href="friends.html"><i class="ti ti-users"></i> Friends</a>
+      </div>
+    </div>
+
     <div class="nav-divider"></div>
     <button class="nav-room-btn" onclick="openRoomModal()">
       <span class="live-dot"></span>
@@ -658,9 +667,16 @@ function updateNav(user) {
   }
 }
 
-function toggleDropdown() { document.getElementById('userDropdown')?.classList.toggle('open'); }
+function toggleDropdown(id) {
+  const target = document.getElementById(id || 'userDropdown');
+  if (!target) return;
+  document.querySelectorAll('.dropdown.open').forEach(d => { if (d !== target) d.classList.remove('open'); });
+  target.classList.toggle('open');
+}
 document.addEventListener('click', e => {
-  if (!e.target.closest('#userDropdown')) document.getElementById('userDropdown')?.classList.remove('open');
+  document.querySelectorAll('.dropdown.open').forEach(d => {
+    if (!d.contains(e.target)) d.classList.remove('open');
+  });
 });
 
 db.collection('pdfs').orderBy('uploadedAt','desc').onSnapshot(snap => {
