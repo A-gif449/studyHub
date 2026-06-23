@@ -788,22 +788,151 @@ if(new URLSearchParams(location.search).get('login')==='1')setTimeout(()=>openMo
 </script>
 
 <script>
-let selectedRoomSlug=null,callInstance=null,activeRoomUrl=null;
-const ROOM_NAMES={'mathematics':'Mathematics Room','physics':'Physics Room','chemistry':'Chemistry Room','biology':'Biology Room','cs-tech':'CS & Tech Room','economics':'Economics Room','literature':'Literature Room','engineering':'Engineering Room','general':'General Study Room'};
-function openRoomModal(){if(!currentUser){openModal('login');showToast('Sign in to join a study room','error');return;}document.getElementById('roomBackdrop').classList.add('show');document.body.style.overflow='hidden';}
-function closeRoomModal(){if(callInstance)leaveRoom();document.getElementById('roomBackdrop').classList.remove('show');document.body.style.overflow='';resetRoomPicker();}
-function resetRoomPicker(){selectedRoomSlug=null;document.querySelectorAll('.room-option').forEach(o=>o.classList.remove('selected'));document.getElementById('joinRoomBtn').disabled=true;document.getElementById('joinRoomBtn').classList.remove('loading');document.getElementById('roomError').classList.remove('show');document.getElementById('roomPicker').style.display='flex';document.getElementById('callFrame').style.display='none';document.getElementById('roomHeader').style.display='none';}
-function selectRoom(el){document.querySelectorAll('.room-option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');selectedRoomSlug=el.dataset.room;document.getElementById('joinRoomBtn').disabled=false;document.getElementById('roomError').classList.remove('show');}
-async function joinRoom(){
-  if(!selectedRoomSlug)return;
-  const btn=document.getElementById('joinRoomBtn');btn.classList.add('loading');btn.disabled=true;
-  try{const res=await fetch('/api/create-room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({roomName:`studyhub-${selectedRoomSlug}`})});const data=await res.json();if(!data.url)throw new Error(data.error||'Could not create room');activeRoomUrl=data.url;launchCall(data.url);}
-  catch(err){showRoomError('Could not connect to the room. Please try again.');btn.classList.remove('loading');btn.disabled=false;}
+let selectedRoomSlug = null;
+let callInstance     = null;
+let activeRoomUrl    = null;
+
+const ROOM_OWNER_TOKENS = {
+  'mathematics': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItbWF0aGVtYXRpY3MiLCJvIjp0cnVlLCJleHAiOjE4NDUyOTU0MDcsImQiOiI2OGEwZDNmNC0zZDM5LTQ3ZjUtYTJkOS03NzdlYWQ4MTE2YzEiLCJpYXQiOjE3ODIyMjM0MTJ9.yH1zqCBKTEnvd5TflOadpTyA8lXHpSzsH9O6tl12ghE',
+  'physics':     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItcGh5c2ljcyIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQwOSwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxMn0.mhoIYr6c1D6CSJrCJw88EguFEbvjGoCsNt8t1A8s2_g',
+  'chemistry':   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItY2hlbWlzdHJ5IiwibyI6dHJ1ZSwiZXhwIjoxODQ1Mjk1NDA5LCJkIjoiNjhhMGQzZjQtM2QzOS00N2Y1LWEyZDktNzc3ZWFkODExNmMxIiwiaWF0IjoxNzgyMjIzNDEzfQ.x1vQDM5LxVRFRwp4FwtVqbc13jwBFlAnOrT4thBI-i0',
+  'biology':     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItYmlvbG9neSIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQwOSwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxM30.bOk75oMvGdIzFWQkQvlNOFLcpQO6WU7p5-sSW0g8DOg',
+  'cs-tech':     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItY3MtdGVjaCIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQwOSwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxM30.ZhI3aywmGMyhbEE99bi88E5WPEDo4U5zIA2GX_xyddY',
+  'economics':   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItZWNvbm9taWNzIiwibyI6dHJ1ZSwiZXhwIjoxODQ1Mjk1NDEwLCJkIjoiNjhhMGQzZjQtM2QzOS00N2Y1LWEyZDktNzc3ZWFkODExNmMxIiwiaWF0IjoxNzgyMjIzNDE0fQ.c1uzTXKX7V7qJaeNtMGlmFeRC9NFRfvyWSrlSQIC5Rc',
+  'literature':  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItbGl0ZXJhdHVyZSIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQxMCwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxNH0.f0IHUr8fiODrSVgcrkvnqRkFn_ysyZZGq22Hrgf503E',
+  'engineering': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItZW5naW5lZXJpbmciLCJvIjp0cnVlLCJleHAiOjE4NDUyOTU0MTAsImQiOiI2OGEwZDNmNC0zZDM5LTQ3ZjUtYTJkOS03NzdlYWQ4MTE2YzEiLCJpYXQiOjE3ODIyMjM0MTR9.kukfbuYPmia2ozc8pNBfY0iWeWEzGvUenjRKwlUoxLQ',
+  'general':     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItZ2VuZXJhbCIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQxMCwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxNH0.DY51hFlIURmM5Xi1FxBOT9Ae3-rUXj24_jorctTLIQ4',
+};
+
+const ROOM_NAMES = {
+  'mathematics': 'Mathematics Room',
+  'physics':     'Physics Room',
+  'chemistry':   'Chemistry Room',
+  'biology':     'Biology Room',
+  'cs-tech':     'CS & Tech Room',
+  'economics':   'Economics Room',
+  'literature':  'Literature Room',
+  'engineering': 'Engineering Room',
+  'general':     'General Study Room',
+};
+
+function openRoomModal() {
+  if (!currentUser) {
+    openModal('login');
+    showToast('Sign in to join a study room', 'error');
+    return;
+  }
+  document.getElementById('roomBackdrop').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
-function launchCall(roomUrl){document.getElementById('roomPicker').style.display='none';document.getElementById('callFrame').style.display='block';document.getElementById('roomHeader').style.display='flex';document.getElementById('roomHeaderName').textContent=ROOM_NAMES[selectedRoomSlug]||'Study Room';const container=document.getElementById('callFrame');callInstance=window.DailyIframe?DailyIframe.createFrame(container,{iframeStyle:{width:'100%',height:'100%',border:'none',background:'#0A0A10'},showLeaveButton:false,showFullscreenButton:true,theme:{colors:{accent:'#5B7FFF',accentText:'#FFFFFF',background:'#0E0F12',backgroundAccent:'#13141A',baseText:'#ECEDF1',border:'#2A2C35',mainAreaBg:'#0A0B0E',mainAreaBgAccent:'#13141A',mainAreaText:'#ECEDF1',supportiveText:'#9498A6'}}}):null;if(callInstance){const userName=currentUser?.displayName||currentUser?.email?.split('@')[0]||'Learner';callInstance.join({url:roomUrl,userName});callInstance.on('left-meeting',()=>leaveRoom());}else{container.innerHTML=`<iframe src="${roomUrl}" allow="camera;microphone;fullscreen;display-capture" style="width:100%;height:100%;border:none;background:#0A0A10"></iframe>`;}}
-function leaveRoom(){if(callInstance){try{callInstance.leave();callInstance.destroy();}catch(e){}callInstance=null;}activeRoomUrl=null;document.getElementById('callFrame').innerHTML='';resetRoomPicker();}
-function copyRoomLink(){if(!activeRoomUrl)return;navigator.clipboard.writeText(activeRoomUrl).then(()=>showToast('Room link copied!','success')).catch(()=>showToast(activeRoomUrl,'success'));}
-function showRoomError(msg){const el=document.getElementById('roomError');el.textContent=msg;el.classList.add('show');}
+
+function closeRoomModal() {
+  if (callInstance) leaveRoom();
+  document.getElementById('roomBackdrop').classList.remove('show');
+  document.body.style.overflow = '';
+  resetRoomPicker();
+}
+
+function resetRoomPicker() {
+  selectedRoomSlug = null;
+  document.querySelectorAll('.room-option').forEach(o => o.classList.remove('selected'));
+  document.getElementById('joinRoomBtn').disabled = true;
+  document.getElementById('joinRoomBtn').classList.remove('loading');
+  document.getElementById('roomError').classList.remove('show');
+  document.getElementById('roomPicker').style.display = 'flex';
+  document.getElementById('callFrame').style.display = 'none';
+  document.getElementById('roomHeader').style.display = 'none';
+}
+
+function selectRoom(el) {
+  document.querySelectorAll('.room-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRoomSlug = el.dataset.room;
+  document.getElementById('joinRoomBtn').disabled = false;
+  document.getElementById('roomError').classList.remove('show');
+}
+
+async function joinRoom() {
+  if (!selectedRoomSlug) return;
+
+  const btn = document.getElementById('joinRoomBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  const roomUrl = `https://${window.DAILY_DOMAIN}.daily.co/studyhub-${selectedRoomSlug}`;
+  const isHost  = window.ADMIN_EMAILS.includes(currentUser.email);
+  const token   = isHost ? ROOM_OWNER_TOKENS[selectedRoomSlug] : null;
+
+  try {
+    activeRoomUrl = roomUrl;
+    launchCall(roomUrl, token);
+  } catch (err) {
+    showRoomError('Could not connect to the room. Please try again.');
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+function launchCall(roomUrl, token = null) {
+  document.getElementById('roomPicker').style.display = 'none';
+  document.getElementById('callFrame').style.display = 'block';
+  document.getElementById('roomHeader').style.display = 'flex';
+  document.getElementById('roomHeaderName').textContent = ROOM_NAMES[selectedRoomSlug] || 'Study Room';
+
+  const container = document.getElementById('callFrame');
+  const userName  = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Learner';
+
+  callInstance = window.DailyIframe
+    ? DailyIframe.createFrame(container, {
+        iframeStyle: { width:'100%', height:'100%', border:'none', background:'#0A0A10' },
+        showLeaveButton: false,
+        showFullscreenButton: true,
+        theme: {
+          colors: {
+            accent: '#5B7FFF', accentText: '#FFFFFF',
+            background: '#0E0F12', backgroundAccent: '#13141A',
+            baseText: '#ECEDF1', border: '#2A2C35',
+            mainAreaBg: '#0A0B0E', mainAreaBgAccent: '#13141A',
+            mainAreaText: '#ECEDF1', supportiveText: '#9498A6',
+          }
+        }
+      })
+    : null;
+
+  if (callInstance) {
+    const joinOptions = { url: roomUrl, userName };
+    if (token) joinOptions.token = token;
+    callInstance.join(joinOptions);
+    callInstance.on('left-meeting', () => leaveRoom());
+  } else {
+    container.innerHTML = `<iframe src="${roomUrl}" allow="camera;microphone;fullscreen;display-capture" style="width:100%;height:100%;border:none;background:#0A0A10"></iframe>`;
+  }
+}
+
+function leaveRoom() {
+  if (callInstance) {
+    try { callInstance.leave(); callInstance.destroy(); } catch(e) {}
+    callInstance = null;
+  }
+  activeRoomUrl = null;
+  document.getElementById('callFrame').innerHTML = '';
+  resetRoomPicker();
+}
+
+function copyRoomLink() {
+  if (!activeRoomUrl) return;
+  navigator.clipboard.writeText(activeRoomUrl).then(() => {
+    showToast('Room link copied — share it to invite friends!', 'success');
+  }).catch(() => {
+    showToast(activeRoomUrl, 'success');
+  });
+}
+
+function showRoomError(msg) {
+  const el = document.getElementById('roomError');
+  el.textContent = msg;
+  el.classList.add('show');
+}
 </script>
 
 <script>
