@@ -68,6 +68,31 @@
   .chat-header-title{font-size:15px;font-weight:700;color:var(--text)}
   .chat-header-sub{font-size:11.5px;color:var(--text3);margin-top:2px}
   .online-count{font-size:11.5px;color:var(--text3);display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;background:var(--bg3);border:1px solid var(--border)}
+  /* ── JOIN CALL BUTTON ── */
+.join-call-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 18px;
+  border-radius:9px;
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all .2s;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.join-call-btn:hover{
+  background:#4D6FE0;
+  transform:translateY(-1px);
+}
+.join-call-btn i{
+  font-size:14px;
+}
   .online-count .dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
 
   /* ── MESSAGES ── */
@@ -250,18 +275,23 @@
 
     <!-- CHAT HEADER -->
     <div class="chat-header">
-      <div class="chat-header-left">
-        <div class="chat-header-icon" id="roomIcon">💬</div>
-        <div>
-          <div class="chat-header-title" id="roomTitle">General</div>
-          <div class="chat-header-sub" id="roomSub">Ask anything, share notes, discuss topics</div>
-        </div>
-      </div>
-      <div class="online-count">
-        <span class="dot"></span>
-        <span id="onlineCount">0 online</span>
-      </div>
+  <div class="chat-header-left">
+    <div class="chat-header-icon" id="roomIcon">💬</div>
+    <div>
+      <div class="chat-header-title" id="roomTitle">General</div>
+      <div class="chat-header-sub" id="roomSub">Ask anything, share notes, discuss topics</div>
     </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <a class="join-call-btn" id="joinCallBtn" href="#" onclick="openVideoRoom(event)">
+      <i class="ti ti-video"></i> Join Call
+    </a>
+    <div class="online-count">
+      <span class="dot"></span>
+      <span id="onlineCount">0 online</span>
+    </div>
+  </div>
+</div>
 
     <!-- MESSAGES -->
     <div class="messages-area" id="messagesArea">
@@ -341,6 +371,28 @@ function switchRoom(id){
   document.getElementById('messagesArea').innerHTML = `<div class="empty-chat" id="emptyChat"><i class="ti ti-message-circle"></i><h3>Loading…</h3></div>`;
   subscribeMessages();
   updateOnlineCount();
+}
+
+/* ── JOIN VIDEO ROOM ── */
+function openVideoRoom(e){
+  e.preventDefault();
+  if(!currentUser){
+    showToast('Sign in to join a video call','error');
+    document.getElementById('gateOverlay').style.display = 'flex';
+    return;
+  }
+  const roomMap = {
+    'general':'general',
+    'mathematics':'mathematics',
+    'physics':'physics',
+    'chemistry':'chemistry',
+    'biology':'biology',
+    'cs':'cs',
+    'economics':'economics',
+    'engineering':'engineering',
+  };
+  const videoRoom = roomMap[activeRoom] || 'general';
+  window.open(`video-room.html?room=${videoRoom}`,'_blank','width=1200,height=800');
 }
 
 // ── Auth State ──
