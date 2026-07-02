@@ -167,6 +167,7 @@ auth.onAuthStateChanged(user=>{
 });
 
 async function joinRoom(){
+  joinedSuccessfully = false; 
   const btn = document.getElementById('joinBtn');
   const err = document.getElementById('errBanner');
   err.classList.remove('show');
@@ -196,38 +197,68 @@ async function joinRoom(){
   }
 }
 
-function launchCall(url,token=null){
-  document.getElementById('lobbyScreen').style.display='none';
-  const wrap=document.getElementById('videoWrap');
-  wrap.style.display='flex';
-  document.getElementById('leaveBtn').style.display='flex';
-  document.getElementById('backBtn').style.display='none';
-  document.getElementById('navLivePill').style.display='flex';
+let joinedSuccessfully = false;
 
-  const container=document.getElementById('dailyFrame');
-  const userName=currentUser?.displayName||currentUser?.email?.split('@')[0]||'Learner';
+function launchCall(url, token = null) {
+  document.getElementById('lobbyScreen').style.display = 'none';
+  const wrap = document.getElementById('videoWrap');
+  wrap.style.display = 'flex';
+  document.getElementById('leaveBtn').style.display = 'flex';
+  document.getElementById('backBtn').style.display = 'none';
+  document.getElementById('navLivePill').style.display = 'flex';
 
-  callInstance=window.DailyIframe?DailyIframe.createFrame(container,{
-    iframeStyle:{width:'100%',height:'100%',border:'none',background:'#0A0A10'},
-    showLeaveButton:false,showFullscreenButton:true,
-    theme:{colors:{
-      accent:'#5B7FFF',accentText:'#FFFFFF',
-      background:'#0E0F12',backgroundAccent:'#13141A',
-      baseText:'#ECEDF1',border:'#2A2C35',
-      mainAreaBg:'#0A0B0E',mainAreaBgAccent:'#13141A',
-      mainAreaText:'#ECEDF1',supportiveText:'#9498A6',
+  const container = document.getElementById('dailyFrame');
+  const userName = (currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Learner').trim();
+
+  callInstance = window.DailyIframe ? DailyIframe.createFrame(container, {
+    iframeStyle: { width:'100%', height:'100%', border:'none', background:'#0A0A10' },
+    showLeaveButton: false, showFullscreenButton: true,
+    theme: { colors: {
+      accent:'#5B7FFF', accentText:'#FFFFFF',
+      background:'#0E0F12', backgroundAccent:'#13141A',
+      baseText:'#ECEDF1', border:'#2A2C35',
+      mainAreaBg:'#0A0B0E', mainAreaBgAccent:'#13141A',
+      mainAreaText:'#ECEDF1', supportiveText:'#9498A6',
     }}
-  }):null;
+  }) : null;
 
-  if(callInstance){
-    const opts={url,userName};
-    if(token)opts.token=token;
+  if (callInstance) {
+    const opts = { url, userName };
+    if (token) opts.token = token;
     callInstance.join(opts);
-    callInstance.on('left-meeting',()=>leaveRoom());
-  }else{
-    container.innerHTML=`<iframe src="${url}" allow="camera;microphone;fullscreen;display-capture" style="width:100%;height:100%;border:none;background:#000"></iframe>`;
+
+    callInstance.on('joined-meeting', () => {
+      joinedSuccessfully = true;
+      showToast('Joined ' + roomInfo.name + ' room 🎥', 'success');
+    });
+
+    callInstance.on('left-meeting', () => {
+      if (joinedSuccessfully) {
+        joinedSuccessfully = false;
+        leaveRoom();
+      } else {
+        // Never actually got in — show error, don't silently reset
+        document.getElementById('videoWrap').style.display = 'none';
+        document.getElementById('lobbyScreen').style.display = 'flex';
+        document.getElementById('leaveBtn').style.display = 'none';
+        document.getElementById('backBtn').style.display = 'inline-flex';
+        document.getElementById('navLivePill').style.display = 'none';
+        document.getElementById('errMsg').textContent = 'Could not join — please try again.';
+        document.getElementById('errBanner').classList.add('show');
+        const btn = document.getElementById('joinBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-video"></i> Try Again';
+      }
+    });
+
+    callInstance.on('error', (e) => {
+      console.error('[Daily error]', e);
+    });
+
+  } else {
+    container.innerHTML = `<iframe src="${url}" allow="camera;microphone;fullscreen;display-capture" style="width:100%;height:100%;border:none;background:#000"></iframe>`;
+    showToast('Joined ' + roomInfo.name + ' room 🎥', 'success');
   }
-  showToast('Joined '+roomInfo.name+' room 🎥','success');
 }
 
 function leaveRoom(){
