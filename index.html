@@ -855,21 +855,16 @@ function selectRoom(el) {
 async function joinRoom() {
   if (!selectedRoomSlug) return;
 
-  const btn = document.getElementById('joinRoomBtn');
-  btn.classList.add('loading');
-  btn.disabled = true;
+  const isHost = window.ADMIN_EMAILS.includes(currentUser.email);
 
-  const roomUrl = `https://${window.DAILY_DOMAIN}.daily.co/studyhub-${selectedRoomSlug}`;
-  const isHost  = window.ADMIN_EMAILS.includes(currentUser.email);
-  const token   = isHost ? ROOM_OWNER_TOKENS[selectedRoomSlug] : null;
+  closeRoomModal();
 
-  try {
-    activeRoomUrl = roomUrl;
-    launchCall(roomUrl, token);
-  } catch (err) {
-    showRoomError('Could not connect to the room. Please try again.');
-    btn.classList.remove('loading');
-    btn.disabled = false;
+  if (isHost) {
+    // You go directly to the video room as owner
+    window.location.href = `video-room.html?room=${selectedRoomSlug}`;
+  } else {
+    // Everyone else goes to waiting room first
+    window.location.href = `waiting-room.html?room=${selectedRoomSlug}`;
   }
 }
 
