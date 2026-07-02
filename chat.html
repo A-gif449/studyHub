@@ -432,7 +432,7 @@ function openVideoModal(){
     return;
   }
 
-  const jitsiRoom = 'studyhub-' + activeRoom + '-v2';
+  const jitsiRoom = 'SH' + activeRoom.slice(0,4).toUpperCase() + 'x9K2' + activeRoom.length;
 
   // Get or create a password for today's session (resets daily)
   const today = new Date().toISOString().slice(0,10); // "2025-07-03"
@@ -453,7 +453,7 @@ function openVideoModal(){
       });
     }
 
-    const meetUrl = `https://meet.jit.si/${jitsiRoom}#config.requireDisplayName=true`;
+    const meetUrl = `https://meet.jit.si/${jitsiRoom}#config.requireDisplayName=false&config.prejoinPageEnabled=false&config.enableWelcomePage=false&config.disableDeepLinking=true&userInfo.displayName=${encodeURIComponent(currentUser.displayName || currentUser.email.split('@')[0])}`;
 
     // Show modal with password + link
     showMeetModal(meetUrl, password, jitsiRoom);
@@ -569,7 +569,7 @@ function showMeetModal(url, password, roomName){
 // }
 
 function copyMeetLink(){
-  const jitsiRoom = 'studyhub-' + activeRoom + '-v2';
+  const jitsiRoom = 'SH' + activeRoom.slice(0,4).toUpperCase() + 'x9K2' + activeRoom.length;
   const link = 'https://meet.jit.si/' + jitsiRoom;
 
   navigator.clipboard.writeText(link).then(() => {
@@ -584,7 +584,7 @@ function copyMeetLink(){
     }, 2000);
   }).catch(() => {
     // Fallback for browsers that block clipboard
-    const jitsiRoom = 'studyhub-' + activeRoom + '-v2';
+    const jitsiRoom = 'SH' + activeRoom.slice(0,4).toUpperCase() + 'x9K2' + activeRoom.length;
     prompt('Copy this link:', 'https://meet.jit.si/' + jitsiRoom);
   });
 }
