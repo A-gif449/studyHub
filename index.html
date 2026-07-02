@@ -855,16 +855,19 @@ function selectRoom(el) {
 async function joinRoom() {
   if (!selectedRoomSlug) return;
 
-  const isHost = window.ADMIN_EMAILS.includes(currentUser.email);
+  // Save BEFORE closeRoomModal() resets it to null
+  const room = selectedRoomSlug;
+  const isHost = window.ADMIN_EMAILS.includes(currentUser?.email);
 
   closeRoomModal();
 
   if (isHost) {
-    // You go directly to the video room as owner
-    window.location.href = `video-room.html?room=${selectedRoomSlug}`;
+    // Admin goes straight in as host
+    window.location.href = `video-room.html?room=${room}`;
   } else {
-    // Everyone else goes to waiting room first
-    window.location.href = `waiting-room.html?room=${selectedRoomSlug}`;
+    // Everyone else also goes straight in — no waiting room
+    // since there's no dedicated host to approve requests
+    window.location.href = `video-room.html?room=${room}`;
   }
 }
 
