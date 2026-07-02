@@ -334,26 +334,29 @@ async function joinRoom() {
   btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Connecting…';
 
   try {
-    // Call your existing Vercel API to create/get the Daily.co room
+    console.log('[DEBUG] Attempting to create room:', dailyRoomName);
+    
     const res = await fetch('/api/create-room', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ roomName: dailyRoomName })
     });
 
+    console.log('[DEBUG] API Response Status:', res.status);
+
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
+      console.error('[DEBUG] API Error:', err);
       throw new Error(err.error || 'Failed to create room (status ' + res.status + ')');
     }
 
     const data = await res.json();
-    // data.url = e.g. "https://studyhub-team.daily.co/studyhub-general"
+    console.log('[DEBUG] Room Data:', data);
+    
     const roomUrl = data.url;
     if (!roomUrl) throw new Error('No room URL returned from API.');
 
-    // Embed the iframe
     const iframe = document.getElementById('dailyIframe');
-    // Append user name param so Daily shows the right display name
     const displayName = encodeURIComponent(currentUser.displayName || currentUser.email.split('@')[0]);
     iframe.src = roomUrl + '?showLeaveButton=false&userName=' + displayName;
 
