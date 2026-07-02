@@ -167,21 +167,32 @@ auth.onAuthStateChanged(user=>{
 });
 
 async function joinRoom(){
-  const btn=document.getElementById('joinBtn');
-  const err=document.getElementById('errBanner');
+  const btn = document.getElementById('joinBtn');
+  const err = document.getElementById('errBanner');
   err.classList.remove('show');
-  btn.disabled=true;
-  btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Connecting…';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Connecting…';
 
-  try{
-    const isHost=window.ADMIN_EMAILS.includes(currentUser.email);
-    const token=isHost?OWNER_TOKENS[roomKey]:null;
-    launchCall(roomUrl,token);
-  }catch(e){
-    document.getElementById('errMsg').textContent=e.message||'Could not connect.';
+  try {
+    // Step 1: create/verify room exists on Daily first
+    const res = await fetch('/api/create-room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roomName: `studyhub-${roomKey}` }),
+    });
+    const data = await res.json();
+    if (!data.url) throw new Error(data.error || 'Could not get room URL');
+
+    // Step 2: join with the verified URL
+    const isHost = window.ADMIN_EMAILS.includes(currentUser?.email);
+    const token  = isHost ? OWNER_TOKENS[roomKey] : null;
+    launchCall(data.url, token);
+
+  } catch(e) {
+    document.getElementById('errMsg').textContent = e.message || 'Could not connect.';
     err.classList.add('show');
-    btn.disabled=false;
-    btn.innerHTML='<i class="ti ti-video"></i> Try Again';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-video"></i> Try Again';
   }
 }
 
