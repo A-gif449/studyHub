@@ -645,7 +645,7 @@ function updateNav(user) {
   const section = document.getElementById('navUserSection');
   if (user) {
     const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    const adminLink = isAdmin(user) ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><div class="dropdown-divider"></div>` : '';
+    const adminLink = isAdmin(user) ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a> <a class="dropdown-item" href="host-panel.html"><i class="ti ti-crown"></i> Host Panel</a><div class="dropdown-divider"></div>` : '';
     section.innerHTML = `
       <div class="dropdown" id="userDropdown">
         <div class="user-pill" onclick="toggleDropdown()">

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Host Panel – StudyHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0E0F12;--bg2:#13141A;--bg3:#181A21;--card:#15161C;--card2:#1B1D25;
+    --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+    --accent:#5B7FFF;--accent2:#8FA3D6;
+    --green:#4E9E78;--red:#C2564F;--gold:#C9A356;
+    --text:#ECEDF1;--text2:#9498A6;--text3:#62656F;
+    --r:10px;--r2:14px;--r3:18px;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* ── NAV ── */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(14,15,18,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;color:var(--text);text-decoration:none}
+  .host-badge{padding:4px 12px;border-radius:99px;background:rgba(201,163,86,0.1);border:1px solid rgba(201,163,86,0.25);font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:.3px}
+  .btn-ghost{padding:7px 14px;border-radius:var(--r);border:1px solid var(--border2);color:var(--text2);background:transparent;font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2)}
+
+  /* ── PAGE ── */
+  .page{padding:80px 5% 40px;max-width:860px;margin:0 auto}
+
+  /* ── HEADER ── */
+  .page-header{margin-bottom:32px}
+  .page-header h1{font-family:'Source Serif 4',serif;font-size:28px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .page-header p{font-size:14px;color:var(--text2);line-height:1.65}
+
+  /* ── TABS ── */
+  .tabs{display:flex;gap:4px;background:var(--bg2);border-radius:var(--r);padding:3px;margin-bottom:24px;width:fit-content}
+  .tab{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2);background:transparent;border:none;font-family:inherit}
+  .tab.active{background:var(--accent);color:#fff}
+
+  /* ── STATS ROW ── */
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+  .stat-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:18px 20px;display:flex;align-items:center;gap:14px}
+  .stat-icon{width:38px;height:38px;border-radius:9px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--accent2);flex-shrink:0}
+  .stat-val{font-family:'Source Serif 4',serif;font-size:22px;font-weight:700;color:var(--text);line-height:1}
+  .stat-lbl{font-size:11.5px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+
+  /* ── ROOM FILTER ── */
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .filter-chip{padding:6px 14px;border-radius:var(--r);background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s}
+  .filter-chip.active,.filter-chip:hover{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+
+  /* ── WAITING LIST ── */
+  .section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  .request-list{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+
+  .request-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;display:flex;align-items:center;gap:14px;transition:background .2s;animation:slideIn .3s ease}
+  @keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  .request-card:hover{background:var(--card2)}
+
+  .req-av{width:38px;height:38px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+  .req-info{flex:1;min-width:0}
+  .req-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .req-meta{font-size:12px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .req-room{padding:2px 8px;border-radius:5px;background:rgba(91,127,255,0.1);border:1px solid rgba(91,127,255,0.18);color:var(--accent2);font-size:11px;font-weight:600}
+  .req-time{display:flex;align-items:center;gap:4px}
+
+  .req-actions{display:flex;gap:8px;flex-shrink:0}
+  .admit-btn{padding:8px 18px;border-radius:var(--r);background:rgba(78,158,120,0.12);border:1px solid rgba(78,158,120,0.28);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+  .admit-btn:hover{background:rgba(78,158,120,0.22)}
+  .deny-btn{padding:8px 18px;border-radius:var(--r);background:rgba(194,86,79,0.08);border:1px solid rgba(194,86,79,0.22);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+  .deny-btn:hover{background:rgba(194,86,79,0.18)}
+
+  /* ── EMPTY ── */
+  .empty{padding:48px 20px;text-align:center;color:var(--text3)}
+  .empty i{font-size:36px;margin-bottom:12px;display:block;color:var(--text3)}
+  .empty p{font-size:13.5px;line-height:1.65}
+
+  /* ── ACCESS DENIED ── */
+  .denied{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px}
+  .denied-card{max-width:400px;width:100%;background:var(--card);border:1px solid var(--border2);border-radius:var(--r3);padding:40px;text-align:center}
+  .denied-card i{font-size:40px;color:var(--red);margin-bottom:16px;display:block}
+  .denied-card h2{font-family:'Source Serif 4',serif;font-size:22px;margin-bottom:8px;color:var(--text)}
+  .denied-card p{font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:20px}
+
+  /* ── TOAST ── */
+  .toast{position:fixed;bottom:22px;right:22px;z-index:9999;padding:12px 18px;border-radius:var(--r);background:var(--card2);border:1px solid var(--border2);font-size:13px;color:var(--text);box-shadow:0 16px 40px rgba(0,0,0,0.45);transform:translateY(16px);opacity:0;transition:all .25s;display:flex;align-items:center;gap:10px;pointer-events:none}
+  .toast.show{transform:none;opacity:1}
+  .toast.success{border-color:rgba(78,158,120,.3)}
+  .toast.error{border-color:rgba(194,86,79,.3)}
+
+  /* ── NOTIFICATION DOT ── */
+  .notif-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:6px;vertical-align:middle;animation:blink 1.5s ease infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+  @media(max-width:640px){
+    .stats-row{grid-template-columns:1fr 1fr}
+    .req-actions{flex-direction:column}
+    nav{padding:0 16px}
+    .page{padding:76px 16px 40px}
+  }
+</style>
+</head>
+<body>
+<script>
+  window.FIREBASE_CONFIG={apiKey:"AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",authDomain:"studyx-fd90c.firebaseapp.com",projectId:"studyx-fd90c",storageBucket:"studyx-fd90c.firebasestorage.app",messagingSenderId:"520877226051",appId:"1:520877226051:web:94cdfd86eb64623f5f7cf6"};
+  window.ADMIN_EMAILS=["abhishekbasu188@gmail.com"];
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="studyhub-icon.svg" style="width:26px;height:26px;border-radius:7px;object-fit:cover" alt=""/>
+    StudyHub
+  </a>
+  <span class="host-badge"><i class="ti ti-crown" style="font-size:11px"></i> Host Panel</span>
+  <a href="index.html" class="btn-ghost"><i class="ti ti-arrow-left"></i> Back to Site</a>
+</nav>
+
+<!-- ACCESS DENIED (shown until auth confirmed) -->
+<div class="denied" id="deniedView" style="display:none">
+  <div class="denied-card">
+    <i class="ti ti-shield-off"></i>
+    <h2>Access Denied</h2>
+    <p>This panel is only accessible to StudyHub admins. Sign in with an admin account to continue.</p>
+    <a href="index.html" class="btn-ghost" style="display:inline-flex;margin:0 auto"><i class="ti ti-arrow-left"></i> Go Back</a>
+  </div>
+</div>
+
+<!-- MAIN PANEL -->
+<div class="page" id="mainPanel" style="display:none">
+  <div class="page-header">
+    <h1>Waiting Room Panel</h1>
+    <p>Approve or deny students requesting to join study rooms. Decisions happen in real time.</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="ti ti-clock"></i></div>
+      <div><div class="stat-val" id="statWaiting">0</div><div class="stat-lbl">Waiting Now</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="color:var(--green)"><i class="ti ti-check"></i></div>
+      <div><div class="stat-val" id="statApproved">0</div><div class="stat-lbl">Approved Today</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="color:var(--red)"><i class="ti ti-x"></i></div>
+      <div><div class="stat-val" id="statDenied">0</div><div class="stat-lbl">Denied Today</div></div>
+    </div>
+  </div>
+
+  <!-- ROOM FILTER -->
+  <div class="filter-row" id="filterRow">
+    <button class="filter-chip active" data-room="all" onclick="setFilter(this,'all')">All Rooms</button>
+    <button class="filter-chip" data-room="mathematics" onclick="setFilter(this,'mathematics')">🧮 Mathematics</button>
+    <button class="filter-chip" data-room="physics" onclick="setFilter(this,'physics')">⚛️ Physics</button>
+    <button class="filter-chip" data-room="chemistry" onclick="setFilter(this,'chemistry')">⚗️ Chemistry</button>
+    <button class="filter-chip" data-room="biology" onclick="setFilter(this,'biology')">🧬 Biology</button>
+    <button class="filter-chip" data-room="cs-tech" onclick="setFilter(this,'cs-tech')">💻 CS & Tech</button>
+    <button class="filter-chip" data-room="economics" onclick="setFilter(this,'economics')">📈 Economics</button>
+    <button class="filter-chip" data-room="literature" onclick="setFilter(this,'literature')">📚 Literature</button>
+    <button class="filter-chip" data-room="engineering" onclick="setFilter(this,'engineering')">⚙️ Engineering</button>
+    <button class="filter-chip" data-room="general" onclick="setFilter(this,'general')">🎯 General</button>
+  </div>
+
+  <div class="section-label">Pending Requests</div>
+  <div class="request-list" id="requestList">
+    <div class="empty"><i class="ti ti-users"></i><p>No one waiting right now.<br/>Requests will appear here in real time.</p></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
+
+<script>
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+let allRequests=[];
+let activeFilter='all';
+let approvedCount=0,deniedCount=0;
+
+auth.onAuthStateChanged(user=>{
+  if(!user||!window.ADMIN_EMAILS.includes(user.email)){
+    document.getElementById('deniedView').style.display='flex';
+    return;
+  }
+  document.getElementById('mainPanel').style.display='block';
+  startListening();
+});
+
+function startListening(){
+  // Listen to ALL waiting requests in real time
+  db.collection('waitingRoom').where('status','==','waiting')
+    .orderBy('requestedAt','asc')
+    .onSnapshot(snap=>{
+      allRequests=snap.docs.map(d=>({id:d.id,...d.data()}));
+      document.getElementById('statWaiting').textContent=allRequests.length;
+      renderList();
+    });
+}
+
+function setFilter(el,room){
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter=room;
+  renderList();
+}
+
+function renderList(){
+  const list=document.getElementById('requestList');
+  const filtered=activeFilter==='all'?allRequests:allRequests.filter(r=>r.roomId===activeFilter);
+
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty"><i class="ti ti-users"></i><p>No pending requests${activeFilter!=='all'?' in this room':''}.<br/>New requests appear here instantly.</p></div>`;
+    return;
+  }
+
+  list.innerHTML=filtered.map(req=>buildCard(req)).join('');
+}
+
+function buildCard(req){
+  const name=req.name||req.email||'Unknown';
+  const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const email=req.email||'';
+  const roomName=req.roomName||req.roomId||'—';
+  const ago=req.requestedAt?timeAgo(req.requestedAt.toDate?req.requestedAt.toDate():new Date()):'just now';
+
+  return `<div class="request-card" id="req-${req.id}">
+    <div class="req-av">${initials}</div>
+    <div class="req-info">
+      <div class="req-name">${esc(name)}</div>
+      <div class="req-meta">
+        <span>${esc(email)}</span>
+        <span class="req-room"><i class="ti ti-video" style="font-size:10px"></i> ${esc(roomName)}</span>
+        <span class="req-time"><i class="ti ti-clock" style="font-size:11px"></i> ${ago}</span>
+      </div>
+    </div>
+    <div class="req-actions">
+      <button class="admit-btn" onclick="decide('${req.id}','approved')"><i class="ti ti-check"></i> Admit</button>
+      <button class="deny-btn" onclick="decide('${req.id}','rejected')"><i class="ti ti-x"></i> Deny</button>
+    </div>
+  </div>`;
+}
+
+async function decide(id,status){
+  const card=document.getElementById('req-'+id);
+  if(card){card.style.opacity='.4';card.style.pointerEvents='none';}
+  try{
+    await db.collection('waitingRoom').doc(id).update({status,decidedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    if(status==='approved'){approvedCount++;document.getElementById('statApproved').textContent=approvedCount;showToast('Student admitted ✓','success');}
+    else{deniedCount++;document.getElementById('statDenied').textContent=deniedCount;showToast('Request denied','error');}
+  }catch(e){
+    showToast('Error: '+e.message,'error');
+    if(card){card.style.opacity='1';card.style.pointerEvents='';}
+  }
+}
+
+function timeAgo(date){
+  const s=Math.floor((Date.now()-date)/1000);
+  if(s<10)return'just now';
+  if(s<60)return s+'s ago';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  return Math.floor(s/3600)+'h ago';
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastIcon').className=type==='success'?'ti ti-check':'ti ti-alert-circle';
+  t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>

@@ -5,465 +5,241 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Video Room – StudyHub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script crossorigin src="https://unpkg.com/@daily-co/daily-js"></script>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --bg:#0A0A12;--bg2:#0F0F1C;--bg3:#13131F;--card:#14141F;--card2:#1A1A2E;
-    --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
-    --accent:#6C63FF;--accent2:#A78BFA;--accent3:#38BDF8;--accent4:#F472B6;
-    --gold:#FBBF24;--green:#34D399;--red:#F87171;
-    --text:#F0EFF8;--text2:#A09DC0;--text3:#6B6880;
-    --r:14px;--r2:20px;--r3:28px;
+    --bg:#0E0F12;--bg2:#13141A;--bg3:#181A21;--card:#15161C;--card2:#1B1D25;
+    --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+    --accent:#5B7FFF;--accent2:#8FA3D6;
+    --green:#4E9E78;--red:#C2564F;--gold:#C9A356;
+    --text:#ECEDF1;--text2:#9498A6;--text3:#62656F;
+    --r:10px;--r2:14px;--r3:18px;
   }
   html,body{height:100%;overflow:hidden}
-  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text)}
-
-  /* ── ORBs ── */
-  .orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
-  .orb1{width:500px;height:500px;top:-150px;left:-100px;background:rgba(108,99,255,0.1)}
-  .orb2{width:400px;height:400px;bottom:0;right:-100px;background:rgba(56,189,248,0.07)}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
 
   /* ── NAV ── */
-  nav{
-    position:fixed;top:0;left:0;right:0;z-index:100;
-    padding:0 5%;height:64px;
-    display:flex;align-items:center;justify-content:space-between;
-    background:rgba(10,10,18,0.9);backdrop-filter:blur(20px);
-    border-bottom:1px solid var(--border);
-  }
-  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--text);text-decoration:none}
-  .back-link{display:flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;padding:7px 14px;border-radius:9px;border:1px solid var(--border2);transition:all .2s}
-  .back-link:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
-  .nav-center{display:flex;align-items:center;gap:10px}
-  .room-badge{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:99px;background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.25);font-size:13px;font-weight:600;color:var(--accent2)}
-  .room-badge .live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.5s infinite}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
-  .nav-right{display:flex;align-items:center;gap:10px}
-  .btn-ghost{padding:7px 14px;border-radius:9px;border:1px solid var(--border2);color:var(--text2);background:transparent;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
-  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.22)}
-  .btn-danger{padding:7px 14px;border-radius:9px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
-  .btn-danger:hover{background:rgba(248,113,113,0.18)}
-  .user-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(14,15,18,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;color:var(--text);text-decoration:none}
+  .live-pill{display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;background:rgba(78,228,160,0.08);border:1px solid rgba(78,228,160,0.2);font-size:11.5px;font-weight:600;color:#4EE4A0}
+  .live-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:#4EE4A0;animation:blink 1.8s ease infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .nav-right{display:flex;align-items:center;gap:8px}
+  .user-av{width:26px;height:26px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+  .btn-danger{padding:7px 14px;border-radius:var(--r);background:rgba(194,86,79,0.1);border:1px solid rgba(194,86,79,0.25);color:var(--red);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:none;align-items:center;gap:6px}
+  .btn-danger:hover{background:rgba(194,86,79,0.18)}
+  .btn-ghost{padding:7px 14px;border-radius:var(--r);border:1px solid var(--border2);color:var(--text2);background:transparent;font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2)}
 
-  /* ── MAIN LAYOUT ── */
-  .page{position:fixed;top:64px;bottom:0;left:0;right:0;z-index:1;display:flex;flex-direction:column}
+  /* ── PAGE ── */
+  .page{position:fixed;top:56px;bottom:0;left:0;right:0;display:flex;flex-direction:column}
 
-  /* ── STATES ── */
-  .state-screen{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;padding:24px}
-  .state-card{max-width:460px;width:100%;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:40px;animation:fadeUp .3s ease}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-  .state-icon{font-size:44px;margin-bottom:18px;display:inline-block}
-  .state-card h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px}
-  .state-card p{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:22px}
-
-  /* ── LOBBY (pre-join) ── */
-  #lobbyState{display:flex}
-  .lobby-room-icon{width:64px;height:64px;border-radius:18px;background:rgba(108,99,255,0.12);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 18px}
-  .lobby-meta{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:24px}
-  .lobby-tag{padding:5px 14px;border-radius:99px;background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.2);color:var(--accent2);font-size:12px;font-weight:600}
-  .lobby-tag.participants{background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.2);color:var(--green)}
-  .join-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 0 30px rgba(108,99,255,0.35);display:flex;align-items:center;justify-content:center;gap:9px}
-  .join-btn:hover{transform:translateY(-1px);box-shadow:0 6px 40px rgba(108,99,255,0.5)}
-  .join-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-  .lobby-hint{margin-top:14px;font-size:12px;color:var(--text3);line-height:1.6}
-  .lobby-hint a{color:var(--accent2);text-decoration:none}
-  .lobby-hint a:hover{text-decoration:underline}
+  /* ── LOBBY ── */
+  .center-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+  .lobby-card{max-width:440px;width:100%;background:var(--card);border:1px solid var(--border2);border-radius:var(--r3);padding:40px;text-align:center;animation:fadeUp .3s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .room-emoji{font-size:48px;margin-bottom:18px;display:block}
+  .lobby-card h2{font-family:'Source Serif 4',serif;font-size:22px;font-weight:700;margin-bottom:8px;color:var(--text)}
+  .lobby-card p{font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:22px}
+  .tags{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+  .tag{padding:5px 12px;border-radius:99px;background:rgba(91,127,255,0.08);border:1px solid rgba(91,127,255,0.18);color:var(--accent2);font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:5px}
+  .join-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:14.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 0 28px rgba(91,127,255,0.28)}
+  .join-btn:hover{background:#4D6FE0}
+  .join-btn:disabled{opacity:.55;cursor:not-allowed}
+  .err{background:rgba(194,86,79,0.08);border:1px solid rgba(194,86,79,0.2);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;display:none;align-items:center;gap:8px}
+  .err.show{display:flex}
+  .hint{margin-top:14px;font-size:12px;color:var(--text3);line-height:1.6}
 
   /* ── VIDEO FRAME ── */
-  #videoState{display:none;flex-direction:column;flex:1}
-  #dailyIframe{
-    flex:1;
-    border:none;
-    background:var(--bg);
-    display:block;
-  }
-
-  /* ── GATE ── */
-  #gateState{display:none}
-  .gate-inner{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:36px;max-width:420px;width:100%;text-align:left;animation:fadeUp .3s ease}
-  .gate-inner h2{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;margin-bottom:6px}
-  .gate-inner p{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.6}
-  .gate-tabs{display:flex;gap:0;background:var(--bg2);border-radius:10px;padding:3px;margin-bottom:20px}
-  .gate-tab{flex:1;padding:9px;text-align:center;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2);background:transparent;border:none;font-family:inherit}
-  .gate-tab.active{background:var(--accent);color:#fff}
-  .gate-form-group{margin-bottom:13px}
-  .gate-form-group label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px}
-  .gate-form-group input{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
-  .gate-form-group input:focus{border-color:var(--accent)}
-  .gate-form-group input::placeholder{color:var(--text3)}
-  .gate-error{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:12px;display:none}
-  .gate-error.show{display:block}
-  .gate-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 22px rgba(108,99,255,.3)}
-  .gate-submit:hover{transform:translateY(-1px)}
-  .gate-submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
-  .gate-divider{display:flex;align-items:center;gap:10px;margin:14px 0}
-  .gate-divider span{font-size:11px;color:var(--text3);white-space:nowrap}
-  .gate-divider::before,.gate-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-  .gate-google{width:100%;padding:11px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
-  .gate-google:hover{color:var(--text);border-color:rgba(255,255,255,.22)}
-  .gate-back{display:block;text-align:center;margin-top:16px;font-size:12px;color:var(--text3);text-decoration:none}
-  .gate-back:hover{color:var(--text2)}
-
-  /* ── NOT FOUND ── */
-  #notFoundState{display:none}
-
-  /* ── LOADING ── */
-  #loadingState{display:flex}
-  .spin{animation:spin 1s linear infinite}
-  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-
-  /* ── ERROR BANNER (inside lobby) ── */
-  .error-banner{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:16px;display:none;align-items:center;gap:8px}
-  .error-banner.show{display:flex}
+  #videoWrap{display:none;flex:1;flex-direction:column}
+  #dailyFrame{flex:1;border:none;background:#000;display:block}
 
   /* ── TOAST ── */
-  .toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:14px 20px;border-radius:12px;background:var(--card2);border:1px solid var(--border2);font-size:14px;color:var(--text);box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;pointer-events:none}
-  .toast.show{transform:translateY(0);opacity:1}
-  .toast.success{border-color:rgba(52,211,153,.3)}
-  .toast.error{border-color:rgba(248,113,113,.3)}
+  .toast{position:fixed;bottom:22px;right:22px;z-index:9999;padding:12px 18px;border-radius:var(--r);background:var(--card2);border:1px solid var(--border2);font-size:13px;color:var(--text);box-shadow:0 16px 40px rgba(0,0,0,0.45);transform:translateY(16px);opacity:0;transition:all .25s;display:flex;align-items:center;gap:10px;pointer-events:none}
+  .toast.show{transform:none;opacity:1}
+  .toast.success{border-color:rgba(78,158,120,.3)}
+  .toast.error{border-color:rgba(194,86,79,.3)}
 
-  @media(max-width:640px){
-    nav{padding:0 14px}
-    .nav-center{display:none}
-    .gate-inner{padding:26px}
-    .state-card{padding:28px}
-  }
+  @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-
 <script>
-  window.FIREBASE_CONFIG = {
-    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
-    authDomain: "studyx-fd90c.firebaseapp.com",
-    projectId: "studyx-fd90c",
-    storageBucket: "studyx-fd90c.firebasestorage.app",
-    messagingSenderId: "520877226051",
-    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
-  };
-  window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
-  // ← Your Daily.co subdomain (from dashboard URL: domain=studyhub-team)
-  window.DAILY_DOMAIN = "studyhub-team";
+  window.FIREBASE_CONFIG={apiKey:"AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",authDomain:"studyx-fd90c.firebaseapp.com",projectId:"studyx-fd90c",storageBucket:"studyx-fd90c.firebasestorage.app",messagingSenderId:"520877226051",appId:"1:520877226051:web:94cdfd86eb64623f5f7cf6"};
+  window.ADMIN_EMAILS=["abhishekbasu188@gmail.com"];
+  window.DAILY_DOMAIN="study-hub-team";
 </script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-<div class="orb orb1"></div>
-<div class="orb orb2"></div>
-
 <!-- NAV -->
 <nav>
-  <a href="chat.html" class="back-link"><i class="ti ti-arrow-left"></i> <span>Back to Chat</span></a>
-  <div class="nav-center">
-    <div class="room-badge">
-      <span class="live-dot"></span>
-      <span id="navRoomName">Video Room</span>
-    </div>
-  </div>
-  <div class="nav-right" id="navRight">
+  <a href="index.html" class="nav-logo">
+    <img src="studyhub-icon.svg" style="width:26px;height:26px;border-radius:7px;object-fit:cover" alt=""/>
+    StudyHub
+  </a>
+  <div class="live-pill" id="navLivePill" style="display:none"><span id="navRoomName">Video Room</span></div>
+  <div class="nav-right">
     <div class="user-av" id="userAv">?</div>
-    <button class="btn-danger" id="leaveBtn" style="display:none" onclick="leaveRoom()">
-      <i class="ti ti-phone-off"></i> Leave
-    </button>
+    <button class="btn-ghost" id="backBtn" onclick="goBack()"><i class="ti ti-arrow-left"></i> Back</button>
+    <button class="btn-danger" id="leaveBtn" onclick="leaveRoom()"><i class="ti ti-phone-off"></i> Leave</button>
   </div>
 </nav>
 
 <div class="page">
-
-  <!-- LOADING -->
-  <div class="state-screen" id="loadingState">
-    <div class="state-card">
-      <i class="ti ti-loader state-icon spin" style="color:var(--accent2)"></i>
-      <h2>Setting up your room…</h2>
-      <p>Connecting to the video session. This only takes a moment.</p>
-    </div>
-  </div>
-
-  <!-- AUTH GATE -->
-  <div class="state-screen" id="gateState">
-    <div class="gate-inner">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff"><i class="ti ti-video"></i></div>
-        <div style="font-family:Syne,sans-serif;font-size:16px;font-weight:800">Video Room</div>
+  <!-- LOBBY -->
+  <div class="center-screen" id="lobbyScreen">
+    <div class="lobby-card">
+      <span class="room-emoji" id="lobbyEmoji">💬</span>
+      <h2 id="lobbyTitle">General Room</h2>
+      <p id="lobbyDesc">Open video discussion for all members</p>
+      <div class="tags">
+        <span class="tag"><i class="ti ti-video" style="font-size:11px"></i> Video + Audio</span>
+        <span class="tag"><i class="ti ti-screen-share" style="font-size:11px"></i> Screen Share</span>
+        <span class="tag"><i class="ti ti-message" style="font-size:11px"></i> Chat</span>
       </div>
-      <h2>Sign in to join</h2>
-      <p>Video rooms are for StudyHub members only. Sign in or create a free account.</p>
-      <div class="gate-tabs">
-        <button class="gate-tab active" id="gTabLogin" onclick="gSwitchTab('login')">Sign In</button>
-        <button class="gate-tab" id="gTabSignup" onclick="gSwitchTab('signup')">Create Account</button>
-      </div>
-      <div class="gate-error" id="gateError"></div>
-      <div id="gFormLogin">
-        <div class="gate-form-group"><label>Email</label><input type="email" id="gLoginEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')gLogin()"/></div>
-        <div class="gate-form-group"><label>Password</label><input type="password" id="gLoginPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')gLogin()"/></div>
-        <button class="gate-submit" id="gLoginBtn" onclick="gLogin()"><i class="ti ti-login"></i> Sign In</button>
-        <div class="gate-divider"><span>or</span></div>
-        <button class="gate-google" onclick="gGoogleLogin()"><i class="ti ti-brand-google"></i> Continue with Google</button>
-      </div>
-      <div id="gFormSignup" style="display:none">
-        <div class="gate-form-group"><label>Full Name</label><input type="text" id="gSignupName" placeholder="Your name"/></div>
-        <div class="gate-form-group"><label>Email</label><input type="email" id="gSignupEmail" placeholder="you@example.com"/></div>
-        <div class="gate-form-group"><label>Password</label><input type="password" id="gSignupPass" placeholder="Min 6 characters"/></div>
-        <button class="gate-submit" id="gSignupBtn" onclick="gSignup()"><i class="ti ti-user-plus"></i> Create Account</button>
-        <div class="gate-divider"><span>or</span></div>
-        <button class="gate-google" onclick="gGoogleLogin()"><i class="ti ti-brand-google"></i> Continue with Google</button>
-      </div>
-      <a href="index.html" class="gate-back">← Back to homepage</a>
-    </div>
-  </div>
-
-  <!-- NOT FOUND -->
-  <div class="state-screen" id="notFoundState">
-    <div class="state-card">
-      <i class="ti ti-video-off state-icon" style="color:var(--text3)"></i>
-      <h2>Room not found</h2>
-      <p>This video room doesn't exist or the link is incorrect.</p>
-      <a href="chat.html" class="btn-ghost" style="display:inline-flex;margin:0 auto"><i class="ti ti-arrow-left"></i> Back to Chat</a>
-    </div>
-  </div>
-
-  <!-- LOBBY (pre-join screen) -->
-  <div class="state-screen" id="lobbyState" style="display:none">
-    <div class="state-card">
-      <div class="lobby-room-icon" id="lobbyRoomIcon">💬</div>
-      <h2 id="lobbyRoomTitle">General</h2>
-      <p id="lobbyRoomDesc" style="color:var(--text2);font-size:13px;margin-bottom:16px">Open video discussion for all members</p>
-      <div class="lobby-meta">
-        <div class="lobby-tag"><i class="ti ti-video" style="font-size:12px"></i> Video + Audio</div>
-        <div class="lobby-tag"><i class="ti ti-screen-share" style="font-size:12px"></i> Screen Share</div>
-        <div class="lobby-tag"><i class="ti ti-message" style="font-size:12px"></i> In-call Chat</div>
-      </div>
-
-      <div class="error-banner" id="lobbyError">
-        <i class="ti ti-alert-circle"></i>
-        <span id="lobbyErrorMsg">Failed to connect. Please try again.</span>
-      </div>
-
+      <div class="err" id="errBanner"><i class="ti ti-alert-circle"></i><span id="errMsg"></span></div>
       <button class="join-btn" id="joinBtn" onclick="joinRoom()">
         <i class="ti ti-video"></i> Join Video Room
       </button>
-      <p class="lobby-hint">
-        By joining you agree to our community guidelines.<br/>
-        Having trouble? <a href="chat.html">Use text chat instead</a>.
-      </p>
+      <p class="hint">Having trouble? <a href="index.html" style="color:var(--accent2)">Go back to home</a>.</p>
     </div>
   </div>
 
-  <!-- VIDEO CALL ACTIVE -->
-  <div id="videoState">
-    <iframe
-      id="dailyIframe"
-      allow="camera; microphone; fullscreen; speaker; display-capture; autoplay"
-      allowfullscreen
-    ></iframe>
+  <!-- VIDEO -->
+  <div id="videoWrap">
+    <div id="dailyFrame"></div>
   </div>
-
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 
 <script>
-// ── Init Firebase ──
 firebase.initializeApp(window.FIREBASE_CONFIG);
-const auth = firebase.auth();
+const auth=firebase.auth();
 
-// ── Room config ──
-const ROOMS = {
-  general:     { name:'General',     icon:'💬', desc:'Open discussion for all members' },
-  mathematics: { name:'Mathematics', icon:'🧮', desc:'Calculus, algebra, and stats' },
-  physics:     { name:'Physics',     icon:'⚛️', desc:'Mechanics, waves, modern physics' },
-  chemistry:   { name:'Chemistry',   icon:'⚗️', desc:'Organic, inorganic, physical' },
-  biology:     { name:'Biology',     icon:'🧬', desc:'Cell biology, genetics, ecology' },
-  cs:          { name:'CS & Tech',   icon:'💻', desc:'Programming, algorithms, data' },
-  economics:   { name:'Economics',   icon:'📈', desc:'Micro, macro, finance' },
-  engineering: { name:'Engineering', icon:'⚙️', desc:'All engineering branches' },
+const ROOMS={
+  general:{name:'General',emoji:'💬',desc:'Open discussion for all members'},
+  mathematics:{name:'Mathematics',emoji:'🧮',desc:'Calculus, algebra, and stats'},
+  physics:{name:'Physics',emoji:'⚛️',desc:'Mechanics, waves, modern physics'},
+  chemistry:{name:'Chemistry',emoji:'⚗️',desc:'Organic, inorganic, physical'},
+  biology:{name:'Biology',emoji:'🧬',desc:'Cell biology, genetics, ecology'},
+  'cs-tech':{name:'CS & Tech',emoji:'💻',desc:'Programming, algorithms, data'},
+  economics:{name:'Economics',emoji:'📈',desc:'Micro, macro, finance'},
+  literature:{name:'Literature',emoji:'📚',desc:'Essays, poetry, analysis'},
+  engineering:{name:'Engineering',emoji:'⚙️',desc:'All engineering branches'},
 };
 
-const params  = new URLSearchParams(location.search);
-const roomKey = params.get('room') || 'general';     // e.g. "general"
-const roomInfo = ROOMS[roomKey] || ROOMS['general'];
-// Daily.co room name matches your convention: studyhub-general, studyhub-mathematics …
-const dailyRoomName = 'studyhub-' + roomKey;
+const OWNER_TOKENS={
+  'mathematics':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItbWF0aGVtYXRpY3MiLCJvIjp0cnVlLCJleHAiOjE4NDUyOTU0MDcsImQiOiI2OGEwZDNmNC0zZDM5LTQ3ZjUtYTJkOS03NzdlYWQ4MTE2YzEiLCJpYXQiOjE3ODIyMjM0MTJ9.yH1zqCBKTEnvd5TflOadpTyA8lXHpSzsH9O6tl12ghE',
+  'physics':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItcGh5c2ljcyIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQwOSwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxMn0.mhoIYr6c1D6CSJrCJw88EguFEbvjGoCsNt8t1A8s2_g',
+  'chemistry':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItY2hlbWlzdHJ5IiwibyI6dHJ1ZSwiZXhwIjoxODQ1Mjk1NDA5LCJkIjoiNjhhMGQzZjQtM2QzOS00N2Y1LWEyZDktNzc3ZWFkODExNmMxIiwiaWF0IjoxNzgyMjIzNDEzfQ.x1vQDM5LxVRFRwp4FwtVqbc13jwBFlAnOrT4thBI-i0',
+  'biology':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItYmlvbG9neSIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQwOSwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxM30.bOk75oMvGdIzFWQkQvlNOFLcpQO6WU7p5-sSW0g8DOg',
+  'cs-tech':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItY3MtdGVjaCIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQwOSwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxM30.ZhI3aywmGMyhbEE99bi88E5WPEDo4U5zIA2GX_xyddY',
+  'economics':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItZWNvbm9taWNzIiwibyI6dHJ1ZSwiZXhwIjoxODQ1Mjk1NDEwLCJkIjoiNjhhMGQzZjQtM2QzOS00N2Y1LWEyZDktNzc3ZWFkODExNmMxIiwiaWF0IjoxNzgyMjIzNDE0fQ.c1uzTXKX7V7qJaeNtMGlmFeRC9NFRfvyWSrlSQIC5Rc',
+  'literature':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItbGl0ZXJhdHVyZSIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQxMCwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxNH0.f0IHUr8fiODrSVgcrkvnqRkFn_ysyZZGq22Hrgf503E',
+  'engineering':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItZW5naW5lZXJpbmciLCJvIjp0cnVlLCJleHAiOjE4NDUyOTU0MTAsImQiOiI2OGEwZDNmNC0zZDM5LTQ3ZjUtYTJkOS03NzdlYWQ4MTE2YzEiLCJpYXQiOjE3ODIyMjM0MTR9.kukfbuYPmia2ozc8pNBfY0iWeWEzGvUenjRKwlUoxLQ',
+  'general':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItZ2VuZXJhbCIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQxMCwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxNH0.DY51hFlIURmM5Xi1FxBOT9Ae3-rUXj24_jorctTLIQ4',
+};
 
-let currentUser = null;
-let callActive  = false;
+const params=new URLSearchParams(location.search);
+const roomKey=params.get('room')||'general';
+const roomInfo=ROOMS[roomKey]||ROOMS.general;
+const roomUrl=`https://${window.DAILY_DOMAIN}.daily.co/studyhub-${roomKey}`;
 
-// ── Update static UI from room info ──
-document.getElementById('navRoomName').textContent   = roomInfo.name + ' — Video';
-document.getElementById('lobbyRoomIcon').textContent = roomInfo.icon;
-document.getElementById('lobbyRoomTitle').textContent = roomInfo.name + ' Room';
-document.getElementById('lobbyRoomDesc').textContent  = roomInfo.desc;
+let currentUser=null,callInstance=null;
 
-// ── Auth guard ──
-auth.onAuthStateChanged(user => {
-  currentUser = user;
-  if (user) {
-    const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    document.getElementById('userAv').textContent = initials;
-    if (!callActive) showState('lobbyState');
-  } else {
-    showState('gateState');
-  }
+// Set lobby UI
+document.getElementById('lobbyEmoji').textContent=roomInfo.emoji;
+document.getElementById('lobbyTitle').textContent=roomInfo.name+' Room';
+document.getElementById('lobbyDesc').textContent=roomInfo.desc;
+document.getElementById('navRoomName').textContent=roomInfo.name+' · Live';
+
+auth.onAuthStateChanged(user=>{
+  if(!user){window.location.href='index.html';return;}
+  currentUser=user;
+  const initials=(user.displayName||user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('userAv').textContent=initials;
 });
 
-// ── Show/hide states ──
-function showState(id) {
-  ['loadingState','gateState','notFoundState','lobbyState','videoState'].forEach(s => {
-    const el = document.getElementById(s);
-    if (!el) return;
-    if (s === 'videoState') {
-      el.style.display = (s === id) ? 'flex' : 'none';
-    } else {
-      el.style.display = (s === id) ? 'flex' : 'none';
-    }
-  });
-}
+async function joinRoom(){
+  const btn=document.getElementById('joinBtn');
+  const err=document.getElementById('errBanner');
+  err.classList.remove('show');
+  btn.disabled=true;
+  btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Connecting…';
 
-// ── Join room ──
-async function joinRoom() {
-  const btn = document.getElementById('joinBtn');
-  const errBanner = document.getElementById('lobbyError');
-  errBanner.classList.remove('show');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Connecting…';
-
-  try {
-    console.log('[DEBUG] Attempting to create room:', dailyRoomName);
-    
-    const res = await fetch('/api/create-room', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ roomName: dailyRoomName })
-    });
-
-    console.log('[DEBUG] API Response Status:', res.status);
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      console.error('[DEBUG] API Error:', err);
-      throw new Error(err.error || 'Failed to create room (status ' + res.status + ')');
-    }
-
-    const data = await res.json();
-    console.log('[DEBUG] Room Data:', data);
-    
-    const roomUrl = data.url;
-    if (!roomUrl) throw new Error('No room URL returned from API.');
-
-    const iframe = document.getElementById('dailyIframe');
-    const displayName = encodeURIComponent(currentUser.displayName || currentUser.email.split('@')[0]);
-    iframe.src = roomUrl + '?showLeaveButton=false&userName=' + displayName;
-
-    callActive = true;
-    showState('videoState');
-    document.getElementById('leaveBtn').style.display = 'flex';
-    showToast('Joined ' + roomInfo.name + ' video room 🎥', 'success');
-
-  } catch (err) {
-    console.error('[VideoRoom] join error:', err);
-    document.getElementById('lobbyErrorMsg').textContent = err.message;
-    errBanner.classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="ti ti-video"></i> Try Again';
+  try{
+    const isHost=window.ADMIN_EMAILS.includes(currentUser.email);
+    const token=isHost?OWNER_TOKENS[roomKey]:null;
+    launchCall(roomUrl,token);
+  }catch(e){
+    document.getElementById('errMsg').textContent=e.message||'Could not connect.';
+    err.classList.add('show');
+    btn.disabled=false;
+    btn.innerHTML='<i class="ti ti-video"></i> Try Again';
   }
 }
 
-// ── Leave room ──
-function leaveRoom() {
-  callActive = false;
-  const iframe = document.getElementById('dailyIframe');
-  iframe.src = '';
-  document.getElementById('leaveBtn').style.display = 'none';
-  showState('lobbyState');
-  showToast('You left the room.', 'success');
+function launchCall(url,token=null){
+  document.getElementById('lobbyScreen').style.display='none';
+  const wrap=document.getElementById('videoWrap');
+  wrap.style.display='flex';
+  document.getElementById('leaveBtn').style.display='flex';
+  document.getElementById('backBtn').style.display='none';
+  document.getElementById('navLivePill').style.display='flex';
+
+  const container=document.getElementById('dailyFrame');
+  const userName=currentUser?.displayName||currentUser?.email?.split('@')[0]||'Learner';
+
+  callInstance=window.DailyIframe?DailyIframe.createFrame(container,{
+    iframeStyle:{width:'100%',height:'100%',border:'none',background:'#0A0A10'},
+    showLeaveButton:false,showFullscreenButton:true,
+    theme:{colors:{
+      accent:'#5B7FFF',accentText:'#FFFFFF',
+      background:'#0E0F12',backgroundAccent:'#13141A',
+      baseText:'#ECEDF1',border:'#2A2C35',
+      mainAreaBg:'#0A0B0E',mainAreaBgAccent:'#13141A',
+      mainAreaText:'#ECEDF1',supportiveText:'#9498A6',
+    }}
+  }):null;
+
+  if(callInstance){
+    const opts={url,userName};
+    if(token)opts.token=token;
+    callInstance.join(opts);
+    callInstance.on('left-meeting',()=>leaveRoom());
+  }else{
+    container.innerHTML=`<iframe src="${url}" allow="camera;microphone;fullscreen;display-capture" style="width:100%;height:100%;border:none;background:#000"></iframe>`;
+  }
+  showToast('Joined '+roomInfo.name+' room 🎥','success');
 }
 
-// ── Gate Auth ──
-function gSwitchTab(tab) {
-  const isLogin = tab === 'login';
-  document.getElementById('gTabLogin').classList.toggle('active', isLogin);
-  document.getElementById('gTabSignup').classList.toggle('active', !isLogin);
-  document.getElementById('gFormLogin').style.display = isLogin ? 'block' : 'none';
-  document.getElementById('gFormSignup').style.display = isLogin ? 'none' : 'block';
-  document.getElementById('gateError').classList.remove('show');
+function leaveRoom(){
+  if(callInstance){try{callInstance.leave();callInstance.destroy();}catch(e){}callInstance=null;}
+  document.getElementById('videoWrap').style.display='none';
+  document.getElementById('lobbyScreen').style.display='flex';
+  document.getElementById('leaveBtn').style.display='none';
+  document.getElementById('backBtn').style.display='inline-flex';
+  document.getElementById('navLivePill').style.display='none';
+  const btn=document.getElementById('joinBtn');
+  btn.disabled=false;btn.innerHTML='<i class="ti ti-video"></i> Join Video Room';
+  showToast('You left the room.','success');
 }
 
-async function gLogin() {
-  const email = document.getElementById('gLoginEmail').value.trim();
-  const pass  = document.getElementById('gLoginPass').value;
-  const errEl = document.getElementById('gateError');
-  errEl.classList.remove('show');
-  if (!email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.classList.add('show'); return; }
-  const btn = document.getElementById('gLoginBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Signing in…';
-  try { await auth.signInWithEmailAndPassword(email, pass); showToast('Welcome back! 🎉', 'success'); }
-  catch(e) { errEl.textContent = friendlyError(e.code); errEl.classList.add('show'); }
-  btn.disabled = false;
-  btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
-}
+function goBack(){window.location.href='index.html';}
 
-async function gSignup() {
-  const name  = document.getElementById('gSignupName').value.trim();
-  const email = document.getElementById('gSignupEmail').value.trim();
-  const pass  = document.getElementById('gSignupPass').value;
-  const errEl = document.getElementById('gateError');
-  errEl.classList.remove('show');
-  if (!name || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.classList.add('show'); return; }
-  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.classList.add('show'); return; }
-  const btn = document.getElementById('gSignupBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Creating…';
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    await cred.user.updateProfile({ displayName: name });
-    showToast('Welcome to StudyHub! 🚀', 'success');
-  } catch(e) { errEl.textContent = friendlyError(e.code); errEl.classList.add('show'); }
-  btn.disabled = false;
-  btn.innerHTML = '<i class="ti ti-user-plus"></i> Create Account';
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastIcon').className=type==='success'?'ti ti-check':'ti ti-alert-circle';
+  t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3500);
 }
-
-async function gGoogleLogin() {
-  const errEl = document.getElementById('gateError');
-  try {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    await auth.signInWithPopup(provider);
-    showToast('Signed in! 🎉', 'success');
-  } catch(e) { errEl.textContent = friendlyError(e.code); errEl.classList.add('show'); }
-}
-
-function friendlyError(code) {
-  const map = {
-    'auth/user-not-found':'No account found with this email.',
-    'auth/wrong-password':'Incorrect password.',
-    'auth/email-already-in-use':'An account with this email already exists.',
-    'auth/invalid-email':'Invalid email address.',
-    'auth/weak-password':'Password is too weak.',
-    'auth/popup-closed-by-user':'Sign-in popup was closed.',
-    'auth/network-request-failed':'Network error. Check your connection.',
-    'auth/invalid-credential':'Incorrect email or password.',
-  };
-  return map[code] || 'Something went wrong. Please try again.';
-}
-
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  document.getElementById('toastMsg').textContent = msg;
-  document.getElementById('toastIcon').className = type === 'success' ? 'ti ti-check' : 'ti ti-alert-circle';
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3500);
-}
-
-// Spinner CSS
-const s = document.createElement('style');
-s.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
-document.head.appendChild(s);
 </script>
 <script src="notifications.js"></script>
 </body>
