@@ -268,38 +268,6 @@
   </div>
 </nav>
 
-<!-- ══ VIDEO MODAL ══ -->
-<div id="videoModal">
-  <div class="video-modal-header">
-    <div class="video-modal-header-left">
-      <div style="width:36px;height:36px;border-radius:9px;background:rgba(91,127,255,0.12);border:1px solid rgba(91,127,255,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--accent2)">
-        <i class="ti ti-video"></i>
-      </div>
-      <div>
-        <div class="video-modal-title" id="videoModalTitle">Video Call — General</div>
-        <div class="video-modal-sub">Powered by Jitsi Meet · No account needed</div>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <div class="video-room-badge">
-      <span class="live-dot"></span> Live
-      </div>
-      <button onclick="copyMeetLink()" id="copyLinkBtn" style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;background:rgba(91,127,255,0.1);border:1px solid rgba(91,127,255,0.25);color:var(--accent2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s">
-      <i class="ti ti-link"></i> Copy Meet Link
-    </button>
-      <button class="video-close-btn" onclick="closeVideoModal()">
-        <i class="ti ti-phone-off"></i> Leave Call
-      </button>
-    </div>
-  </div>
-  <div id="jitsiContainer">
-    <div class="video-loading" id="videoLoading">
-      <i class="ti ti-loader"></i>
-      <p>Connecting to video call…</p>
-    </div>
-  </div>
-</div>
-
 <!-- MAIN LAYOUT -->
 <div class="chat-layout">
 
@@ -402,7 +370,7 @@
 <div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 
 <!-- Jitsi Meet External API -->
-<script src="https://meet.jit.si/external_api.js"></script>
+<!-- <script src="https://meet.jit.si/external_api.js"></script> -->
 
 <script>
 // ── Init Firebase ──
@@ -415,7 +383,7 @@ let activeRoom  = 'general';
 let messagesUnsubscribe = null;
 let typingTimeout = null;
 let isTyping = false;
-let jitsiApi = null;  // holds the Jitsi API instance
+// let jitsiApi = null;  // holds the Jitsi API instance
 
 // ── Rooms ──
 const ROOMS = [
@@ -463,100 +431,24 @@ function openVideoModal(){
     document.getElementById('gateOverlay').style.display = 'flex';
     return;
   }
-
-  // Show modal
-  document.getElementById('videoModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-
-  // Update title
-  const room = ROOMS.find(r=>r.id===activeRoom);
-  document.getElementById('videoModalTitle').textContent =
-    'Video Call — ' + (room ? room.name : 'General');
-
-  // Show loading spinner, clear old iframe
-  document.getElementById('videoLoading').style.display = 'flex';
-  const container = document.getElementById('jitsiContainer');
-
-  // Destroy previous instance if any
-  if(jitsiApi){
-    try{ jitsiApi.dispose(); } catch(e){}
-    jitsiApi = null;
-  }
-
-  // Room name: "studyhub-" + activeRoom (unique per chat room)
   const jitsiRoom = 'studyhub-' + activeRoom + '-v2';
-
-  // Display name from Firebase user
-  const displayName = currentUser.displayName || currentUser.email.split('@')[0];
-
-  // Wait a tick so the modal is visible before Jitsi initialises
-  setTimeout(() => {
-    try {
-      jitsiApi = new JitsiMeetExternalAPI('meet.jit.si', {
-        roomName: jitsiRoom,
-        parentNode: container,
-        width:  '100%',
-        height: '100%',
-        configOverwrite: {
-          prejoinPageEnabled:     false,   // skip pre-join screen
-          startWithAudioMuted:    false,
-          startWithVideoMuted:    false,
-          disableDeepLinking:     true,
-          enableWelcomePage:      false,
-          toolbarButtons: [
-            'microphone','camera','desktop','chat',
-            'raisehand','tileview','participants-pane','hangup'
-          ],
-        },
-        interfaceConfigOverwrite: {
-          SHOW_JITSI_WATERMARK:       false,
-          SHOW_WATERMARK_FOR_GUESTS:  false,
-          SHOW_BRAND_WATERMARK:       false,
-          DEFAULT_BACKGROUND:         '#0E0F12',
-          TOOLBAR_ALWAYS_VISIBLE:     false,
-        },
-        userInfo: {
-          displayName: displayName,
-          email:       currentUser.email,
-        },
-      });
-
-      // Hide spinner once iframe loads
-      jitsiApi.addEventListeners({
-        videoConferenceJoined: () => {
-          document.getElementById('videoLoading').style.display = 'none';
-        },
-        readyToClose: () => {
-          closeVideoModal();
-        },
-      });
-
-      // Fallback: hide spinner after 6s regardless
-      setTimeout(() => {
-        document.getElementById('videoLoading').style.display = 'none';
-      }, 6000);
-
-    } catch(err) {
-      document.getElementById('videoLoading').innerHTML =
-        `<i class="ti ti-wifi-off" style="font-size:36px;color:var(--red);animation:none"></i>
-         <p style="color:var(--text2)">Could not load video call.<br/>Check your internet connection.</p>`;
-    }
-  }, 100);
+  window.open('https://meet.jit.si/' + jitsiRoom, '_blank');
+  showToast('Video call opened in new tab!', 'success');
 }
 
-function closeVideoModal(){
-  document.getElementById('videoModal').classList.remove('open');
-  document.body.style.overflow = '';
-  if(jitsiApi){
-    try{ jitsiApi.dispose(); } catch(e){}
-    jitsiApi = null;
-  }
-  // Reset container for next open
-  document.getElementById('videoLoading').style.display = 'flex';
-  document.getElementById('videoLoading').innerHTML =
-    `<i class="ti ti-loader" style="font-size:40px;color:var(--accent2);animation:spin 1s linear infinite"></i>
-     <p>Connecting to video call…</p>`;
-}
+// function closeVideoModal(){
+//   document.getElementById('videoModal').classList.remove('open');
+//   document.body.style.overflow = '';
+//   if(jitsiApi){
+//     try{ jitsiApi.dispose(); } catch(e){}
+//     jitsiApi = null;
+//   }
+//   // Reset container for next open
+//   document.getElementById('videoLoading').style.display = 'flex';
+//   document.getElementById('videoLoading').innerHTML =
+//     `<i class="ti ti-loader" style="font-size:40px;color:var(--accent2);animation:spin 1s linear infinite"></i>
+//      <p>Connecting to video call…</p>`;
+// }
 
 function copyMeetLink(){
   const jitsiRoom = 'studyhub-' + activeRoom + '-v2';
