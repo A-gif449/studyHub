@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Waiting Room – StudyHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#07080C;--card:#0F1018;--card2:#13151F;
+    --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+    --accent:#5B7FFF;--accent2:#8FA3FF;--green:#4ADE80;--red:#F87171;
+    --gold:#FBBF24;--text:#ECEDF1;--text2:#9498A6;--text3:#62656F;
+  }
+  html,body{height:100%;overflow:hidden}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center}
+
+  /* ── CANVAS BACKGROUND ── */
+  #bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+  /* ── FLOATING ORBS ── */
+  .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:orbFloat ease-in-out infinite}
+  .orb1{width:600px;height:600px;top:-200px;left:-150px;background:rgba(91,127,255,0.15);animation-duration:8s}
+  .orb2{width:500px;height:500px;bottom:-150px;right:-100px;background:rgba(139,163,255,0.1);animation-duration:11s;animation-delay:-4s}
+  .orb3{width:300px;height:300px;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(74,222,128,0.06);animation-duration:7s;animation-delay:-2s}
+  @keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+  .orb3{animation-name:orbFloat3}
+  @keyframes orbFloat3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-53%) scale(1.08)}}
+
+  /* ── MAIN CARD ── */
+  .wait-card{
+    position:relative;z-index:1;
+    background:rgba(15,16,24,0.85);
+    backdrop-filter:blur(40px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:28px;
+    padding:52px 48px;
+    max-width:520px;width:90%;
+    text-align:center;
+    box-shadow:0 40px 120px rgba(0,0,0,0.7), 0 0 0 1px rgba(91,127,255,0.1);
+    animation:cardIn .6s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+  /* ── AVATAR RING ── */
+  .avatar-ring{
+    width:96px;height:96px;border-radius:50%;
+    margin:0 auto 28px;
+    position:relative;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .avatar-ring::before{
+    content:'';position:absolute;inset:-4px;border-radius:50%;
+    background:conic-gradient(from 0deg, var(--accent), var(--accent2), #C084FC, var(--accent));
+    animation:ringRotate 3s linear infinite;
+    z-index:0;
+  }
+  .avatar-ring::after{
+    content:'';position:absolute;inset:-2px;border-radius:50%;
+    background:var(--bg);z-index:1;
+  }
+  @keyframes ringRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .avatar-inner{
+    width:88px;height:88px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),#8B5CF6);
+    display:flex;align-items:center;justify-content:center;
+    font-size:32px;font-weight:700;color:#fff;
+    position:relative;z-index:2;
+    letter-spacing:-1px;
+  }
+
+  /* ── PULSE RINGS ── */
+  .pulse-rings{position:absolute;inset:-20px;z-index:-1}
+  .pulse-ring{
+    position:absolute;inset:0;border-radius:50%;
+    border:1px solid rgba(91,127,255,0.3);
+    animation:pulseRing 2.5s ease-out infinite;
+  }
+  .pulse-ring:nth-child(2){animation-delay:.8s;border-color:rgba(91,127,255,0.2)}
+  .pulse-ring:nth-child(3){animation-delay:1.6s;border-color:rgba(91,127,255,0.1)}
+  @keyframes pulseRing{0%{transform:scale(1);opacity:1}100%{transform:scale(2.2);opacity:0}}
+
+  /* ── TEXT ── */
+  .room-badge{
+    display:inline-flex;align-items:center;gap:7px;
+    padding:5px 14px;border-radius:99px;
+    background:rgba(91,127,255,0.1);
+    border:1px solid rgba(91,127,255,0.2);
+    font-size:12px;font-weight:600;color:var(--accent2);
+    margin-bottom:20px;letter-spacing:.3px;
+  }
+  .room-badge i{font-size:13px}
+  h1{font-family:'Source Serif 4',serif;font-size:28px;font-weight:700;margin-bottom:10px;line-height:1.2;color:var(--text)}
+  .sub{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:32px;max-width:360px;margin-left:auto;margin-right:auto}
+
+  /* ── STATUS BOX ── */
+  .status-box{
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--border2);
+    border-radius:16px;
+    padding:22px 24px;
+    margin-bottom:28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .status-box::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(91,127,255,0.5),transparent);
+    animation:shimmerLine 2.5s ease-in-out infinite;
+  }
+  @keyframes shimmerLine{0%,100%{opacity:.3}50%{opacity:1}}
+
+  .status-dots{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px}
+  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:statusBounce 1.4s ease-in-out infinite}
+  .status-dot:nth-child(2){animation-delay:.2s;background:var(--accent2)}
+  .status-dot:nth-child(3){animation-delay:.4s;background:#C084FC}
+  @keyframes statusBounce{0%,60%,100%{transform:translateY(0);opacity:1}30%{transform:translateY(-8px);opacity:.7}}
+
+  .status-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+  .status-sub{font-size:12px;color:var(--text3)}
+
+  /* ── TIMER ── */
+  .wait-timer{
+    font-size:13px;color:var(--text3);
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    margin-bottom:28px;
+  }
+  .wait-timer i{font-size:14px;color:var(--text3)}
+  #timerCount{color:var(--text2);font-weight:600;font-variant-numeric:tabular-nums}
+
+  /* ── INFO ROW ── */
+  .info-row{
+    display:flex;gap:10px;margin-bottom:28px;
+  }
+  .info-pill{
+    flex:1;padding:12px 10px;border-radius:12px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--border);
+    font-size:11.5px;color:var(--text3);
+    display:flex;flex-direction:column;align-items:center;gap:5px;
+  }
+  .info-pill i{font-size:18px;color:var(--accent2)}
+  .info-pill span{color:var(--text2);font-weight:500}
+
+  /* ── CANCEL BTN ── */
+  .cancel-btn{
+    padding:12px 28px;border-radius:10px;
+    background:transparent;
+    border:1px solid var(--border2);
+    color:var(--text2);font-size:14px;font-weight:500;
+    cursor:pointer;font-family:inherit;transition:all .2s;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .cancel-btn:hover{color:var(--red);border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.05)}
+
+  /* ── APPROVED STATE ── */
+  .approved-state{display:none;flex-direction:column;align-items:center;gap:16px}
+  .approved-icon{
+    width:80px;height:80px;border-radius:50%;
+    background:rgba(74,222,128,0.12);
+    border:2px solid rgba(74,222,128,0.4);
+    display:flex;align-items:center;justify-content:center;
+    font-size:36px;color:var(--green);
+    animation:approvedPop .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes approvedPop{from{transform:scale(0)}to{transform:scale(1)}}
+  .approved-state h2{font-family:'Source Serif 4',serif;font-size:24px;font-weight:700;color:var(--green)}
+  .approved-state p{font-size:14px;color:var(--text2);text-align:center}
+  .join-now-btn{
+    padding:14px 40px;border-radius:12px;
+    background:linear-gradient(135deg,var(--green),#059669);
+    color:#fff;border:none;font-size:15px;font-weight:700;
+    cursor:pointer;font-family:inherit;transition:all .2s;
+    display:inline-flex;align-items:center;gap:9px;
+    box-shadow:0 0 30px rgba(74,222,128,0.3);
+    animation:btnPulse 2s ease-in-out infinite;
+  }
+  .join-now-btn:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(74,222,128,0.45)}
+  @keyframes btnPulse{0%,100%{box-shadow:0 0 30px rgba(74,222,128,0.3)}50%{box-shadow:0 0 50px rgba(74,222,128,0.5)}}
+  .countdown-bar{width:100%;height:4px;border-radius:99px;background:rgba(255,255,255,0.06);overflow:hidden;margin-top:4px}
+  .countdown-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green),#059669);width:100%;transition:width 1s linear}
+
+  /* ── REJECTED STATE ── */
+  .rejected-state{display:none;flex-direction:column;align-items:center;gap:16px}
+  .rejected-icon{
+    width:80px;height:80px;border-radius:50%;
+    background:rgba(248,113,113,0.1);
+    border:2px solid rgba(248,113,113,0.3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:36px;color:var(--red);
+  }
+  .rejected-state h2{font-family:'Source Serif 4',serif;font-size:22px;font-weight:700;color:var(--red)}
+  .rejected-state p{font-size:13px;color:var(--text2);text-align:center;line-height:1.6}
+  .retry-btn{
+    padding:12px 28px;border-radius:10px;
+    background:rgba(91,127,255,0.1);
+    border:1px solid rgba(91,127,255,0.25);
+    color:var(--accent2);font-size:14px;font-weight:600;
+    cursor:pointer;font-family:inherit;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .retry-btn:hover{background:rgba(91,127,255,0.18)}
+
+  /* ── PARTICLES ── */
+  .particle{position:fixed;pointer-events:none;z-index:0;border-radius:50%;animation:particleFloat linear infinite}
+  @keyframes particleFloat{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:.6}90%{opacity:.3}100%{transform:translateY(-100px) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+  window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<canvas id="bgCanvas"></canvas>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="wait-card" id="waitCard">
+  <!-- WAITING STATE -->
+  <div id="waitingState">
+    <div class="avatar-ring">
+      <div class="pulse-rings">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+      </div>
+      <div class="avatar-inner" id="userInitials">?</div>
+    </div>
+
+    <div class="room-badge">
+      <i class="ti ti-video"></i>
+      <span id="roomLabel">General</span>
+    </div>
+
+    <h1>You're in the waiting room</h1>
+    <p class="sub">The host will let you in shortly. Please wait while your request is being reviewed.</p>
+
+    <div class="status-box">
+      <div class="status-dots">
+        <div class="status-dot"></div>
+        <div class="status-dot"></div>
+        <div class="status-dot"></div>
+      </div>
+      <div class="status-text" id="statusText">Waiting for host approval…</div>
+      <div class="status-sub" id="statusSub">Your request has been sent to the host</div>
+    </div>
+
+    <div class="wait-timer">
+      <i class="ti ti-clock"></i>
+      Waiting for <span id="timerCount">0:00</span>
+    </div>
+
+    <div class="info-row">
+      <div class="info-pill">
+        <i class="ti ti-lock"></i>
+        <span>Secure Room</span>
+        <span style="font-size:10px">Host controlled</span>
+      </div>
+      <div class="info-pill">
+        <i class="ti ti-users"></i>
+        <span id="waitingCount">—</span>
+        <span style="font-size:10px">In waiting room</span>
+      </div>
+      <div class="info-pill">
+        <i class="ti ti-shield-check"></i>
+        <span>Verified</span>
+        <span style="font-size:10px">StudyHub member</span>
+      </div>
+    </div>
+
+    <button class="cancel-btn" onclick="cancelWait()">
+      <i class="ti ti-x"></i> Cancel & Go Back
+    </button>
+  </div>
+
+  <!-- APPROVED STATE -->
+  <div class="approved-state" id="approvedState">
+    <div class="approved-icon"><i class="ti ti-check"></i></div>
+    <h2>You're approved! 🎉</h2>
+    <p>The host has approved your request.<br/>Joining the call automatically…</p>
+    <div style="width:100%;max-width:300px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;text-align:center">Redirecting in <span id="redirectCount">5</span>s</div>
+      <div class="countdown-bar"><div class="countdown-fill" id="countdownFill"></div></div>
+    </div>
+    <button class="join-now-btn" onclick="joinCall()">
+      <i class="ti ti-video"></i> Join Now
+    </button>
+  </div>
+
+  <!-- REJECTED STATE -->
+  <div class="rejected-state" id="rejectedState">
+    <div class="rejected-icon"><i class="ti ti-x"></i></div>
+    <h2>Request Declined</h2>
+    <p>The host has declined your request to join.<br/>You can try again or go back to chat.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button class="retry-btn" onclick="retryRequest()">
+        <i class="ti ti-refresh"></i> Try Again
+      </button>
+      <button class="cancel-btn" onclick="goBack()">
+        <i class="ti ti-arrow-left"></i> Back to Chat
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+const params    = new URLSearchParams(location.search);
+const roomId    = params.get('room') || 'general';
+const jitsiRoom = 'SH' + roomId.slice(0,4).toUpperCase() + 'x9K2' + roomId.length;
+const meetUrl   = 'https://meet.jit.si/' + jitsiRoom;
+
+let currentUser  = null;
+let requestId    = null;
+let unsubscribe  = null;
+let timerInterval= null;
+let waitSeconds  = 0;
+let redirectTimer= null;
+
+const ROOM_NAMES = {
+  general:'General',mathematics:'Mathematics',physics:'Physics',
+  chemistry:'Chemistry',biology:'Biology',cs:'CS & Tech',
+  economics:'Economics',engineering:'Engineering'
+};
+
+// ── Animated canvas background ──
+(function(){
+  const canvas = document.getElementById('bgCanvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, dots = [];
+
+  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  for(let i=0;i<60;i++){
+    dots.push({
+      x:Math.random()*1920, y:Math.random()*1080,
+      r:Math.random()*1.5+.5,
+      vx:(Math.random()-.5)*.3,
+      vy:(Math.random()-.5)*.3,
+      a:Math.random()*.5+.1,
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    dots.forEach(d=>{
+      d.x+=d.vx; d.y+=d.vy;
+      if(d.x<0)d.x=W; if(d.x>W)d.x=0;
+      if(d.y<0)d.y=H; if(d.y>H)d.y=0;
+      ctx.beginPath();
+      ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(91,127,255,${d.a})`;
+      ctx.fill();
+    });
+    // draw connections
+    dots.forEach((a,i)=>{
+      dots.slice(i+1).forEach(b=>{
+        const dist=Math.hypot(a.x-b.x,a.y-b.y);
+        if(dist<120){
+          ctx.beginPath();
+          ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+          ctx.strokeStyle=`rgba(91,127,255,${.08*(1-dist/120)})`;
+          ctx.lineWidth=.5;ctx.stroke();
+        }
+      });
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── Floating particles ──
+function spawnParticle(){
+  const p = document.createElement('div');
+  p.className='particle';
+  const size=Math.random()*4+2;
+  const colors=['rgba(91,127,255,0.4)','rgba(139,163,255,0.3)','rgba(192,132,252,0.3)','rgba(74,222,128,0.2)'];
+  p.style.cssText=`
+    width:${size}px;height:${size}px;
+    left:${Math.random()*100}vw;
+    background:${colors[Math.floor(Math.random()*colors.length)]};
+    animation-duration:${Math.random()*8+6}s;
+    animation-delay:${Math.random()*4}s;
+  `;
+  document.body.appendChild(p);
+  setTimeout(()=>p.remove(), 14000);
+}
+setInterval(spawnParticle, 600);
+
+// ── Timer ──
+function startTimer(){
+  timerInterval = setInterval(()=>{
+    waitSeconds++;
+    const m=Math.floor(waitSeconds/60);
+    const s=waitSeconds%60;
+    document.getElementById('timerCount').textContent=m+':'+(s<10?'0':'')+s;
+  }, 1000);
+}
+
+// ── Auth ──
+auth.onAuthStateChanged(user=>{
+  if(!user){ window.location.href='chat.html'; return; }
+  currentUser = user;
+  const initials=(user.displayName||user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('userInitials').textContent = initials;
+  document.getElementById('roomLabel').textContent = ROOM_NAMES[roomId]||roomId;
+  submitRequest();
+  startTimer();
+  watchWaitingCount();
+});
+
+// ── Submit waiting request ──
+async function submitRequest(){
+  // Remove any old pending request from this user in this room
+  const old = await db.collection('waitingRoom')
+    .where('uid','==',currentUser.uid)
+    .where('roomId','==',roomId)
+    .where('status','==','waiting')
+    .get();
+  old.forEach(d=>d.ref.delete());
+
+  const ref = await db.collection('waitingRoom').add({
+    uid:       currentUser.uid,
+    email:     currentUser.email,
+    name:      currentUser.displayName || currentUser.email.split('@')[0],
+    roomId:    roomId,
+    roomName:  ROOM_NAMES[roomId]||roomId,
+    status:    'waiting',
+    requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+  requestId = ref.id;
+  listenForDecision();
+}
+
+// ── Listen for host decision ──
+function listenForDecision(){
+  if(unsubscribe) unsubscribe();
+  unsubscribe = db.collection('waitingRoom').doc(requestId)
+    .onSnapshot(snap=>{
+      if(!snap.exists) return;
+      const data = snap.data();
+      if(data.status === 'approved') showApproved();
+      if(data.status === 'rejected') showRejected();
+    });
+}
+
+// ── Watch waiting count ──
+function watchWaitingCount(){
+  db.collection('waitingRoom')
+    .where('roomId','==',roomId)
+    .where('status','==','waiting')
+    .onSnapshot(snap=>{
+      document.getElementById('waitingCount').textContent = snap.size;
+    });
+}
+
+// ── Show approved ──
+function showApproved(){
+  clearInterval(timerInterval);
+  if(unsubscribe) unsubscribe();
+  document.getElementById('waitingState').style.display='none';
+  const el = document.getElementById('approvedState');
+  el.style.display='flex';
+
+  let count=5;
+  const fill = document.getElementById('countdownFill');
+  redirectTimer = setInterval(()=>{
+    count--;
+    document.getElementById('redirectCount').textContent=count;
+    fill.style.width=(count/5*100)+'%';
+    if(count<=0){ clearInterval(redirectTimer); joinCall(); }
+  },1000);
+}
+
+// ── Show rejected ──
+function showRejected(){
+  clearInterval(timerInterval);
+  if(unsubscribe) unsubscribe();
+  document.getElementById('waitingState').style.display='none';
+  document.getElementById('rejectedState').style.display='flex';
+}
+
+function joinCall(){
+  clearInterval(redirectTimer);
+  // Clean up request
+  if(requestId) db.collection('waitingRoom').doc(requestId).delete().catch(()=>{});
+  window.location.href = meetUrl;
+}
+
+function cancelWait(){
+  clearInterval(timerInterval);
+  if(unsubscribe) unsubscribe();
+  if(requestId) db.collection('waitingRoom').doc(requestId).delete().catch(()=>{});
+  window.location.href='chat.html';
+}
+
+function goBack(){
+  if(requestId) db.collection('waitingRoom').doc(requestId).delete().catch(()=>{});
+  window.location.href='chat.html';
+}
+
+async function retryRequest(){
+  document.getElementById('rejectedState').style.display='none';
+  document.getElementById('waitingState').style.display='block';
+  waitSeconds=0;
+  startTimer();
+  await submitRequest();
+}
+
+window.addEventListener('beforeunload',()=>{
+  if(requestId) db.collection('waitingRoom').doc(requestId).delete();
+});
+</script>
+</body>
+</html>
