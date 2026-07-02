@@ -282,8 +282,11 @@
     </div>
     <div style="display:flex;align-items:center;gap:12px">
       <div class="video-room-badge">
-        <span class="live-dot"></span> Live
+      <span class="live-dot"></span> Live
       </div>
+      <button onclick="copyMeetLink()" id="copyLinkBtn" style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;background:rgba(91,127,255,0.1);border:1px solid rgba(91,127,255,0.25);color:var(--accent2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s">
+      <i class="ti ti-link"></i> Copy Meet Link
+    </button>
       <button class="video-close-btn" onclick="closeVideoModal()">
         <i class="ti ti-phone-off"></i> Leave Call
       </button>
@@ -553,6 +556,27 @@ function closeVideoModal(){
   document.getElementById('videoLoading').innerHTML =
     `<i class="ti ti-loader" style="font-size:40px;color:var(--accent2);animation:spin 1s linear infinite"></i>
      <p>Connecting to video call…</p>`;
+}
+
+function copyMeetLink(){
+  const jitsiRoom = 'studyhub-' + activeRoom + '-v2';
+  const link = 'https://meet.jit.si/' + jitsiRoom;
+
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.getElementById('copyLinkBtn');
+    btn.innerHTML = '<i class="ti ti-check"></i> Copied!';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'rgba(78,158,120,0.3)';
+    setTimeout(() => {
+      btn.innerHTML = '<i class="ti ti-link"></i> Copy Meet Link';
+      btn.style.color = 'var(--accent2)';
+      btn.style.borderColor = 'rgba(91,127,255,0.25)';
+    }, 2000);
+  }).catch(() => {
+    // Fallback for browsers that block clipboard
+    const jitsiRoom = 'studyhub-' + activeRoom + '-v2';
+    prompt('Copy this link:', 'https://meet.jit.si/' + jitsiRoom);
+  });
 }
 
 // Close modal with Escape key
