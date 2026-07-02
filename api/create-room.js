@@ -37,6 +37,8 @@ export default async function handler(req, res) {
             enable_screenshare: true,
             start_video_off: true,
             start_audio_off: true,
+            enable_knocking: false,
+            enable_prejoin_ui: false, 
             exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8 // 8 hour expiry
           }
         })
