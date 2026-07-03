@@ -1268,14 +1268,26 @@ async function rejectPayment(pendingId){
 
 // ── Waiting Room Host Panel ──
 function loadWaitingRoom(){
+  const el = document.getElementById('waitingList');
+  el.innerHTML = `<div class="empty-list"><i class="ti ti-loader"></i><p>Connecting…</p></div>`;
+
+  // Debug: first check ALL docs in waitingRoom collection
+  db.collection('waitingRoom').get().then(snap => {
+    console.log('Total waitingRoom docs:', snap.size);
+    snap.forEach(d => console.log('Doc:', d.id, JSON.stringify(d.data())));
+  });
+
+  // Then listen for waiting ones
   db.collection('waitingRoom')
     .where('status','==','waiting')
     .onSnapshot(snap => {
-      const el = document.getElementById('waitingList');
+      console.log('Waiting docs found:', snap.size);
+      
       if(!snap.docs.length){
-        el.innerHTML = `<div class="empty-list"><i class="ti ti-checks"></i><p>No one waiting right now.</p></div>`;
+        el.innerHTML = `<div class="empty-list"><i class="ti ti-checks"></i><p>No one waiting right now.<br/><small style="color:var(--text3)">Check browser console for debug info</small></p></div>`;
         return;
       }
+
       el.innerHTML = snap.docs.map(d => {
         const v = d.data();
         const time = v.requestedAt ? new Date(v.requestedAt.seconds*1000).toLocaleTimeString() : 'Just now';
@@ -1283,11 +1295,11 @@ function loadWaitingRoom(){
           <div class="pdf-item" style="border-left:3px solid var(--accent)">
             <div class="pdf-emoji">👤</div>
             <div class="pdf-info">
-              <div class="pdf-title">${escHtml(v.name)}</div>
+              <div class="pdf-title">${escHtml(v.name||'Unknown')}</div>
               <div class="pdf-meta">
-                <span class="tag">${escHtml(v.roomName||v.roomId)}</span>
-                <span>${escHtml(v.email)}</span>
-                <span>· Waiting since ${time}</span>
+                <span class="tag">${escHtml(v.roomName||v.roomId||'?')}</span>
+                <span>${escHtml(v.email||'')}</span>
+                <span>· ${time}</span>
               </div>
             </div>
             <div class="pdf-actions">
@@ -1303,10 +1315,10 @@ function loadWaitingRoom(){
             </div>
           </div>`;
       }).join('');
+
     }, err => {
-      console.error('Waiting room error:', err);
-      document.getElementById('waitingList').innerHTML = 
-        `<div class="empty-list"><i class="ti ti-alert-circle"></i><p>Error: ${err.message}</p></div>`;
+      console.error('Waiting room listener error:', err);
+      el.innerHTML = `<div class="empty-list"><i class="ti ti-alert-circle"></i><p style="color:var(--red)">${err.message}</p></div>`;
     });
 }
 
