@@ -217,7 +217,6 @@
       .sh-item.sh-unread { background: rgba(91,127,255,0.05); }
       .sh-item.sh-unread:hover { background: rgba(91,127,255,0.09); }
 
-      /* ── Waiting room item gets a subtle amber tint ── */
       .sh-item.sh-waiting { background: rgba(201,163,86,0.05); }
       .sh-item.sh-waiting:hover { background: rgba(201,163,86,0.09); }
       .sh-item.sh-waiting.sh-unread { background: rgba(201,163,86,0.08); }
@@ -255,7 +254,6 @@
       .sh-tag.friend  { background: rgba(78,158,120,0.12); color: #4E9E78; }
       .sh-tag.view    { background: rgba(63,169,204,0.10); color: #3FA9CC; }
 
-      /* Approve / Reject inline buttons (waiting room) */
       .sh-action-row {
         display: flex; gap: 6px; margin-top: 7px;
       }
@@ -489,8 +487,18 @@
     });
   }
 
-  /* ── Waiting Room Subscription ── */
+  /* ══════════════════════════════════════════════════════════
+     ★  FIXED: Waiting Room Subscription
+     
+     Two bugs were here:
+     1. `if (data.requestedAt)` failed because serverTimestamp()
+        returns null in the first (pending-write) snapshot.
+     2. No initialLoad guard — ALL existing docs fired as "added"
+        on first subscription, causing false toasts.
+  ══════════════════════════════════════════════════════════ */
   function subscribeWaitingRoom(db) {
+    let initialLoad = true;   /* ← FIX 1: skip toasts for the first batch */
+
     db.collection("waitingRoom")
       .where("status", "==", "waiting")
       .orderBy("requestedAt", "desc")
@@ -499,21 +507,37 @@
 
         waitingRoomNotifs = snap.docs.map(d => Object.assign({ id: d.id, _type: "waitingRoom" }, d.data()));
 
-        // show toast for NEW entries only
-        snap.docChanges().forEach(change => {
-          if (change.type === "added" && !prev.has(change.doc.id)) {
-            const data = change.doc.data();
-            // small delay so it doesn't fire on initial load
-            if (data.requestedAt) {
-              const age = Date.now() - (data.requestedAt.toDate?.()?.getTime() || 0);
-              if (age < 15000) { // only if joined within last 15s
-                showWaitingToast(change.doc.id, data);
-                ringBell();
-              }
-            }
-          }
-        });
+        if (!initialLoad) {
+          snap.docChanges().forEach(change => {
+            if (change.type !== "added") return;
+            if (prev.has(change.doc.id)) return;
 
+            const data = change.doc.data();
+
+            /*
+             * FIX 2: serverTimestamp() is null on the first (pending-write)
+             * snapshot — the server hasn't resolved it yet.
+             * A null requestedAt means the doc was JUST written, so treat
+             * it as "now" (age = 0, definitely recent).
+             */
+            let isRecent;
+            if (!data.requestedAt) {
+              /* Pending write — document was literally just added */
+              isRecent = true;
+            } else {
+              const ts  = data.requestedAt.toDate ? data.requestedAt.toDate() : new Date(data.requestedAt);
+              const age = Date.now() - ts.getTime();
+              isRecent  = age < 30000; /* 30 s window (generous for slow connections) */
+            }
+
+            if (isRecent) {
+              showWaitingToast(change.doc.id, data);
+              ringBell();
+            }
+          });
+        }
+
+        initialLoad = false;   /* ← after first snapshot, enable toasts */
         pruneReadIds(); updateBadge(); renderList();
       }, err => console.warn("[Notif] waitingRoom:", err.message));
   }
@@ -729,7 +753,6 @@
      6.  WAITING ROOM TOAST (admin only)
   ══════════════════════════════════════════════════════════ */
   function showWaitingToast(docId, data) {
-    // remove old toast for same person if any
     const existing = document.getElementById("sh-wt-" + docId);
     if (existing) existing.remove();
 
@@ -762,7 +785,6 @@
       </div>`;
     document.body.appendChild(t);
 
-    // auto-dismiss after 12s
     setTimeout(() => { if (t.parentElement) t.remove(); }, 12000);
   }
 
