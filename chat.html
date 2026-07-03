@@ -556,12 +556,15 @@ function openVideoModal(){
 // }
 
 function copyMeetLink(){
-  const jitsiRoom = 'SH' + activeRoom.slice(0,4).toUpperCase() + 'x9K2' + activeRoom.length;
-  const link = 'https://meet.jit.si/' + jitsiRoom;
-  navigator.clipboard.writeText(link).then(() => {
-    showToast('Meet link copied! Share it with anyone. 🔗', 'success');
+  // Share waiting-room URL, not Jitsi directly
+  // This forces everyone to go through approval first
+  const baseUrl = window.location.origin + window.location.pathname.replace('chat.html','');
+  const waitingRoomUrl = baseUrl + 'waiting-room.html?room=' + activeRoom;
+  
+  navigator.clipboard.writeText(waitingRoomUrl).then(() => {
+    showToast('Invite link copied! Anyone who opens it will go through the waiting room 🔗', 'success');
   }).catch(() => {
-    prompt('Copy this link:', link);
+    prompt('Copy this invite link:', waitingRoomUrl);
   });
 }
 
