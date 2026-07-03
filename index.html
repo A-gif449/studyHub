@@ -1,4 +1,3 @@
-//index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -285,12 +284,9 @@
   window.DAILY_DOMAIN = "study-hub-team";
 </script>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
-<!-- ✅ STEP 1: search.js loaded after Firebase -->
 <script src="search.js"></script>
 
 <!-- NAV -->
@@ -302,7 +298,6 @@
   <div class="nav-links">
     <a href="chat.html" class="nav-link-icon"><i class="ti ti-messages"></i> Chat</a>
     <a href="important-questions.html" class="nav-link-highlight"><i class="ti ti-star"></i> Important Qs</a>
-
     <div class="dropdown" id="navMoreDropdown">
       <div class="nav-link-icon" onclick="toggleDropdown('navMoreDropdown')">
         More <i class="ti ti-chevron-down" style="font-size:11px;margin-left:1px"></i>
@@ -318,7 +313,6 @@
         <a class="dropdown-item" href="messages.html"><i class="ti ti-message-circle"></i> Messages</a>
       </div>
     </div>
-
     <div class="nav-divider"></div>
     <button class="nav-room-btn" onclick="openRoomModal()">
       <span class="live-dot"></span>
@@ -472,11 +466,8 @@
       <button class="filter-tab" data-filter="Advanced">Advanced</button>
     </div>
   </div>
-
-  <!-- ✅ STEP 2: Search bar slot - appears above the PDF grid -->
   <div id="searchBarSlot" style="margin-bottom:20px;"></div>
   <div id="shResultCount"></div>
-
   <div class="courses-grid" id="pdfGrid">
     <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
   </div>
@@ -548,6 +539,7 @@
       <button class="modal-tab" id="tabGuest" onclick="switchTab('guest')">Guest</button>
     </div>
     <div class="auth-error" id="authError"></div>
+    <!-- LOGIN -->
     <div id="formLogin">
       <div class="form-group"><label>Email address</label><input type="email" id="loginEmail" placeholder="you@example.com"/></div>
       <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="Enter your password"/></div>
@@ -555,6 +547,7 @@
       <div class="modal-divider"><span>or continue with</span></div>
       <button class="btn-ghost" onclick="handleGoogleLogin()" style="width:100%;justify-content:center;display:flex;align-items:center;gap:8px;padding:11px"><i class="ti ti-brand-google"></i> Google</button>
     </div>
+    <!-- SIGNUP -->
     <div id="formSignup" style="display:none">
       <div class="form-group"><label>Full Name</label><input type="text" id="signupName" placeholder="Your name"/></div>
       <div class="form-group"><label>Email address</label><input type="email" id="signupEmail" placeholder="you@example.com"/></div>
@@ -563,27 +556,25 @@
       <div class="modal-divider"><span>or continue with</span></div>
       <button class="btn-ghost" onclick="handleGoogleLogin()" style="width:100%;justify-content:center;display:flex;align-items:center;gap:8px;padding:11px"><i class="ti ti-brand-google"></i> Google</button>
     </div>
+    <!-- GUEST -->
     <div id="formGuest" style="display:none">
-  <div style="text-align:center;margin-bottom:20px">
-    <div style="font-size:36px;margin-bottom:8px">👤</div>
-    <p style="font-size:13px;color:var(--text2);line-height:1.6">No email needed. Pick a username and start learning — your progress is saved for this session.</p>
-  </div>
-  <div class="form-group">
-    <label>Your username</label>
-    <div style="display:flex;gap:8px">
-      <input type="text" id="guestName" placeholder="e.g. StudyNinja#4821" maxlength="30"
-        style="flex:1"
-        oninput="this.value=this.value.replace(/[^a-zA-Z0-9 _#-]/g,'')"
-      />
-      <button onclick="generateGuestName()" type="button"
-        style="padding:0 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:18px;flex-shrink:0;transition:all .2s"
-        title="Generate new name">🎲</button>
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:36px;margin-bottom:8px">👤</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6">No email needed. Pick a username and start learning — your progress is saved for this session.</p>
+      </div>
+      <div class="form-group">
+        <label>Your username</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="guestName" placeholder="e.g. StudyNinja#4821" maxlength="30" style="flex:1" oninput="this.value=this.value.replace(/[^a-zA-Z0-9 _#-]/g,'')"/>
+          <button onclick="generateGuestName()" type="button"
+            style="padding:0 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:18px;flex-shrink:0;transition:all .2s"
+            title="Generate new name">🎲</button>
+        </div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:6px">Letters, numbers, spaces, # _ - only. Max 30 chars.</div>
+      </div>
+      <button class="form-submit" id="guestBtn" onclick="handleGuestLogin()">Continue as Guest →</button>
+      <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.6">Guest sessions are temporary. <a onclick="switchTab('signup')" style="color:var(--accent2);cursor:pointer">Create a free account</a> to save your history permanently.</p>
     </div>
-    <div style="font-size:11.5px;color:var(--text3);margin-top:6px">Letters, numbers, spaces, # _ - only. Max 30 chars.</div>
-  </div>
-  <button class="form-submit" id="guestBtn" onclick="handleGuestLogin()">Continue as Guest →</button>
-  <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.6">Guest sessions are temporary. <a onclick="switchTab('signup')" style="color:var(--accent2);cursor:pointer">Create a free account</a> to save your history permanently.</p>
-</div>
   </div>
 </div>
 
@@ -636,7 +627,7 @@ let currentUser    = null;
 let allPdfs        = [];
 let activeCategory = 'All';
 let activeFilter   = 'all';
-let searchMounted  = false;  /* prevent double-mounting on re-auth */
+let searchMounted  = false;
 
 const subjectIcon = {
   'Mathematics':'ti-math-function','Physics':'ti-atom','Chemistry':'ti-test-pipe','Biology':'ti-dna',
@@ -644,20 +635,14 @@ const subjectIcon = {
   'Psychology':'ti-brain','Engineering':'ti-building-bridge','Default':'ti-file-text'
 };
 
-/* ✅ STEP 3: Init SHSearch inside onAuthStateChanged */
 auth.onAuthStateChanged(user => {
   currentUser = user;
   updateNav(user);
   renderCurrentPdfs();
-
   if (!searchMounted) {
     searchMounted = true;
     SHSearch.mountBar(document.getElementById('searchBarSlot'));
-    SHSearch.init({
-      getPdfs:     () => allPdfs,
-      onResults:   (filtered) => { renderPdfGrid(filtered); },
-      currentUser: user,
-    });
+    SHSearch.init({ getPdfs: () => allPdfs, onResults: (filtered) => { renderPdfGrid(filtered); }, currentUser: user });
   }
 });
 
@@ -666,21 +651,24 @@ function isAdmin(u) { return u && window.ADMIN_EMAILS.includes(u.email); }
 function updateNav(user) {
   const section = document.getElementById('navUserSection');
   if (user) {
-    const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    const adminLink = isAdmin(user) ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a> <a class="dropdown-item" href="host-panel.html"><i class="ti ti-crown"></i> Host Panel</a><div class="dropdown-divider"></div>` : '';
+    const displayName = user.displayName || (user.isAnonymous ? 'Guest' : user.email?.split('@')[0]) || 'Guest';
+    const initials = displayName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const emailLine = user.isAnonymous
+      ? `<div style="padding:8px 12px 4px;font-size:12px;color:var(--text3)">👤 Guest session</div>`
+      : `<div style="padding:8px 12px 4px;font-size:12px;color:var(--text3)">${user.email}</div>`;
+    const adminLink = isAdmin(user) ? `<a class="dropdown-item" href="admin.html"><i class="ti ti-settings"></i> Admin Panel</a><a class="dropdown-item" href="host-panel.html"><i class="ti ti-crown"></i> Host Panel</a><div class="dropdown-divider"></div>` : '';
     section.innerHTML = `
       <div class="dropdown" id="userDropdown">
         <div class="user-pill" onclick="toggleDropdown()">
           <div class="user-av">${initials}</div>
-          <span class="user-name">${user.displayName || user.email.split('@')[0]}</span>
+          <span class="user-name">${displayName}</span>
           <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i>
         </div>
         <div class="dropdown-menu">
-          <div style="padding:8px 12px 4px;font-size:12px;color:var(--text3)">${user.email}</div>
+          ${emailLine}
           <div class="dropdown-divider"></div>
           ${adminLink}
-          <a class="dropdown-item" href="profile.html"><i class="ti ti-user"></i> My Profile</a>
-          <div class="dropdown-divider"></div>
+          ${!user.isAnonymous ? `<a class="dropdown-item" href="profile.html"><i class="ti ti-user"></i> My Profile</a><div class="dropdown-divider"></div>` : ''}
           <button class="dropdown-item danger" onclick="handleLogout()"><i class="ti ti-logout"></i> Sign Out</button>
         </div>
       </div>`;
@@ -707,7 +695,7 @@ db.collection('pdfs').orderBy('uploadedAt','desc').onSnapshot(snap => {
   allPdfs = snap.docs.map(d => ({id:d.id,...d.data()}));
   document.getElementById('statMaterials').textContent = allPdfs.length + '+';
   renderCurrentPdfs();
-}, err => {
+}, () => {
   document.getElementById('pdfGrid').innerHTML = `<div class="empty-state"><i class="ti ti-wifi-off"></i><p>Could not load materials.</p></div>`;
 });
 
@@ -720,10 +708,7 @@ function renderCurrentPdfs() {
 
 function renderPdfGrid(pdfs) {
   const grid = document.getElementById('pdfGrid');
-  if (!pdfs.length) {
-    grid.innerHTML = `<div class="empty-state"><i class="ti ti-file-off"></i><p>No materials found. Check back soon!</p></div>`;
-    return;
-  }
+  if (!pdfs.length) { grid.innerHTML = `<div class="empty-state"><i class="ti ti-file-off"></i><p>No materials found. Check back soon!</p></div>`; return; }
   grid.innerHTML = pdfs.map(buildCard).join('');
 }
 
@@ -757,6 +742,7 @@ document.querySelectorAll('.filter-tab').forEach(b => b.addEventListener('click'
   b.classList.add('active'); activeFilter=b.dataset.filter; renderCurrentPdfs();
 }));
 
+/* ── Auth ── */
 async function handleLogin() {
   const email=document.getElementById('loginEmail').value.trim(), pass=document.getElementById('loginPass').value;
   if(!email||!pass){showAuthError('Please fill in all fields.');return;}
@@ -778,22 +764,66 @@ async function handleGoogleLogin() {
   try{const p=new firebase.auth.GoogleAuthProvider();await auth.signInWithPopup(p);closeModal();showToast('Signed in with Google!','success');}
   catch(e){showAuthError(friendlyError(e.code));}
 }
-async function handleLogout(){await auth.signOut();showToast('Signed out. See you soon!','success');}
-function friendlyError(code){
-  return({'auth/user-not-found':'No account found with this email.','auth/wrong-password':'Incorrect password.','auth/email-already-in-use':'An account with this email already exists.','auth/invalid-email':'Invalid email address.','auth/weak-password':'Password is too weak.','auth/popup-closed-by-user':'Sign-in popup was closed.','auth/network-request-failed':'Network error. Check your connection.','auth/invalid-credential':'Incorrect email or password.'})[code]||'Something went wrong. Please try again.';
+
+/* ── Guest login ── */
+const GUEST_ADJECTIVES = ['Silent','Cosmic','Bright','Swift','Calm','Bold','Eager','Wise','Sharp','Keen','Nimble','Stellar'];
+const GUEST_NOUNS      = ['Scholar','Ninja','Thinker','Reader','Coder','Ranger','Keeper','Seeker','Solver','Voyager','Pioneer','Falcon'];
+
+function generateGuestName() {
+  const adj  = GUEST_ADJECTIVES[Math.floor(Math.random() * GUEST_ADJECTIVES.length)];
+  const noun = GUEST_NOUNS[Math.floor(Math.random() * GUEST_NOUNS.length)];
+  const num  = Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('guestName').value = `${adj}${noun}#${num}`;
 }
+
+async function handleGuestLogin() {
+  const nameInput = document.getElementById('guestName').value.trim();
+  if (!nameInput || nameInput.length < 3) { showAuthError('Please enter a username (at least 3 characters).'); return; }
+  setLoading('guestBtn', true);
+  try {
+    const cred = await auth.signInAnonymously();
+    await cred.user.updateProfile({ displayName: nameInput });
+    await auth.currentUser.reload();
+    closeModal();
+    showToast(`Welcome, ${nameInput}! 👋`, 'success');
+  } catch(e) { showAuthError(friendlyError(e.code)); }
+  setLoading('guestBtn', false);
+}
+
+async function handleLogout(){await auth.signOut();showToast('Signed out. See you soon!','success');}
+
+function friendlyError(code){
+  return({
+    'auth/user-not-found':'No account found with this email.',
+    'auth/wrong-password':'Incorrect password.',
+    'auth/email-already-in-use':'An account with this email already exists.',
+    'auth/invalid-email':'Invalid email address.',
+    'auth/weak-password':'Password is too weak.',
+    'auth/popup-closed-by-user':'Sign-in popup was closed.',
+    'auth/network-request-failed':'Network error. Check your connection.',
+    'auth/invalid-credential':'Incorrect email or password.',
+    'auth/operation-not-allowed':'Guest login is not enabled yet — please contact the admin.',
+  })[code]||'Something went wrong. Please try again.';
+}
+
 function openModal(tab){document.getElementById('authModal').classList.add('show');switchTab(tab||'login');document.body.style.overflow='hidden';clearAuthError();}
 function closeModal(){document.getElementById('authModal').classList.remove('show');document.body.style.overflow='';}
-function switchTab(tab){
-  const l=tab==='login';
-  document.getElementById('tabLogin').classList.toggle('active',l);
-  document.getElementById('tabSignup').classList.toggle('active',!l);
-  document.getElementById('formLogin').style.display=l?'block':'none';
-  document.getElementById('formSignup').style.display=l?'none':'block';
-  document.getElementById('modalTitle').textContent=l?'Welcome back':'Join StudyHub';
-  document.getElementById('modalSub').textContent=l?'Sign in to access all your study materials':'Create your free account — no card required';
+
+function switchTab(tab) {
+  const tabs  = { login:'tabLogin', signup:'tabSignup', guest:'tabGuest' };
+  const forms = { login:'formLogin', signup:'formSignup', guest:'formGuest' };
+  Object.keys(tabs).forEach(t => {
+    document.getElementById(tabs[t])?.classList.toggle('active', t === tab);
+    document.getElementById(forms[t]).style.display = t === tab ? 'block' : 'none';
+  });
+  const titles = { login:'Welcome back', signup:'Join StudyHub', guest:'Continue as Guest' };
+  const subs   = { login:'Sign in to access all your study materials', signup:'Create your free account — no card required', guest:'No sign-up needed — just pick a name' };
+  document.getElementById('modalTitle').textContent = titles[tab];
+  document.getElementById('modalSub').textContent   = subs[tab];
   clearAuthError();
+  if (tab === 'guest' && !document.getElementById('guestName').value) generateGuestName();
 }
+
 document.getElementById('authModal').addEventListener('click',e=>{if(e.target===document.getElementById('authModal'))closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeRoomModal();}});
 function showAuthError(m){const el=document.getElementById('authError');el.textContent=m;el.classList.add('show');}
@@ -814,36 +844,14 @@ let selectedRoomSlug = null;
 let callInstance     = null;
 let activeRoomUrl    = null;
 
-// const ROOM_OWNER_TOKENS = {
-//   'mathematics': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItbWF0aGVtYXRpY3MiLCJvIjp0cnVlLCJleHAiOjE4NDUyOTU0MDcsImQiOiI2OGEwZDNmNC0zZDM5LTQ3ZjUtYTJkOS03NzdlYWQ4MTE2YzEiLCJpYXQiOjE3ODIyMjM0MTJ9.yH1zqCBKTEnvd5TflOadpTyA8lXHpSzsH9O6tl12ghE',
-//   'physics':     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItcGh5c2ljcyIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQwOSwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxMn0.mhoIYr6c1D6CSJrCJw88EguFEbvjGoCsNt8t1A8s2_g',
-//   'chemistry':   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItY2hlbWlzdHJ5IiwibyI6dHJ1ZSwiZXhwIjoxODQ1Mjk1NDA5LCJkIjoiNjhhMGQzZjQtM2QzOS00N2Y1LWEyZDktNzc3ZWFkODExNmMxIiwiaWF0IjoxNzgyMjIzNDEzfQ.x1vQDM5LxVRFRwp4FwtVqbc13jwBFlAnOrT4thBI-i0',
-//   'biology':     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItYmlvbG9neSIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQwOSwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxM30.bOk75oMvGdIzFWQkQvlNOFLcpQO6WU7p5-sSW0g8DOg',
-//   'cs-tech':     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItY3MtdGVjaCIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQwOSwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxM30.ZhI3aywmGMyhbEE99bi88E5WPEDo4U5zIA2GX_xyddY',
-//   'economics':   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItZWNvbm9taWNzIiwibyI6dHJ1ZSwiZXhwIjoxODQ1Mjk1NDEwLCJkIjoiNjhhMGQzZjQtM2QzOS00N2Y1LWEyZDktNzc3ZWFkODExNmMxIiwiaWF0IjoxNzgyMjIzNDE0fQ.c1uzTXKX7V7qJaeNtMGlmFeRC9NFRfvyWSrlSQIC5Rc',
-//   'literature':  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItbGl0ZXJhdHVyZSIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQxMCwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxNH0.f0IHUr8fiODrSVgcrkvnqRkFn_ysyZZGq22Hrgf503E',
-//   'engineering': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItZW5naW5lZXJpbmciLCJvIjp0cnVlLCJleHAiOjE4NDUyOTU0MTAsImQiOiI2OGEwZDNmNC0zZDM5LTQ3ZjUtYTJkOS03NzdlYWQ4MTE2YzEiLCJpYXQiOjE3ODIyMjM0MTR9.kukfbuYPmia2ozc8pNBfY0iWeWEzGvUenjRKwlUoxLQ',
-//   'general':     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoic3R1ZHlodWItZ2VuZXJhbCIsIm8iOnRydWUsImV4cCI6MTg0NTI5NTQxMCwiZCI6IjY4YTBkM2Y0LTNkMzktNDdmNS1hMmQ5LTc3N2VhZDgxMTZjMSIsImlhdCI6MTc4MjIyMzQxNH0.DY51hFlIURmM5Xi1FxBOT9Ae3-rUXj24_jorctTLIQ4',
-// };
-
 const ROOM_NAMES = {
-  'mathematics': 'Mathematics Room',
-  'physics':     'Physics Room',
-  'chemistry':   'Chemistry Room',
-  'biology':     'Biology Room',
-  'cs-tech':     'CS & Tech Room',
-  'economics':   'Economics Room',
-  'literature':  'Literature Room',
-  'engineering': 'Engineering Room',
-  'general':     'General Study Room',
+  'mathematics':'Mathematics Room','physics':'Physics Room','chemistry':'Chemistry Room',
+  'biology':'Biology Room','cs-tech':'CS & Tech Room','economics':'Economics Room',
+  'literature':'Literature Room','engineering':'Engineering Room','general':'General Study Room',
 };
 
 function openRoomModal() {
-  if (!currentUser) {
-    openModal('login');
-    showToast('Sign in to join a study room', 'error');
-    return;
-  }
+  if (!currentUser) { openModal('login'); showToast('Sign in to join a study room','error'); return; }
   document.getElementById('roomBackdrop').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
@@ -876,64 +884,13 @@ function selectRoom(el) {
 
 async function joinRoom() {
   if (!selectedRoomSlug) return;
-
-  // Save BEFORE closeRoomModal() resets it to null
-  const room = selectedRoomSlug;
-  const isHost = window.ADMIN_EMAILS.includes(currentUser?.email);
-
+  const room = selectedRoomSlug; // save before closeRoomModal resets it
   closeRoomModal();
-
-  if (isHost) {
-    // Admin goes straight in as host
-    window.location.href = `video-room.html?room=${room}`;
-  } else {
-    // Everyone else also goes straight in — no waiting room
-    // since there's no dedicated host to approve requests
-    window.location.href = `video-room.html?room=${room}`;
-  }
-}
-
-function launchCall(roomUrl, token = null) {
-  document.getElementById('roomPicker').style.display = 'none';
-  document.getElementById('callFrame').style.display = 'block';
-  document.getElementById('roomHeader').style.display = 'flex';
-  document.getElementById('roomHeaderName').textContent = ROOM_NAMES[selectedRoomSlug] || 'Study Room';
-
-  const container = document.getElementById('callFrame');
-  const userName  = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Learner';
-
-  callInstance = window.DailyIframe
-    ? DailyIframe.createFrame(container, {
-        iframeStyle: { width:'100%', height:'100%', border:'none', background:'#0A0A10' },
-        showLeaveButton: false,
-        showFullscreenButton: true,
-        theme: {
-          colors: {
-            accent: '#5B7FFF', accentText: '#FFFFFF',
-            background: '#0E0F12', backgroundAccent: '#13141A',
-            baseText: '#ECEDF1', border: '#2A2C35',
-            mainAreaBg: '#0A0B0E', mainAreaBgAccent: '#13141A',
-            mainAreaText: '#ECEDF1', supportiveText: '#9498A6',
-          }
-        }
-      })
-    : null;
-
-  if (callInstance) {
-    const joinOptions = { url: roomUrl, userName };
-    if (token) joinOptions.token = token;
-    callInstance.join(joinOptions);
-    callInstance.on('left-meeting', () => leaveRoom());
-  } else {
-    container.innerHTML = `<iframe src="${roomUrl}" allow="camera;microphone;fullscreen;display-capture" style="width:100%;height:100%;border:none;background:#0A0A10"></iframe>`;
-  }
+  window.location.href = `video-room.html?room=${room}`;
 }
 
 function leaveRoom() {
-  if (callInstance) {
-    try { callInstance.leave(); callInstance.destroy(); } catch(e) {}
-    callInstance = null;
-  }
+  if (callInstance) { try { callInstance.leave(); callInstance.destroy(); } catch(e) {} callInstance = null; }
   activeRoomUrl = null;
   document.getElementById('callFrame').innerHTML = '';
   resetRoomPicker();
@@ -941,17 +898,14 @@ function leaveRoom() {
 
 function copyRoomLink() {
   if (!activeRoomUrl) return;
-  navigator.clipboard.writeText(activeRoomUrl).then(() => {
-    showToast('Room link copied — share it to invite friends!', 'success');
-  }).catch(() => {
-    showToast(activeRoomUrl, 'success');
-  });
+  navigator.clipboard.writeText(activeRoomUrl)
+    .then(() => showToast('Room link copied!','success'))
+    .catch(() => showToast(activeRoomUrl,'success'));
 }
 
 function showRoomError(msg) {
   const el = document.getElementById('roomError');
-  el.textContent = msg;
-  el.classList.add('show');
+  el.textContent = msg; el.classList.add('show');
 }
 </script>
 
