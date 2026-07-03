@@ -884,7 +884,27 @@ function selectRoom(el) {
 
 async function joinRoom() {
   if (!selectedRoomSlug) return;
-  const room = selectedRoomSlug; // save before closeRoomModal resets it
+  if (!currentUser) { openModal('login'); return; }
+
+  const btn = document.getElementById('joinRoomBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+    // Write to waitingRoom → triggers admin notification
+    await db.collection('waitingRoom').add({
+      uid:          currentUser.uid,
+      userEmail:    currentUser.email,
+      userName:     currentUser.displayName || currentUser.email,
+      room:         selectedRoomSlug,
+      status:       'waiting',
+      requestedAt:  firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) {
+    console.warn('waitingRoom write failed:', e.message);
+  }
+
+  const room = selectedRoomSlug;
   closeRoomModal();
   window.location.href = `video-room.html?room=${room}`;
 }
