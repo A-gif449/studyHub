@@ -1,3 +1,4 @@
+//notifications.js//
 (function () {
   "use strict";
 
@@ -9,6 +10,7 @@
   let allRecent         = [];
   let friendRequestNotifs = [];
   let profileViewNotifs = [];
+  let waitingRoomNotifs = [];
   let panelOpen         = false;
   let prevUnreadCount   = 0;
 
@@ -36,6 +38,7 @@
     allRecent.forEach(p => ids.add(p.id));
     friendRequestNotifs.forEach(r => ids.add(r.id));
     profileViewNotifs.forEach(v => ids.add(v.id));
+    waitingRoomNotifs.forEach(w => ids.add(w.id));
     saveReadIds(ids);
     updateBadge();
     renderList();
@@ -52,6 +55,7 @@
       ...allRecent.filter(p => isUnread(p.id)),
       ...friendRequestNotifs.filter(r => isUnread(r.id)),
       ...profileViewNotifs.filter(v => isUnread(v.id)),
+      ...waitingRoomNotifs.filter(w => isUnread(w.id)),
     ];
   }
 
@@ -420,12 +424,18 @@
           max-height: 68vh !important;
           border-radius: 12px !important;
         }
+        @keyframes sh-toast-in {
+        from { opacity:0; transform:translateY(8px); }
+        to   { opacity:1; transform:translateY(0); }
+      }
       }
     `;
     const style = document.createElement("style");
     style.textContent = css;
     document.head.appendChild(style);
   }
+
+ 
 
   /* ══════════════════════════════════════════════════════════
      2.  BUILD BELL
@@ -506,11 +516,7 @@
         console.warn("[StudyHub Notif] pdfs error:", err.message);
       });
 
-    auth.onAuthStateChanged(function (user) {
-      if (!user) return;
-      syncUserProfile(user);
-
-      db.collection("friendRequests")
+    
         .where("to", "==", user.uid)
         .where("status", "==", "pending")
         .onSnapshot(function (snap) {
@@ -556,6 +562,7 @@
       ...allRecent.map(p => p.id),
       ...friendRequestNotifs.map(r => r.id),
       ...profileViewNotifs.map(v => v.id),
+      ...waitingRoomNotifs.map(w => w.id),
     ]);
     const current = getReadIds();
     const pruned  = new Set([...current].filter(id => allIds.has(id)));
@@ -639,6 +646,8 @@
     }
 
     let html = "";
+
+    const hasWaiting = waitingRoomNotifs.length > 0;
 
     if (hasFriends) {
       html += `<div class="sh-divider">Friend Requests</div>`;
@@ -761,6 +770,51 @@
       if (!panelOpen) panel.style.display = "";
       panel.removeEventListener("transitionend", hide);
     });
+  }
+
+window._shOpenWaiting = function(id) {
+    markItemRead(id);
+    closePanel();
+    window.location.href = 'admin.html#waiting';
+  };
+
+  function showWaitingToast(name, room) {
+    const existing = document.getElementById('sh-waiting-toast');
+    if (existing) existing.remove();
+
+    const t = document.createElement('div');
+    t.id = 'sh-waiting-toast';
+    t.style.cssText = `
+      position:fixed;bottom:24px;right:24px;z-index:9999;
+      padding:14px 18px;border-radius:12px;
+      background:#1B1D25;border:1px solid rgba(201,163,86,0.35);
+      font-size:13px;color:#ECEDF1;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      display:flex;align-items:center;gap:12px;
+      animation:sh-toast-in .25s ease;
+      font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+      max-width:320px;
+    `;
+    t.innerHTML = `
+      <div style="width:36px;height:36px;border-radius:9px;background:rgba(201,163,86,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👤</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;color:#ECEDF1;margin-bottom:3px">${esc(name)} is waiting</div>
+        <div style="font-size:11.5px;color:#9498A6">Room: ${esc(room)} · <a href="admin.html#waiting" style="color:#C9A356;text-decoration:none;font-weight:600">Approve now →</a></div>
+      </div>
+      <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#62656F;cursor:pointer;font-size:16px;flex-shrink:0;padding:2px">✕</button>
+    `;
+    document.body.appendChild(t);
+
+    // Ring the bell
+    const btn = document.getElementById('sh-bell-btn');
+    if (btn) {
+      btn.classList.remove('sh-ring');
+      void btn.offsetWidth;
+      btn.classList.add('sh-ring');
+      btn.addEventListener('animationend', () => btn.classList.remove('sh-ring'), { once: true });
+    }
+
+    setTimeout(() => { if(t.parentElement) t.remove(); }, 8000);
   }
 
 })();
