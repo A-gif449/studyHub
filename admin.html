@@ -1353,10 +1353,11 @@ function showToast(msg, type='success'){
 }
 
 function admSwitch(sec){
-  ['upload','views','downloads','premium','payments'].forEach(s=>{
-    document.getElementById('adm-'+s).style.display = s===sec?'block':'none';
-    document.querySelector(`.adm-pill[data-sec="${s}"]`)
-      .classList.toggle('active', s===sec);
+  ['upload','views','downloads','premium','payments','waiting'].forEach(s=>{
+    const el = document.getElementById('adm-'+s);
+    if(el) el.style.display = s===sec?'block':'none';
+    const pill = document.querySelector(`.adm-pill[data-sec="${s}"]`);
+    if(pill) pill.classList.toggle('active', s===sec);
   });
 }
 
