@@ -1,4 +1,3 @@
-//notifications.js//
 (function () {
   "use strict";
 
@@ -425,17 +424,15 @@
           border-radius: 12px !important;
         }
         @keyframes sh-toast-in {
-        from { opacity:0; transform:translateY(8px); }
-        to   { opacity:1; transform:translateY(0); }
-      }
+          from { opacity:0; transform:translateY(8px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
       }
     `;
     const style = document.createElement("style");
     style.textContent = css;
     document.head.appendChild(style);
   }
-
- 
 
   /* ══════════════════════════════════════════════════════════
      2.  BUILD BELL
@@ -494,7 +491,7 @@
   }
 
   /* ══════════════════════════════════════════════════════════
-     3.  FIRESTORE SUBSCRIPTIONS
+     3.  FIRESTORE SUBSCRIPTIONS  ← FIXED
      ══════════════════════════════════════════════════════════ */
   function subscribeToFirestore() {
     if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
@@ -504,6 +501,7 @@
 
     const db = firebase.firestore();
 
+    /* PDFs — no auth needed, always subscribe */
     db.collection("pdfs")
       .orderBy("uploadedAt", "desc")
       .limit(MAX_SHOW)
@@ -516,7 +514,13 @@
         console.warn("[StudyHub Notif] pdfs error:", err.message);
       });
 
-    
+    /* Auth-gated subscriptions */
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (!user) return;
+
+      syncUserProfile(user);
+
+      db.collection("friendRequests")
         .where("to", "==", user.uid)
         .where("status", "==", "pending")
         .onSnapshot(function (snap) {
@@ -647,8 +651,6 @@
 
     let html = "";
 
-    const hasWaiting = waitingRoomNotifs.length > 0;
-
     if (hasFriends) {
       html += `<div class="sh-divider">Friend Requests</div>`;
       html += friendRequestNotifs.map(req => `
@@ -772,7 +774,7 @@
     });
   }
 
-window._shOpenWaiting = function(id) {
+  window._shOpenWaiting = function(id) {
     markItemRead(id);
     closePanel();
     window.location.href = 'admin.html#waiting';
@@ -805,7 +807,7 @@ window._shOpenWaiting = function(id) {
     `;
     document.body.appendChild(t);
 
-    // Ring the bell
+    /* Ring the bell */
     const btn = document.getElementById('sh-bell-btn');
     if (btn) {
       btn.classList.remove('sh-ring');
