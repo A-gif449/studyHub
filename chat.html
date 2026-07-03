@@ -432,33 +432,8 @@ function openVideoModal(){
     document.getElementById('gateOverlay').style.display = 'flex';
     return;
   }
-
-  const jitsiRoom = 'SH' + activeRoom.slice(0,4).toUpperCase() + 'x9K2' + activeRoom.length;
-
-  // Get or create a password for today's session (resets daily)
-  const today = new Date().toISOString().slice(0,10); // "2025-07-03"
-  const sessionRef = db.collection('videoSessions').doc(activeRoom + '-' + today);
-
-  sessionRef.get().then(snap => {
-    let password;
-    if(snap.exists){
-      password = snap.data().password;
-    } else {
-      // Generate a random 6-char password
-      password = Math.random().toString(36).slice(2,8).toUpperCase();
-      sessionRef.set({
-        password,
-        room: activeRoom,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        createdBy: currentUser.email,
-      });
-    }
-
-    const meetUrl = `https://meet.jit.si/${jitsiRoom}#config.requireDisplayName=false&config.prejoinPageEnabled=false&config.enableWelcomePage=false&config.disableDeepLinking=true&userInfo.displayName=${encodeURIComponent(currentUser.displayName || currentUser.email.split('@')[0])}`;
-
-    // Show modal with password + link
-    showMeetModal(meetUrl, password, jitsiRoom);
-  });
+  // Redirect to waiting room instead of old video-room.html
+  window.location.href = 'waiting-room.html?room=' + activeRoom;
 }
 
 function showMeetModal(url, password, roomName){

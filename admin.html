@@ -269,6 +269,7 @@
       <button class="adm-pill" data-sec="downloads" onclick="admSwitch('downloads')">⬇️ Downloads</button>
       <button class="adm-pill" data-sec="premium" onclick="admSwitch('premium')">⭐ Premium</button>
       <button class="adm-pill" data-sec="payments" onclick="admSwitch('payments')">💳 Payments</button>
+      <button class="adm-pill" data-sec="waiting" onclick="admSwitch('waiting')">🎥 Waiting Room</button>
     </div>
 
     <div id="adm-upload">
@@ -440,6 +441,16 @@
     </div>
     </div><!-- closes adm-payments -->
 
+    <!-- WAITING ROOM PANEL -->
+    <div id="adm-waiting" style="display:none">
+      <div class="panel" style="margin-top:24px">
+        <div class="panel-title"><i class="ti ti-clock"></i> Waiting Room Requests</div>
+        <div id="waitingList" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto">
+          <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- closes page-wrap -->
 </div><!-- closes adminUI -->
 
@@ -543,6 +554,7 @@ function showAdmin(user){
   document.getElementById('adminName').textContent = user.displayName || user.email;
   loadPdfs();
   loadViews();
+  loadWaitingRoom();
   loadDownloads();
   loadIqSets();
   loadPendingPayments(); 
@@ -1253,6 +1265,58 @@ async function rejectPayment(pendingId){
     showToast('Error: ' + e.message, 'error');
   }
 }
+
+// ── Waiting Room Host Panel ──
+function loadWaitingRoom(){
+  db.collection('waitingRoom')
+    .where('status','==','waiting')
+    .orderBy('requestedAt','asc')
+    .onSnapshot(snap => {
+      const el = document.getElementById('waitingList');
+      if(!snap.docs.length){
+        el.innerHTML = `<div class="empty-list"><i class="ti ti-checks"></i><p>No one waiting right now.</p></div>`;
+        return;
+      }
+      el.innerHTML = snap.docs.map(d => {
+        const v = d.data();
+        const time = v.requestedAt ? new Date(v.requestedAt.seconds*1000).toLocaleTimeString() : 'Just now';
+        return `
+          <div class="pdf-item" style="border-left:3px solid var(--accent)">
+            <div class="pdf-emoji">👤</div>
+            <div class="pdf-info">
+              <div class="pdf-title">${escHtml(v.name)}</div>
+              <div class="pdf-meta">
+                <span class="tag">${escHtml(v.roomName||v.roomId)}</span>
+                <span>${escHtml(v.email)}</span>
+                <span>· Waiting since ${time}</span>
+              </div>
+            </div>
+            <div class="pdf-actions">
+              <button class="icon-btn" title="Approve"
+                style="border-color:rgba(52,211,153,.4);color:var(--green)"
+                onclick="handleWaitingRequest('${d.id}','approved')">
+                <i class="ti ti-check"></i>
+              </button>
+              <button class="icon-btn del" title="Reject"
+                onclick="handleWaitingRequest('${d.id}','rejected')">
+                <i class="ti ti-x"></i>
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    });
+}
+
+async function handleWaitingRequest(docId, status){
+  try {
+    await db.collection('waitingRoom').doc(docId).update({ status });
+    showToast(status==='approved' ? 'User approved! ✅' : 'Request rejected.', status==='approved' ? 'success' : 'error');
+    if(status==='rejected'){
+      setTimeout(()=> db.collection('waitingRoom').doc(docId).delete().catch(()=>{}), 5000);
+    }
+  } catch(e){ showToast('Error: '+e.message,'error'); }
+}
+
 
 
 // ── Helpers ──
