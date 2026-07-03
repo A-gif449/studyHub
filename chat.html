@@ -436,16 +436,20 @@ function openVideoModal(){
     return;
   }
 
+  const jitsiRoom = 'SH' + activeRoom.slice(0,4).toUpperCase() + 'x9K2' + activeRoom.length;
+  const displayName = encodeURIComponent(currentUser.displayName || currentUser.email.split('@')[0]);
   const isAdmin = window.ADMIN_EMAILS.includes(currentUser.email);
 
   if(isAdmin){
-    // Admin = host, goes directly to Jitsi as the host
-    const jitsiRoom = 'SH' + activeRoom.slice(0,4).toUpperCase() + 'x9K2' + activeRoom.length;
-    window.open('https://meet.jit.si/' + jitsiRoom, '_blank');
-    showToast('You joined as host! Approve members from Admin Panel → Waiting Room 🎥', 'success');
+    // Host joins with lobby enabled — everyone else will wait for approval
+    const hostUrl = `https://meet.jit.si/${jitsiRoom}#config.lobby.autoKnock=true&config.lobby.enableChat=false&config.startWithAudioMuted=false&config.startWithVideoMuted=false&config.prejoinPageEnabled=false&userInfo.displayName=${displayName}`;
+    window.open(hostUrl, '_blank');
+    showToast('You joined as host! Members will wait in lobby until you admit them 🎥', 'success');
   } else {
-    // Regular user goes to waiting room
-    window.location.href = 'waiting-room.html?room=' + activeRoom;
+    // Guest joins — Jitsi lobby will hold them until host admits
+    const guestUrl = `https://meet.jit.si/${jitsiRoom}#config.startWithAudioMuted=false&config.startWithVideoMuted=false&config.prejoinPageEnabled=false&userInfo.displayName=${displayName}`;
+    window.open(guestUrl, '_blank');
+    showToast('Waiting for host to admit you…', 'success');
   }
 }
 
