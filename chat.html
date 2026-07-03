@@ -432,8 +432,18 @@ function openVideoModal(){
     document.getElementById('gateOverlay').style.display = 'flex';
     return;
   }
-  // Redirect to waiting room instead of old video-room.html
-  window.location.href = 'waiting-room.html?room=' + activeRoom;
+
+  const isAdmin = window.ADMIN_EMAILS.includes(currentUser.email);
+
+  if(isAdmin){
+    // Admin = host, goes directly to Jitsi as the host
+    const jitsiRoom = 'SH' + activeRoom.slice(0,4).toUpperCase() + 'x9K2' + activeRoom.length;
+    window.open('https://meet.jit.si/' + jitsiRoom, '_blank');
+    showToast('You joined as host! Approve members from Admin Panel → Waiting Room 🎥', 'success');
+  } else {
+    // Regular user goes to waiting room
+    window.location.href = 'waiting-room.html?room=' + activeRoom;
+  }
 }
 
 function showMeetModal(url, password, roomName){
