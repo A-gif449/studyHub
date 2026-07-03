@@ -545,6 +545,7 @@
     <div class="modal-tabs">
       <button class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
       <button class="modal-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+      <button class="modal-tab" id="tabGuest" onclick="switchTab('guest')">Guest</button>
     </div>
     <div class="auth-error" id="authError"></div>
     <div id="formLogin">
@@ -562,6 +563,27 @@
       <div class="modal-divider"><span>or continue with</span></div>
       <button class="btn-ghost" onclick="handleGoogleLogin()" style="width:100%;justify-content:center;display:flex;align-items:center;gap:8px;padding:11px"><i class="ti ti-brand-google"></i> Google</button>
     </div>
+    <div id="formGuest" style="display:none">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:36px;margin-bottom:8px">👤</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.6">No email needed. Pick a username and start learning — your progress is saved for this session.</p>
+  </div>
+  <div class="form-group">
+    <label>Your username</label>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="guestName" placeholder="e.g. StudyNinja#4821" maxlength="30"
+        style="flex:1"
+        oninput="this.value=this.value.replace(/[^a-zA-Z0-9 _#-]/g,'')"
+      />
+      <button onclick="generateGuestName()" type="button"
+        style="padding:0 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:18px;flex-shrink:0;transition:all .2s"
+        title="Generate new name">🎲</button>
+    </div>
+    <div style="font-size:11.5px;color:var(--text3);margin-top:6px">Letters, numbers, spaces, # _ - only. Max 30 chars.</div>
+  </div>
+  <button class="form-submit" id="guestBtn" onclick="handleGuestLogin()">Continue as Guest →</button>
+  <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.6">Guest sessions are temporary. <a onclick="switchTab('signup')" style="color:var(--accent2);cursor:pointer">Create a free account</a> to save your history permanently.</p>
+</div>
   </div>
 </div>
 
