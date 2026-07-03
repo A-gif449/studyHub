@@ -1270,7 +1270,6 @@ async function rejectPayment(pendingId){
 function loadWaitingRoom(){
   db.collection('waitingRoom')
     .where('status','==','waiting')
-    .orderBy('requestedAt','asc')
     .onSnapshot(snap => {
       const el = document.getElementById('waitingList');
       if(!snap.docs.length){
@@ -1304,6 +1303,10 @@ function loadWaitingRoom(){
             </div>
           </div>`;
       }).join('');
+    }, err => {
+      console.error('Waiting room error:', err);
+      document.getElementById('waitingList').innerHTML = 
+        `<div class="empty-list"><i class="ti ti-alert-circle"></i><p>Error: ${err.message}</p></div>`;
     });
 }
 
