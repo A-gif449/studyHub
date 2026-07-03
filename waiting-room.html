@@ -286,8 +286,8 @@ function showRejected(){
 function joinCall(){
   clearInterval(redirectTimer);
   if(requestId)db.collection('waitingRoom').doc(requestId).delete().catch(()=>{});
-  // Redirect to video-room with the room param
-  window.location.href=`video-room.html?room=${roomId}`;
+  const jitsiRoom = 'SH' + roomId.slice(0,4).toUpperCase() + 'x9K2' + roomId.length;
+  window.location.href = 'https://meet.jit.si/' + jitsiRoom;
 }
 
 function cancelWait(){
