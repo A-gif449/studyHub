@@ -2,53 +2,42 @@
   "use strict";
 
   /* ─── constants ─── */
-  const LS_READ_IDS = "studyhub_read_ids";   // stores Set of read item IDs
+  const LS_READ_IDS = "studyhub_read_ids";
   const MAX_SHOW    = 20;
 
   /* ─── state ─── */
-  let allRecent         = [];
+  let allRecent           = [];
   let friendRequestNotifs = [];
-  let profileViewNotifs = [];
-  let waitingRoomNotifs = [];
-  let panelOpen         = false;
-  let prevUnreadCount   = 0;
+  let profileViewNotifs   = [];
+  let waitingRoomNotifs   = [];
+  let panelOpen           = false;
+  let prevUnreadCount     = 0;
+  let currentUserEmail    = null;
+  let currentUserUid      = null;
+  const ADMIN_EMAILS      = ["abhishekbasu188@gmail.com"];
 
-  /* ─── helpers: read-state uses a persistent ID set ─── */
+  /* ─── read-state helpers ─── */
   function getReadIds() {
-    try {
-      return new Set(JSON.parse(localStorage.getItem(LS_READ_IDS) || "[]"));
-    } catch (e) { return new Set(); }
+    try { return new Set(JSON.parse(localStorage.getItem(LS_READ_IDS) || "[]")); }
+    catch (e) { return new Set(); }
   }
-
   function saveReadIds(set) {
-    try {
-      localStorage.setItem(LS_READ_IDS, JSON.stringify([...set]));
-    } catch (e) {}
+    try { localStorage.setItem(LS_READ_IDS, JSON.stringify([...set])); } catch (e) {}
   }
-
   function markItemRead(id) {
-    const ids = getReadIds();
-    ids.add(id);
-    saveReadIds(ids);
+    const ids = getReadIds(); ids.add(id); saveReadIds(ids);
   }
-
   function markAllRead() {
     const ids = getReadIds();
-    allRecent.forEach(p => ids.add(p.id));
-    friendRequestNotifs.forEach(r => ids.add(r.id));
-    profileViewNotifs.forEach(v => ids.add(v.id));
-    waitingRoomNotifs.forEach(w => ids.add(w.id));
+    [...allRecent, ...friendRequestNotifs, ...profileViewNotifs, ...waitingRoomNotifs]
+      .forEach(x => ids.add(x.id));
     saveReadIds(ids);
     updateBadge();
     renderList();
     const btn = document.getElementById("sh-bell-btn");
     if (btn) btn.classList.remove("sh-bell-active");
   }
-
-  function isUnread(id) {
-    return !getReadIds().has(id);
-  }
-
+  function isUnread(id) { return !getReadIds().has(id); }
   function getUnreadItems() {
     return [
       ...allRecent.filter(p => isUnread(p.id)),
@@ -56,6 +45,14 @@
       ...profileViewNotifs.filter(v => isUnread(v.id)),
       ...waitingRoomNotifs.filter(w => isUnread(w.id)),
     ];
+  }
+  function pruneReadIds() {
+    const allIds = new Set([
+      ...allRecent, ...friendRequestNotifs,
+      ...profileViewNotifs, ...waitingRoomNotifs
+    ].map(x => x.id));
+    const pruned = new Set([...getReadIds()].filter(id => allIds.has(id)));
+    saveReadIds(pruned);
   }
 
   /* ─── init ─── */
@@ -69,118 +66,92 @@
 
   /* ══════════════════════════════════════════════════════════
      1.  STYLES
-     ══════════════════════════════════════════════════════════ */
+  ══════════════════════════════════════════════════════════ */
   function injectStyles() {
     const css = `
-      /* ── Wrapper ── */
       #sh-notif-wrap {
         position: relative;
         display: inline-flex;
         align-items: center;
       }
-
-      /* ── Bell button ── */
       #sh-bell-btn {
         position: relative;
-        width: 36px;
-        height: 36px;
+        width: 36px; height: 36px;
         border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.09);
         background: rgba(255,255,255,0.03);
         color: #7C7A9A;
         font-size: 16px;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        display: flex; align-items: center; justify-content: center;
+        transition: color .18s, border-color .18s, background .18s;
         font-family: inherit;
         flex-shrink: 0;
         outline: none;
       }
       #sh-bell-btn:hover {
-        color: #E8E6F8;
-        border-color: rgba(255,255,255,0.18);
-        background: rgba(255,255,255,0.06);
+        color: #ECEDF1;
+        border-color: rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.05);
       }
       #sh-bell-btn.sh-bell-active {
-        color: #9B8EFF;
-        border-color: rgba(108,99,255,0.35);
-        background: rgba(108,99,255,0.08);
+        color: #8FA3D6;
+        border-color: rgba(91,127,255,0.3);
+        background: rgba(91,127,255,0.07);
       }
-
-      /* ── Badge ── */
       #sh-badge {
         position: absolute;
-        top: -4px;
-        right: -4px;
-        min-width: 17px;
-        height: 17px;
+        top: -4px; right: -4px;
+        min-width: 17px; height: 17px;
         padding: 0 4px;
         border-radius: 99px;
-        background: #E8445A;
+        background: #C2564F;
         color: #fff;
-        font-size: 9.5px;
-        font-weight: 700;
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid #0A0A12;
-        line-height: 1;
+        font-size: 9.5px; font-weight: 700;
+        font-family: 'Inter', system-ui, sans-serif;
+        display: flex; align-items: center; justify-content: center;
+        border: 2px solid #0E0F12;
         opacity: 0;
         transform: scale(0.6);
-        transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34,1.4,0.64,1);
+        transition: opacity .2s, transform .2s cubic-bezier(0.34,1.4,0.64,1);
         pointer-events: none;
         z-index: 2;
-        letter-spacing: -0.3px;
       }
-      #sh-badge.sh-badge-visible {
-        opacity: 1;
-        transform: scale(1);
-      }
+      #sh-badge.sh-badge-visible { opacity: 1; transform: scale(1); }
 
-      /* Bell ring on new item */
       @keyframes sh-ring {
         0%   { transform: rotate(0deg); }
-        10%  { transform: rotate(-14deg); }
-        25%  { transform: rotate(14deg); }
-        40%  { transform: rotate(-10deg); }
-        55%  { transform: rotate(10deg); }
-        70%  { transform: rotate(-5deg); }
-        85%  { transform: rotate(5deg); }
+        15%  { transform: rotate(-12deg); }
+        30%  { transform: rotate(12deg); }
+        45%  { transform: rotate(-8deg); }
+        60%  { transform: rotate(8deg); }
+        75%  { transform: rotate(-4deg); }
+        90%  { transform: rotate(4deg); }
         100% { transform: rotate(0deg); }
       }
       #sh-bell-btn.sh-ring i {
         display: inline-block;
-        animation: sh-ring 0.6s ease;
+        animation: sh-ring .55s ease;
         transform-origin: 50% 0%;
       }
 
-      /* ── Dropdown panel ── */
+      /* ── Panel ── */
       #sh-panel {
         display: none;
         position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        width: 348px;
-        max-height: 460px;
-        background: #111118;
-        border: 1px solid rgba(255,255,255,0.09);
-        border-radius: 14px;
-        box-shadow:
-          0 0 0 1px rgba(0,0,0,0.4),
-          0 8px 24px rgba(0,0,0,0.4),
-          0 32px 64px rgba(0,0,0,0.35);
+        top: calc(100% + 8px); right: 0;
+        width: 344px; max-height: 460px;
+        background: #111318;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        box-shadow: 0 0 0 1px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.4), 0 24px 56px rgba(0,0,0,.35);
         z-index: 9999;
         flex-direction: column;
         overflow: hidden;
         opacity: 0;
-        transform: translateY(-6px) scale(0.985);
+        transform: translateY(-6px) scale(.985);
         pointer-events: none;
-        transition:
-          opacity 0.18s ease,
-          transform 0.18s ease;
+        transition: opacity .16s ease, transform .16s ease;
       }
       #sh-panel.sh-open {
         display: flex;
@@ -189,244 +160,225 @@
         pointer-events: auto;
       }
 
-      /* Panel header */
       .sh-panel-head {
-        padding: 14px 16px 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        padding: 13px 14px 11px;
+        display: flex; align-items: center; justify-content: space-between;
         border-bottom: 1px solid rgba(255,255,255,0.06);
         flex-shrink: 0;
       }
-      .sh-panel-head-left {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
+      .sh-panel-head-left { display: flex; align-items: center; gap: 8px; }
       .sh-panel-title {
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-        font-size: 13.5px;
-        font-weight: 700;
-        color: #E8E6F8;
-        letter-spacing: -0.1px;
+        font-family: 'Source Serif 4', 'Inter', serif;
+        font-size: 14px; font-weight: 700;
+        color: #ECEDF1; letter-spacing: -.1px;
       }
       .sh-count-pill {
-        padding: 2px 7px;
-        border-radius: 99px;
-        font-size: 10.5px;
-        font-weight: 700;
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-        letter-spacing: 0.1px;
-        transition: background 0.2s, color 0.2s;
+        padding: 2px 7px; border-radius: 5px;
+        font-size: 10.5px; font-weight: 700;
+        font-family: 'Inter', system-ui, sans-serif;
+        letter-spacing: .1px;
+        transition: background .2s, color .2s;
       }
-      .sh-count-pill.has-new {
-        background: rgba(155,142,255,0.15);
-        color: #9B8EFF;
-      }
-      .sh-count-pill.all-read {
-        background: rgba(52,211,153,0.10);
-        color: #34D399;
-      }
+      .sh-count-pill.has-new  { background: rgba(91,127,255,0.14); color: #8FA3D6; }
+      .sh-count-pill.all-read { background: rgba(78,158,120,0.12); color: #4E9E78; }
       .sh-mark-all-btn {
-        font-size: 11px;
-        font-weight: 500;
-        color: #524F6E;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-family: inherit;
-        padding: 4px 8px;
-        border-radius: 6px;
-        transition: color 0.15s, background 0.15s;
-        letter-spacing: 0.1px;
+        font-size: 11px; font-weight: 500;
+        color: #62656F; background: none; border: none;
+        cursor: pointer; font-family: inherit;
+        padding: 4px 8px; border-radius: 6px;
+        transition: color .15s, background .15s;
       }
-      .sh-mark-all-btn:hover {
-        color: #9B8EFF;
-        background: rgba(155,142,255,0.08);
-      }
+      .sh-mark-all-btn:hover { color: #8FA3D6; background: rgba(91,127,255,0.08); }
 
-      /* Scrollable list */
       .sh-list {
-        overflow-y: auto;
-        flex: 1;
-        padding: 6px;
+        overflow-y: auto; flex: 1; padding: 6px;
         scrollbar-width: thin;
-        scrollbar-color: rgba(108,99,255,0.4) transparent;
+        scrollbar-color: rgba(91,127,255,0.3) transparent;
       }
       .sh-list::-webkit-scrollbar { width: 3px; }
-      .sh-list::-webkit-scrollbar-track { background: transparent; }
-      .sh-list::-webkit-scrollbar-thumb {
-        background: rgba(108,99,255,0.4);
-        border-radius: 99px;
-      }
+      .sh-list::-webkit-scrollbar-thumb { background: rgba(91,127,255,0.3); border-radius: 99px; }
 
-      /* Divider label */
       .sh-divider {
         padding: 8px 10px 4px;
-        font-size: 10px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
+        font-size: 10px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .9px;
         color: #3E3C56;
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-family: 'Inter', system-ui, sans-serif;
       }
 
-      /* Notification row */
       .sh-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 10px 10px;
-        border-radius: 8px;
+        display: flex; align-items: flex-start; gap: 10px;
+        padding: 10px; border-radius: 8px;
         cursor: pointer;
-        transition: background 0.12s ease;
+        transition: background .12s;
         position: relative;
       }
-      .sh-item:hover {
-        background: rgba(255,255,255,0.03);
-      }
-      .sh-item.sh-unread {
-        background: rgba(108,99,255,0.06);
-      }
-      .sh-item.sh-unread:hover {
-        background: rgba(108,99,255,0.10);
-      }
+      .sh-item:hover { background: rgba(255,255,255,0.03); }
+      .sh-item.sh-unread { background: rgba(91,127,255,0.05); }
+      .sh-item.sh-unread:hover { background: rgba(91,127,255,0.09); }
 
-      /* Icon box */
+      /* ── Waiting room item gets a subtle amber tint ── */
+      .sh-item.sh-waiting { background: rgba(201,163,86,0.05); }
+      .sh-item.sh-waiting:hover { background: rgba(201,163,86,0.09); }
+      .sh-item.sh-waiting.sh-unread { background: rgba(201,163,86,0.08); }
+
       .sh-icon-box {
-        width: 34px;
-        height: 34px;
-        border-radius: 7px;
+        width: 34px; height: 34px; border-radius: 7px;
         flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 15px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; color: #9498A6;
       }
-      .sh-icon-box.type-pdf    { background: rgba(108,99,255,0.12); }
-      .sh-icon-box.type-friend { background: rgba(52,211,153,0.10); }
-      .sh-icon-box.type-view   { background: rgba(56,189,248,0.10); }
+      .sh-icon-box.type-pdf     { background: rgba(91,127,255,0.1); }
+      .sh-icon-box.type-friend  { background: rgba(78,158,120,0.1); }
+      .sh-icon-box.type-view    { background: rgba(63,169,204,0.1); }
+      .sh-icon-box.type-waiting { background: rgba(201,163,86,0.12); }
 
-      /* Text block */
-      .sh-item-body {
-        flex: 1;
-        min-width: 0;
-      }
+      .sh-item-body { flex: 1; min-width: 0; }
       .sh-item-title {
-        font-size: 12.5px;
-        font-weight: 600;
-        color: #D8D6F0;
-        line-height: 1.4;
+        font-size: 12.5px; font-weight: 600;
+        color: #C8C6E0; line-height: 1.4;
         margin-bottom: 3px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        letter-spacing: -0.1px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        letter-spacing: -.1px;
       }
-      .sh-item.sh-unread .sh-item-title {
-        color: #ECEAF8;
-      }
+      .sh-item.sh-unread .sh-item-title { color: #ECEDF1; }
       .sh-item-meta {
-        font-size: 11px;
-        color: #4A4866;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        flex-wrap: wrap;
+        font-size: 11px; color: #4A4866;
+        display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
       }
       .sh-tag {
-        padding: 1px 6px;
-        border-radius: 4px;
+        padding: 1px 6px; border-radius: 4px;
         background: rgba(255,255,255,0.05);
-        color: #6B6880;
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.1px;
+        color: #62656F; font-size: 10px; font-weight: 600;
       }
+      .sh-tag.waiting { background: rgba(201,163,86,0.12); color: #C9A356; }
+      .sh-tag.friend  { background: rgba(78,158,120,0.12); color: #4E9E78; }
+      .sh-tag.view    { background: rgba(63,169,204,0.10); color: #3FA9CC; }
 
-      /* Unread indicator dot */
+      /* Approve / Reject inline buttons (waiting room) */
+      .sh-action-row {
+        display: flex; gap: 6px; margin-top: 7px;
+      }
+      .sh-action-btn {
+        padding: 5px 12px; border-radius: 6px;
+        font-size: 11.5px; font-weight: 600;
+        cursor: pointer; font-family: inherit;
+        transition: background .15s, color .15s;
+        border: 1px solid transparent;
+        display: inline-flex; align-items: center; gap: 5px;
+      }
+      .sh-action-btn.approve {
+        background: rgba(78,158,120,0.12);
+        color: #4E9E78;
+        border-color: rgba(78,158,120,0.25);
+      }
+      .sh-action-btn.approve:hover { background: rgba(78,158,120,0.22); }
+      .sh-action-btn.reject {
+        background: rgba(194,86,79,0.08);
+        color: #C2564F;
+        border-color: rgba(194,86,79,0.2);
+      }
+      .sh-action-btn.reject:hover { background: rgba(194,86,79,0.16); }
+
       .sh-unread-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #6C63FF;
-        flex-shrink: 0;
-        margin-top: 6px;
-        opacity: 0;
-        transition: opacity 0.15s;
+        width: 6px; height: 6px; border-radius: 50%;
+        background: #5B7FFF; flex-shrink: 0; margin-top: 6px;
+        opacity: 0; transition: opacity .15s;
       }
-      .sh-item.sh-unread .sh-unread-dot {
-        opacity: 1;
-      }
+      .sh-item.sh-unread .sh-unread-dot { opacity: 1; }
+      .sh-item.sh-waiting.sh-unread .sh-unread-dot { background: #C9A356; }
 
-      /* Empty state */
       .sh-empty {
-        padding: 40px 20px;
-        text-align: center;
-        color: #3E3C56;
-        font-size: 13px;
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-        line-height: 1.6;
+        padding: 40px 20px; text-align: center;
+        color: #3E3C56; font-size: 13px;
+        font-family: 'Inter', system-ui, sans-serif; line-height: 1.6;
       }
-      .sh-empty-icon {
-        font-size: 28px;
-        margin-bottom: 12px;
-        display: block;
-        opacity: 0.5;
-      }
-      .sh-empty p {
-        color: #4A4866;
-        font-size: 12.5px;
-      }
+      .sh-empty-icon { font-size: 26px; margin-bottom: 12px; display: block; opacity: .4; }
+      .sh-empty p { color: #4A4866; font-size: 12.5px; }
 
-      /* Panel footer */
       .sh-panel-foot {
         padding: 8px;
         border-top: 1px solid rgba(255,255,255,0.05);
         flex-shrink: 0;
       }
       .sh-foot-link {
-        display: block;
-        text-align: center;
-        font-size: 12px;
-        font-weight: 500;
-        color: #524F6E;
-        text-decoration: none;
-        padding: 8px;
-        border-radius: 7px;
-        transition: background 0.15s, color 0.15s;
-        letter-spacing: 0.1px;
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        display: block; text-align: center;
+        font-size: 12px; font-weight: 500; color: #4A4866;
+        text-decoration: none; padding: 8px; border-radius: 7px;
+        transition: background .15s, color .15s;
+        font-family: 'Inter', system-ui, sans-serif;
       }
-      .sh-foot-link:hover {
-        background: rgba(255,255,255,0.04);
-        color: #9B8EFF;
-      }
+      .sh-foot-link:hover { background: rgba(255,255,255,0.04); color: #8FA3D6; }
 
-      /* Loading */
-      .sh-loading {
-        padding: 32px 20px;
-        text-align: center;
-        color: #3E3C56;
-        font-size: 12.5px;
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      /* ── Waiting room toast (admin only) ── */
+      .sh-waiting-toast {
+        position: fixed; bottom: 24px; right: 24px; z-index: 9998;
+        width: 320px;
+        background: #111318;
+        border: 1px solid rgba(201,163,86,0.28);
+        border-radius: 10px;
+        padding: 14px 14px 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,.5);
+        display: flex; flex-direction: column; gap: 10px;
+        font-family: 'Inter', system-ui, sans-serif;
+        animation: sh-toast-slide .25s ease;
       }
+      @keyframes sh-toast-slide {
+        from { opacity:0; transform:translateY(10px); }
+        to   { opacity:1; transform:translateY(0); }
+      }
+      .sh-toast-head {
+        display: flex; align-items: center; gap: 10px;
+      }
+      .sh-toast-icon {
+        width: 36px; height: 36px; border-radius: 8px;
+        background: rgba(201,163,86,0.12);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; font-size: 16px; color: #C9A356;
+      }
+      .sh-toast-body { flex: 1; min-width: 0; }
+      .sh-toast-title {
+        font-size: 13px; font-weight: 700; color: #ECEDF1;
+        margin-bottom: 2px; white-space: nowrap;
+        overflow: hidden; text-overflow: ellipsis;
+      }
+      .sh-toast-sub { font-size: 11.5px; color: #9498A6; }
+      .sh-toast-close {
+        background: none; border: none; color: #62656F;
+        font-size: 15px; cursor: pointer; flex-shrink: 0;
+        padding: 2px; line-height: 1;
+        transition: color .15s;
+      }
+      .sh-toast-close:hover { color: #ECEDF1; }
+      .sh-toast-actions { display: flex; gap: 8px; }
+      .sh-toast-btn {
+        flex: 1; padding: 7px; border-radius: 7px;
+        font-size: 12px; font-weight: 600; cursor: pointer;
+        font-family: inherit; border: 1px solid transparent;
+        transition: background .15s;
+        display: flex; align-items: center; justify-content: center; gap: 5px;
+      }
+      .sh-toast-btn.approve {
+        background: rgba(78,158,120,0.14); color: #4E9E78;
+        border-color: rgba(78,158,120,0.28);
+      }
+      .sh-toast-btn.approve:hover { background: rgba(78,158,120,0.24); }
+      .sh-toast-btn.reject {
+        background: rgba(194,86,79,0.08); color: #C2564F;
+        border-color: rgba(194,86,79,0.2);
+      }
+      .sh-toast-btn.reject:hover { background: rgba(194,86,79,0.16); }
 
-      /* Mobile */
       @media (max-width: 768px) {
         #sh-panel {
           position: fixed !important;
           top: 64px !important;
-          left: 10px !important;
-          right: 10px !important;
+          left: 10px !important; right: 10px !important;
           width: calc(100vw - 20px) !important;
           max-height: 68vh !important;
-          border-radius: 12px !important;
+          border-radius: 10px !important;
         }
-        @keyframes sh-toast-in {
-          from { opacity:0; transform:translateY(8px); }
-          to   { opacity:1; transform:translateY(0); }
-        }
+        .sh-waiting-toast { width: calc(100vw - 32px); right: 16px; bottom: 16px; }
       }
     `;
     const style = document.createElement("style");
@@ -436,7 +388,7 @@
 
   /* ══════════════════════════════════════════════════════════
      2.  BUILD BELL
-     ══════════════════════════════════════════════════════════ */
+  ══════════════════════════════════════════════════════════ */
   function buildBell() {
     const nav = document.querySelector("nav");
     if (!nav) return;
@@ -465,9 +417,7 @@
         </div>
         <button class="sh-mark-all-btn" onclick="window._shMarkAll()">Mark all read</button>
       </div>
-      <div class="sh-list" id="sh-list">
-        <div class="sh-loading">Loading…</div>
-      </div>
+      <div class="sh-list" id="sh-list"><div style="padding:30px 20px;text-align:center;color:#3E3C56;font-size:12.5px">Loading…</div></div>
       <div class="sh-panel-foot">
         <a href="index.html#materials" class="sh-foot-link">Browse all materials →</a>
       </div>`;
@@ -476,131 +426,138 @@
     wrap.appendChild(panel);
 
     const bellSlot = document.getElementById("bellSlot");
-    if (bellSlot) {
-      bellSlot.appendChild(wrap);
-    } else {
-      const navRight = nav.querySelector(".nav-right");
-      navRight ? navRight.insertBefore(wrap, navRight.firstChild) : nav.appendChild(wrap);
+    if (bellSlot) bellSlot.appendChild(wrap);
+    else {
+      const nr = nav.querySelector(".nav-right");
+      nr ? nr.insertBefore(wrap, nr.firstChild) : nav.appendChild(wrap);
     }
 
-    document.addEventListener("click", function (e) {
-      if (!wrap.contains(e.target)) closePanel();
-    });
-
+    document.addEventListener("click", e => { if (!wrap.contains(e.target)) closePanel(); });
     window._shMarkAll = markAllRead;
   }
 
   /* ══════════════════════════════════════════════════════════
-     3.  FIRESTORE SUBSCRIPTIONS  ← FIXED
-     ══════════════════════════════════════════════════════════ */
+     3.  FIRESTORE SUBSCRIPTIONS
+  ══════════════════════════════════════════════════════════ */
   function subscribeToFirestore() {
     if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
-      setTimeout(subscribeToFirestore, 300);
-      return;
+      setTimeout(subscribeToFirestore, 300); return;
     }
 
     const db = firebase.firestore();
 
-    /* PDFs — no auth needed, always subscribe */
+    /* ── PDFs (everyone) ── */
     db.collection("pdfs")
       .orderBy("uploadedAt", "desc")
       .limit(MAX_SHOW)
-      .onSnapshot(function (snap) {
+      .onSnapshot(snap => {
         allRecent = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
-        pruneReadIds();
-        updateBadge();
-        renderList();
-      }, function (err) {
-        console.warn("[StudyHub Notif] pdfs error:", err.message);
-      });
+        pruneReadIds(); updateBadge(); renderList();
+      }, err => console.warn("[Notif] pdfs:", err.message));
 
-    /* Auth-gated subscriptions */
-    firebase.auth().onAuthStateChanged(function (user) {
+    /* ── Auth-gated ── */
+    firebase.auth().onAuthStateChanged(user => {
       if (!user) return;
+      currentUserEmail = user.email;
+      currentUserUid   = user.uid;
 
       syncUserProfile(user);
 
+      /* Friend requests */
       db.collection("friendRequests")
         .where("to", "==", user.uid)
         .where("status", "==", "pending")
-        .onSnapshot(function (snap) {
+        .onSnapshot(snap => {
           friendRequestNotifs = snap.docs.map(d => Object.assign({ id: d.id, _type: "friendRequest" }, d.data()));
-          pruneReadIds();
-          updateBadge();
-          renderList();
-        }, function (err) {
-          console.warn("[StudyHub Notif] friendRequests error:", err.message);
-        });
+          pruneReadIds(); updateBadge(); renderList();
+        }, err => console.warn("[Notif] friendRequests:", err.message));
 
+      /* Profile views */
       db.collection("profileViews")
         .where("profileOwnerUid", "==", user.uid)
         .orderBy("viewedAt", "desc")
         .limit(MAX_SHOW)
-        .onSnapshot(function (snap) {
+        .onSnapshot(snap => {
           profileViewNotifs = snap.docs.map(d => Object.assign({ id: d.id, _type: "profileView" }, d.data()));
-          pruneReadIds();
-          updateBadge();
-          renderList();
-        }, function (err) {
-          console.warn("[StudyHub Notif] profileViews error:", err.message);
-        });
+          pruneReadIds(); updateBadge(); renderList();
+        }, err => console.warn("[Notif] profileViews:", err.message));
+
+      /* ── Waiting room (admin only) ── */
+      if (ADMIN_EMAILS.includes(user.email)) {
+        subscribeWaitingRoom(db);
+      }
     });
   }
 
+  /* ── Waiting Room Subscription ── */
+  function subscribeWaitingRoom(db) {
+    db.collection("waitingRoom")
+      .where("status", "==", "waiting")
+      .orderBy("requestedAt", "desc")
+      .onSnapshot(snap => {
+        const prev = new Set(waitingRoomNotifs.map(w => w.id));
+
+        waitingRoomNotifs = snap.docs.map(d => Object.assign({ id: d.id, _type: "waitingRoom" }, d.data()));
+
+        // show toast for NEW entries only
+        snap.docChanges().forEach(change => {
+          if (change.type === "added" && !prev.has(change.doc.id)) {
+            const data = change.doc.data();
+            // small delay so it doesn't fire on initial load
+            if (data.requestedAt) {
+              const age = Date.now() - (data.requestedAt.toDate?.()?.getTime() || 0);
+              if (age < 15000) { // only if joined within last 15s
+                showWaitingToast(change.doc.id, data);
+                ringBell();
+              }
+            }
+          }
+        });
+
+        pruneReadIds(); updateBadge(); renderList();
+      }, err => console.warn("[Notif] waitingRoom:", err.message));
+  }
+
   function syncUserProfile(user) {
-    const db = firebase.firestore();
-    db.collection("userProfiles").doc(user.uid).set({
+    firebase.firestore().collection("userProfiles").doc(user.uid).set({
       uid: user.uid,
       displayName: user.displayName || user.email.split("@")[0],
       email: user.email,
       lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true }).catch(err => {
-      console.warn("[StudyHub] userProfile sync error:", err.message);
-    });
-  }
-
-  /* Remove stale IDs from localStorage so it doesn't grow forever */
-  function pruneReadIds() {
-    const allIds = new Set([
-      ...allRecent.map(p => p.id),
-      ...friendRequestNotifs.map(r => r.id),
-      ...profileViewNotifs.map(v => v.id),
-      ...waitingRoomNotifs.map(w => w.id),
-    ]);
-    const current = getReadIds();
-    const pruned  = new Set([...current].filter(id => allIds.has(id)));
-    saveReadIds(pruned);
+    }, { merge: true }).catch(err => console.warn("[Notif] userProfile:", err.message));
   }
 
   /* ══════════════════════════════════════════════════════════
-     4.  BADGE UPDATE
-     ══════════════════════════════════════════════════════════ */
+     4.  BADGE
+  ══════════════════════════════════════════════════════════ */
+  function ringBell() {
+    const btn = document.getElementById("sh-bell-btn");
+    if (!btn) return;
+    btn.classList.remove("sh-ring");
+    void btn.offsetWidth;
+    btn.classList.add("sh-ring");
+    btn.addEventListener("animationend", () => btn.classList.remove("sh-ring"), { once: true });
+  }
+
   function updateBadge() {
-    const badge   = document.getElementById("sh-badge");
-    const btn     = document.getElementById("sh-bell-btn");
-    const pill    = document.getElementById("sh-count-pill");
+    const badge = document.getElementById("sh-badge");
+    const btn   = document.getElementById("sh-bell-btn");
+    const pill  = document.getElementById("sh-count-pill");
     if (!badge || !btn) return;
 
     const count = getUnreadItems().length;
 
     if (pill) {
       pill.textContent = count > 0 ? count + " new" : "All read";
-      pill.className = "sh-count-pill " + (count > 0 ? "has-new" : "all-read");
+      pill.className   = "sh-count-pill " + (count > 0 ? "has-new" : "all-read");
     }
 
     if (count > 0) {
       badge.textContent = count > 99 ? "99+" : String(count);
       badge.classList.add("sh-badge-visible");
       btn.classList.add("sh-bell-active");
-
-      /* ring bell if count increased */
-      if (count > prevUnreadCount && document.visibilityState !== "hidden") {
-        btn.classList.remove("sh-ring");
-        void btn.offsetWidth;
-        btn.classList.add("sh-ring");
-        btn.addEventListener("animationend", () => btn.classList.remove("sh-ring"), { once: true });
-      }
+      if (count > prevUnreadCount && document.visibilityState !== "hidden") ringBell();
     } else {
       badge.classList.remove("sh-badge-visible");
       btn.classList.remove("sh-bell-active");
@@ -610,7 +567,7 @@
 
   /* ══════════════════════════════════════════════════════════
      5.  RENDER LIST
-     ══════════════════════════════════════════════════════════ */
+  ══════════════════════════════════════════════════════════ */
   const subjectEmoji = {
     Mathematics:"🧮", Physics:"⚛️", Chemistry:"⚗️", Biology:"🧬",
     "CS & Tech":"💻", Economics:"📈", Literature:"📚", History:"📜",
@@ -618,68 +575,117 @@
   };
 
   function timeAgo(date) {
-    const diff = Math.floor((Date.now() - date.getTime()) / 1000);
-    if (diff < 60)     return "just now";
-    if (diff < 3600)   return Math.floor(diff / 60) + "m ago";
-    if (diff < 86400)  return Math.floor(diff / 3600) + "h ago";
-    if (diff < 604800) return Math.floor(diff / 86400) + "d ago";
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const d = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (d < 60) return "just now";
+    if (d < 3600) return Math.floor(d/60) + "m ago";
+    if (d < 86400) return Math.floor(d/3600) + "h ago";
+    if (d < 604800) return Math.floor(d/86400) + "d ago";
+    return date.toLocaleDateString("en-US", { month:"short", day:"numeric" });
   }
 
   function esc(str) {
-    return String(str || "")
-      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    return String(str||"")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
 
   function renderList() {
     const list = document.getElementById("sh-list");
     if (!list) return;
 
-    const hasFriends  = friendRequestNotifs.length > 0;
-    const hasViews    = profileViewNotifs.length > 0;
-    const hasPdfs     = allRecent.length > 0;
+    const isAdmin = ADMIN_EMAILS.includes(currentUserEmail);
 
-    if (!hasFriends && !hasViews && !hasPdfs) {
+    const hasWaiting = isAdmin && waitingRoomNotifs.length > 0;
+    const hasFriends = friendRequestNotifs.length > 0;
+    const hasViews   = profileViewNotifs.length > 0;
+    const hasPdfs    = allRecent.length > 0;
+
+    if (!hasWaiting && !hasFriends && !hasViews && !hasPdfs) {
       list.innerHTML = `
         <div class="sh-empty">
-          <span class="sh-empty-icon">📭</span>
-          <p>Nothing here yet.<br/>Check back when materials are uploaded.</p>
+          <span class="sh-empty-icon"><i class="ti ti-inbox" style="font-size:26px"></i></span>
+          <p>Nothing here yet.</p>
         </div>`;
       return;
     }
 
     let html = "";
 
-    if (hasFriends) {
-      html += `<div class="sh-divider">Friend Requests</div>`;
-      html += friendRequestNotifs.map(req => `
-        <div class="sh-item ${isUnread(req.id) ? "sh-unread" : ""}"
-             onclick="window._shOpenFriends(); window._shReadItem('${esc(req.id)}')">
-          <div class="sh-icon-box type-friend">🤝</div>
-          <div class="sh-item-body">
-            <div class="sh-item-title">${esc(req.fromName || "Someone")} sent you a friend request</div>
-            <div class="sh-item-meta">
-              <span class="sh-tag">Friend Request</span>
-              <span>Tap to respond</span>
+    /* ── Waiting Room (admin) ── */
+    if (hasWaiting) {
+      html += `<div class="sh-divider">Waiting Room</div>`;
+      html += waitingRoomNotifs.map(w => {
+        const ts  = w.requestedAt ? (w.requestedAt.toDate?.() || new Date(w.requestedAt)) : new Date();
+        const ago = timeAgo(ts);
+        const unread = isUnread(w.id);
+        return `
+          <div class="sh-item sh-waiting ${unread ? "sh-unread" : ""}"
+               onclick="window._shReadItem('${esc(w.id)}')">
+            <div class="sh-icon-box type-waiting">
+              <i class="ti ti-door-enter" style="font-size:16px;color:#C9A356"></i>
             </div>
-          </div>
-          <div class="sh-unread-dot"></div>
-        </div>`).join("");
+            <div class="sh-item-body">
+              <div class="sh-item-title">${esc(w.userName || w.userEmail || "Someone")} wants to join</div>
+              <div class="sh-item-meta">
+                <span class="sh-tag waiting">Waiting Room</span>
+                <span>${esc(w.room || "Study Room")}</span>
+                <span>· ${ago}</span>
+              </div>
+              <div class="sh-action-row">
+                <button class="sh-action-btn approve"
+                  onclick="event.stopPropagation(); window._shApproveWaiting('${esc(w.id)}', this)">
+                  <i class="ti ti-check" style="font-size:12px"></i> Approve
+                </button>
+                <button class="sh-action-btn reject"
+                  onclick="event.stopPropagation(); window._shRejectWaiting('${esc(w.id)}', this)">
+                  <i class="ti ti-x" style="font-size:12px"></i> Reject
+                </button>
+              </div>
+            </div>
+            <div class="sh-unread-dot"></div>
+          </div>`;
+      }).join("");
     }
 
+    /* ── Friend Requests ── */
+    if (hasFriends) {
+      html += `<div class="sh-divider">Friend Requests</div>`;
+      html += friendRequestNotifs.map(req => {
+        const unread = isUnread(req.id);
+        return `
+          <div class="sh-item ${unread ? "sh-unread" : ""}"
+               onclick="window._shOpenFriends(); window._shReadItem('${esc(req.id)}')">
+            <div class="sh-icon-box type-friend">
+              <i class="ti ti-user-plus" style="font-size:15px;color:#4E9E78"></i>
+            </div>
+            <div class="sh-item-body">
+              <div class="sh-item-title">${esc(req.fromName || "Someone")} sent you a friend request</div>
+              <div class="sh-item-meta">
+                <span class="sh-tag friend">Friend Request</span>
+                <span>Tap to respond</span>
+              </div>
+            </div>
+            <div class="sh-unread-dot"></div>
+          </div>`;
+      }).join("");
+    }
+
+    /* ── Profile Views ── */
     if (hasViews) {
       html += `<div class="sh-divider">Profile Views</div>`;
       html += profileViewNotifs.map(pv => {
-        const ts = pv.viewedAt ? (pv.viewedAt.toDate ? pv.viewedAt.toDate() : new Date(pv.viewedAt)) : new Date();
+        const ts  = pv.viewedAt ? (pv.viewedAt.toDate?.() || new Date(pv.viewedAt)) : new Date();
+        const unread = isUnread(pv.id);
         return `
-          <div class="sh-item ${isUnread(pv.id) ? "sh-unread" : ""}"
+          <div class="sh-item ${unread ? "sh-unread" : ""}"
                onclick="window._shOpenProfileViewer('${esc(pv.viewerUid)}'); window._shReadItem('${esc(pv.id)}')">
-            <div class="sh-icon-box type-view">👤</div>
+            <div class="sh-icon-box type-view">
+              <i class="ti ti-eye" style="font-size:15px;color:#3FA9CC"></i>
+            </div>
             <div class="sh-item-body">
               <div class="sh-item-title">${esc(pv.viewerName || "Someone")} viewed your profile</div>
               <div class="sh-item-meta">
-                <span class="sh-tag">Profile View</span>
+                <span class="sh-tag view">Profile View</span>
                 <span>${timeAgo(ts)}</span>
               </div>
             </div>
@@ -688,19 +694,21 @@
       }).join("");
     }
 
+    /* ── PDFs ── */
     if (hasPdfs) {
       html += `<div class="sh-divider">Study Materials</div>`;
       html += allRecent.map(pdf => {
         const emoji = subjectEmoji[pdf.subject] || subjectEmoji.Default;
+        const unread = isUnread(pdf.id);
         let ago = "";
         if (pdf.uploadedAt) {
           const d = pdf.uploadedAt.toDate ? pdf.uploadedAt.toDate() : new Date(pdf.uploadedAt);
           ago = timeAgo(d);
         }
         return `
-          <div class="sh-item ${isUnread(pdf.id) ? "sh-unread" : ""}"
+          <div class="sh-item ${unread ? "sh-unread" : ""}"
                onclick="window._shOpenPdf('${esc(pdf.id)}')">
-            <div class="sh-icon-box type-pdf">${emoji}</div>
+            <div class="sh-icon-box type-pdf" style="font-size:17px">${emoji}</div>
             <div class="sh-item-body">
               <div class="sh-item-title">${esc(pdf.title || "Untitled")}</div>
               <div class="sh-item-meta">
@@ -717,48 +725,94 @@
     list.innerHTML = html;
   }
 
-  /* ── Global click handlers ── */
-  window._shReadItem = function (id) {
-    markItemRead(id);
-    updateBadge();
-    renderList();
+  /* ══════════════════════════════════════════════════════════
+     6.  WAITING ROOM TOAST (admin only)
+  ══════════════════════════════════════════════════════════ */
+  function showWaitingToast(docId, data) {
+    // remove old toast for same person if any
+    const existing = document.getElementById("sh-wt-" + docId);
+    if (existing) existing.remove();
+
+    const name = esc(data.userName || data.userEmail || "Someone");
+    const room = esc(data.room || "Study Room");
+
+    const t = document.createElement("div");
+    t.className = "sh-waiting-toast";
+    t.id = "sh-wt-" + docId;
+    t.innerHTML = `
+      <div class="sh-toast-head">
+        <div class="sh-toast-icon"><i class="ti ti-door-enter"></i></div>
+        <div class="sh-toast-body">
+          <div class="sh-toast-title">${name} wants to join</div>
+          <div class="sh-toast-sub">${room} · Just now</div>
+        </div>
+        <button class="sh-toast-close" onclick="document.getElementById('sh-wt-${docId}')?.remove()">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="sh-toast-actions">
+        <button class="sh-toast-btn approve"
+          onclick="window._shApproveWaiting('${docId}', this); document.getElementById('sh-wt-${docId}')?.remove()">
+          <i class="ti ti-check"></i> Approve
+        </button>
+        <button class="sh-toast-btn reject"
+          onclick="window._shRejectWaiting('${docId}', this); document.getElementById('sh-wt-${docId}')?.remove()">
+          <i class="ti ti-x"></i> Reject
+        </button>
+      </div>`;
+    document.body.appendChild(t);
+
+    // auto-dismiss after 12s
+    setTimeout(() => { if (t.parentElement) t.remove(); }, 12000);
+  }
+
+  /* ── Approve / Reject handlers ── */
+  window._shApproveWaiting = async function(docId, btn) {
+    if (btn) { btn.disabled = true; btn.textContent = "Approving…"; }
+    try {
+      await firebase.firestore().collection("waitingRoom").doc(docId).update({
+        status: "approved",
+        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        approvedBy: currentUserEmail
+      });
+      markItemRead(docId);
+      updateBadge();
+      renderList();
+    } catch(e) { console.error("[Notif] approve error:", e); if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-check"></i> Approve';} }
   };
 
-  window._shOpenFriends = function () {
-    closePanel();
-    window.location.href = "friends.html?tab=requests";
+  window._shRejectWaiting = async function(docId, btn) {
+    if (btn) { btn.disabled = true; btn.textContent = "Rejecting…"; }
+    try {
+      await firebase.firestore().collection("waitingRoom").doc(docId).update({
+        status: "rejected",
+        rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        rejectedBy: currentUserEmail
+      });
+      markItemRead(docId);
+      updateBadge();
+      renderList();
+    } catch(e) { console.error("[Notif] reject error:", e); if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-x"></i> Reject';} }
   };
 
-  window._shOpenProfileViewer = function (uid) {
-    closePanel();
-    window.location.href = "profile.html?uid=" + encodeURIComponent(uid);
-  };
-
-  window._shOpenPdf = function (id) {
-    markItemRead(id);
-    closePanel();
-    window.location.href = "viewer.html?id=" + encodeURIComponent(id);
-  };
+  /* ── Other handlers ── */
+  window._shReadItem = function(id) { markItemRead(id); updateBadge(); renderList(); };
+  window._shOpenFriends = function() { closePanel(); window.location.href = "friends.html?tab=requests"; };
+  window._shOpenProfileViewer = function(uid) { closePanel(); window.location.href = "profile.html?uid=" + encodeURIComponent(uid); };
+  window._shOpenPdf = function(id) { markItemRead(id); closePanel(); window.location.href = "viewer.html?id=" + encodeURIComponent(id); };
+  window._shOpenWaiting = function(id) { markItemRead(id); closePanel(); window.location.href = "admin.html#waiting"; };
 
   /* ══════════════════════════════════════════════════════════
-     6.  PANEL OPEN / CLOSE
-     ══════════════════════════════════════════════════════════ */
-  function togglePanel(e) {
-    e.stopPropagation();
-    panelOpen ? closePanel() : openPanel();
-  }
+     7.  PANEL OPEN / CLOSE
+  ══════════════════════════════════════════════════════════ */
+  function togglePanel(e) { e.stopPropagation(); panelOpen ? closePanel() : openPanel(); }
 
   function openPanel() {
     panelOpen = true;
     const panel = document.getElementById("sh-panel");
     if (!panel) return;
-    /* Use requestAnimationFrame so display:flex is applied before transition fires */
     panel.style.display = "flex";
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        panel.classList.add("sh-open");
-      });
-    });
+    requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.add("sh-open")));
     renderList();
   }
 
@@ -767,56 +821,10 @@
     const panel = document.getElementById("sh-panel");
     if (!panel) return;
     panel.classList.remove("sh-open");
-    /* Hide after transition */
     panel.addEventListener("transitionend", function hide() {
       if (!panelOpen) panel.style.display = "";
       panel.removeEventListener("transitionend", hide);
     });
-  }
-
-  window._shOpenWaiting = function(id) {
-    markItemRead(id);
-    closePanel();
-    window.location.href = 'admin.html#waiting';
-  };
-
-  function showWaitingToast(name, room) {
-    const existing = document.getElementById('sh-waiting-toast');
-    if (existing) existing.remove();
-
-    const t = document.createElement('div');
-    t.id = 'sh-waiting-toast';
-    t.style.cssText = `
-      position:fixed;bottom:24px;right:24px;z-index:9999;
-      padding:14px 18px;border-radius:12px;
-      background:#1B1D25;border:1px solid rgba(201,163,86,0.35);
-      font-size:13px;color:#ECEDF1;
-      box-shadow:0 8px 32px rgba(0,0,0,0.5);
-      display:flex;align-items:center;gap:12px;
-      animation:sh-toast-in .25s ease;
-      font-family:'Plus Jakarta Sans',system-ui,sans-serif;
-      max-width:320px;
-    `;
-    t.innerHTML = `
-      <div style="width:36px;height:36px;border-radius:9px;background:rgba(201,163,86,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👤</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:700;color:#ECEDF1;margin-bottom:3px">${esc(name)} is waiting</div>
-        <div style="font-size:11.5px;color:#9498A6">Room: ${esc(room)} · <a href="admin.html#waiting" style="color:#C9A356;text-decoration:none;font-weight:600">Approve now →</a></div>
-      </div>
-      <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#62656F;cursor:pointer;font-size:16px;flex-shrink:0;padding:2px">✕</button>
-    `;
-    document.body.appendChild(t);
-
-    /* Ring the bell */
-    const btn = document.getElementById('sh-bell-btn');
-    if (btn) {
-      btn.classList.remove('sh-ring');
-      void btn.offsetWidth;
-      btn.classList.add('sh-ring');
-      btn.addEventListener('animationend', () => btn.classList.remove('sh-ring'), { once: true });
-    }
-
-    setTimeout(() => { if(t.parentElement) t.remove(); }, 8000);
   }
 
 })();
