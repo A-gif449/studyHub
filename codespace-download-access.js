@@ -235,8 +235,8 @@ const OTP_MAX_TRIES  = 3;
             Keep this window open. You'll be moved to the next step automatically once approved.
           </p>
         </div>
-        <button class="dla-btn ghost" onclick="SHDownloadAccess.close()" style="margin-top:20px">
-          Cancel request
+        <button class="dla-btn ghost" onclick="SHDownloadAccess.cancelAndClose()" style="margin-top:20px">
+            Cancel request
         </button>
       </div>
 
@@ -576,14 +576,21 @@ async function open(fileId, fileName, fileUrl) {
     if (_unsub) { _unsub(); _unsub = null; }
     // Cancel pending request if still waiting for admin
     if (_requestId) {
-      firebase.firestore().collection('downloadRequests').doc(_requestId)
-        .get().then(snap => {
-          if (snap.exists && snap.data().status === 'pending') {
-            snap.ref.update({ status: 'cancelled' }).catch(() => {});
-          }
-        }).catch(() => {});
-      _requestId = '';
-    }
+  // Only cancel if user hasn't yet passed OTP verification
+  // Step 3+ means request is already with admin — don't cancel it
+  const activeStep = [...document.querySelectorAll('.dla-step')]
+    .findIndex(el => el.classList.contains('active')) + 1;
+  
+  if (activeStep < 3) {
+    firebase.firestore().collection('downloadRequests').doc(_requestId)
+      .get().then(snap => {
+        if (snap.exists && snap.data().status === 'pending') {
+          snap.ref.update({ status: 'cancelled' }).catch(() => {});
+        }
+      }).catch(() => {});
+  }
+  _requestId = '';
+}
   }
 
   /* ── Show email collection step for anonymous users ── */
@@ -653,5 +660,20 @@ async function open(fileId, fileName, fileUrl) {
     await _proceedWithEmail(email, 'Guest', _fileName);
   }
 
-  return { open, close, verifyOtp, resendOtp, renderBtn, submitGuestEmail };
+  function cancelAndClose() {
+  if (_requestId) {
+    firebase.firestore().collection('downloadRequests').doc(_requestId)
+      .get().then(snap => {
+        if (snap.exists && snap.data().status === 'pending') {
+          snap.ref.update({ status: 'cancelled' }).catch(() => {});
+        }
+      }).catch(() => {});
+    _requestId = '';
+  }
+  $('dlaBackdrop').classList.remove('show');
+  clearInterval(_timerInterval);
+  if (_unsub) { _unsub(); _unsub = null; }
+}
+
+return { open, close, verifyOtp, resendOtp, renderBtn, submitGuestEmail, cancelAndClose };
 })();
