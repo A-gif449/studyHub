@@ -274,6 +274,12 @@ nav{
 window.FIREBASE_CONFIG={apiKey:"AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",authDomain:"studyx-fd90c.firebaseapp.com",projectId:"studyx-fd90c",storageBucket:"studyx-fd90c.firebasestorage.app",messagingSenderId:"520877226051",appId:"1:520877226051:web:94cdfd86eb64623f5f7cf6"};
 window.ADMIN_EMAILS=["abhishekbasu188@gmail.com"];
 window.CLOUDINARY_CONFIG={cloudName:"dwmvn4kj3",uploadPreset:"preupload"};
+window.GITHUB_CONFIG = {
+  token: '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',
+  owner: 'A-gif449',
+  repo:  'studyhub-files',  // create a public repo with this name
+  branch: 'main'
+};
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -781,7 +787,7 @@ async function handleSubmit(){
       btn.innerHTML='<i class="ti ti-loader spin"></i> Uploading…';
       setProgress(10,'Uploading to cloud storage…');
       try{
-        const url=await uploadToCloudinary(selectedFile, pct=>setProgress(pct*0.85,'Uploading…'));
+        const url=await uploadToGitHub(selectedFile, pct=>setProgress(pct,'Uploading to GitHub…'));
         setProgress(95,'Saving reference…');
         await db.collection('codespaceFiles').add({
           name, content:'',
@@ -842,29 +848,50 @@ function isBinaryFile(file){
   return binaryExts.includes(ext);
 }
 
-function uploadToCloudinary(file,onProgress){
-  return new Promise((resolve,reject)=>{
-    const cfg=window.CLOUDINARY_CONFIG;
-    const fd=new FormData();
-    fd.append('file',file);
-    fd.append('upload_preset',cfg.uploadPreset);
-    fd.append('resource_type','auto');
-    const xhr=new XMLHttpRequest();
-    xhr.upload.addEventListener('progress',e=>{
-      if(e.lengthComputable) onProgress(Math.round(e.loaded/e.total*100));
-    });
-    xhr.addEventListener('load',()=>{
-      if(xhr.status>=200&&xhr.status<300){
-        const data=JSON.parse(xhr.responseText);
-        resolve(data.secure_url);
-      } else {
-        try{const err=JSON.parse(xhr.responseText);reject(new Error(err.error?.message||'Upload failed'));}
-        catch{reject(new Error('Cloudinary upload failed (status '+xhr.status+')'));}
+function uploadToGitHub(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        onProgress(30);
+        // Convert to base64
+        const base64 = e.target.result.split(',')[1];
+        const cfg = window.GITHUB_CONFIG;
+        const path = `uploads/${Date.now()}_${file.name}`;
+        const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
+
+        onProgress(60);
+        const res = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${cfg.token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: `Upload ${file.name}`,
+            content: base64,
+            branch: cfg.branch
+          })
+        });
+
+        onProgress(90);
+        if (!res.ok) {
+          const err = await res.json();
+          reject(new Error(err.message || 'GitHub upload failed'));
+          return;
+        }
+
+        const data = await res.json();
+        // Return the raw download URL
+        const rawUrl = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${path}`;
+        onProgress(100);
+        resolve(rawUrl);
+      } catch(err) {
+        reject(err);
       }
-    });
-    xhr.addEventListener('error',()=>reject(new Error('Network error')));
-    xhr.open('POST',`https://api.cloudinary.com/v1_1/${cfg.cloudName}/auto/upload`);
-    xhr.send(fd);
+    };
+    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.readAsDataURL(file);
   });
 }
 
