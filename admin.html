@@ -7,211 +7,412 @@
 <title>Admin Panel – StudyHub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --bg:#F4F5F7;
-    --surface:#FFFFFF;
-    --surface-alt:#FAFBFC;
-    --sidebar:#FFFFFF;
-    --border:#E4E6EB;
-    --border-strong:#D3D6DE;
-    --ink:#14161F;
-    --ink2:#5B5F6D;
-    --ink3:#9298A6;
-    --accent:#3D4FE0;
-    --accent-dark:#2E3CB8;
-    --accent-soft:#EEF0FE;
-    --success:#0E9F6E;
-    --success-soft:#E7F8F1;
-    --danger:#D5372B;
-    --danger-soft:#FCEBE9;
-    --warning:#B4750F;
-    --warning-soft:#FBF1DE;
-    --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;
-    --shadow-sm:0 1px 2px rgba(20,22,31,0.05);
-    --shadow-md:0 6px 20px rgba(20,22,31,0.07);
-    --shadow-lg:0 20px 50px rgba(20,22,31,0.14);
-    --sidebar-w:236px;
-    --topbar-h:64px;
+    --bg:#0E0F12;--bg2:#13141A;--bg3:#181A21;--card:#15161C;--card2:#1B1D25;
+    --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+    --accent:#5B7FFF;--accent2:#8FA3D6;--accent3:#3FA9CC;
+    --gold:#C9A356;--green:#4E9E78;--red:#C2564F;
+    --text:#ECEDF1;--text2:#9498A6;--text3:#62656F;
+    --r:10px;--r2:14px;--r3:18px;
+    --sidebar-w:220px;--topbar-h:64px;
   }
   html{scroll-behavior:smooth}
-  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
-  h1,h2,h3,h4{font-family:'Inter Tight',sans-serif}
-  ::-webkit-scrollbar{width:8px;height:8px}
-  ::-webkit-scrollbar-track{background:transparent}
-  ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:99px}
-  ::-webkit-scrollbar-thumb:hover{background:var(--ink3)}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::-webkit-scrollbar{width:5px}
+  ::-webkit-scrollbar-track{background:var(--bg2)}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
 
-  /* ── Topbar ── */
-  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--border)}
-  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Inter Tight',sans-serif;font-size:17px;font-weight:800;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
-  .nav-logo img{width:30px;height:30px;border-radius:8px;object-fit:cover;border:1px solid var(--border)}
-  .admin-badge{padding:4px 11px;border-radius:6px;background:var(--danger-soft);border:1px solid rgba(213,55,43,0.18);color:var(--danger);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:5px}
+  /* ── TOPBAR ── */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    padding:0 24px;height:var(--topbar-h);
+    display:flex;align-items:center;justify-content:space-between;
+    background:rgba(14,15,18,0.92);backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:.2px}
+  .nav-logo img{width:28px;height:28px;border-radius:8px;object-fit:cover}
+  .admin-badge{
+    padding:4px 12px;border-radius:6px;
+    background:rgba(194,86,79,0.12);border:1px solid rgba(194,86,79,0.25);
+    color:var(--red);font-size:11px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.8px;
+    display:flex;align-items:center;gap:5px;
+  }
   .nav-right{display:flex;align-items:center;gap:10px}
-  .btn-ghost{padding:8px 16px;border-radius:8px;border:1px solid var(--border-strong);color:var(--ink2);background:var(--surface);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
-  .btn-ghost:hover{color:var(--ink);border-color:var(--ink3);background:var(--surface-alt)}
-  .btn-primary{padding:9px 18px;border-radius:8px;background:var(--accent);color:#fff;border:1px solid var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow-sm)}
-  .btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
-  .btn-danger{padding:8px 16px;border-radius:8px;background:var(--surface);border:1px solid var(--border-strong);color:var(--danger);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
-  .btn-danger:hover{background:var(--danger-soft);border-color:rgba(213,55,43,0.3)}
-  .user-info{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink2);padding-right:6px;border-right:1px solid var(--border);margin-right:2px}
-  .user-av{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+  .btn-ghost{
+    padding:7px 15px;border-radius:8px;border:1px solid var(--border2);
+    color:var(--text2);background:transparent;font-size:13px;font-weight:500;
+    cursor:pointer;font-family:inherit;transition:all .15s;
+    text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.03)}
+  .btn-danger{
+    padding:7px 15px;border-radius:8px;
+    background:rgba(194,86,79,0.08);border:1px solid rgba(194,86,79,0.2);
+    color:var(--red);font-size:13px;font-weight:500;
+    cursor:pointer;font-family:inherit;transition:all .15s;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn-danger:hover{background:rgba(194,86,79,0.14);border-color:rgba(194,86,79,0.35)}
+  .user-info{display:flex;align-items:center;gap:8px;padding-right:12px;border-right:1px solid var(--border2)}
+  .user-av{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
 
-  /* ── Sidebar ── */
-  .sidebar{position:fixed;top:var(--topbar-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--sidebar);border-right:1px solid var(--border);padding:20px 12px;z-index:90;overflow-y:auto}
-  .sidebar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink3);padding:0 10px;margin-bottom:8px}
-  .admin-section-nav{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
-  .adm-pill{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink2);font-size:13.5px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;width:100%}
-  .adm-pill i{font-size:16px;width:18px;text-align:center;color:var(--ink3);transition:color .15s}
-  .adm-pill:hover:not(.active){background:var(--surface-alt);color:var(--ink)}
-  .adm-pill.active{background:var(--accent-soft);color:var(--accent-dark);font-weight:600}
+  /* ── SIDEBAR ── */
+  .sidebar{
+    position:fixed;top:var(--topbar-h);left:0;bottom:0;
+    width:var(--sidebar-w);
+    background:var(--bg2);border-right:1px solid var(--border);
+    padding:16px 10px;z-index:90;overflow-y:auto;
+  }
+  .sidebar-label{
+    font-size:10px;font-weight:700;text-transform:uppercase;
+    letter-spacing:1.2px;color:var(--text3);
+    padding:0 10px;margin-bottom:8px;margin-top:4px;
+  }
+  .admin-section-nav{display:flex;flex-direction:column;gap:2px;margin-bottom:20px}
+  .adm-pill{
+    display:flex;align-items:center;gap:9px;
+    padding:9px 12px;border-radius:var(--r);
+    border:1px solid transparent;background:transparent;
+    color:var(--text2);font-size:13px;font-weight:500;
+    cursor:pointer;font-family:inherit;transition:all .15s;
+    text-align:left;width:100%;
+  }
+  .adm-pill i{font-size:15px;width:16px;text-align:center;color:var(--text3);transition:color .15s;flex-shrink:0}
+  .adm-pill:hover:not(.active){background:rgba(255,255,255,0.03);color:var(--text)}
+  .adm-pill:hover:not(.active) i{color:var(--text2)}
+  .adm-pill.active{background:rgba(91,127,255,0.1);border-color:rgba(91,127,255,0.2);color:var(--accent2);font-weight:600}
   .adm-pill.active i{color:var(--accent)}
 
-  /* ── Page layout ── */
-  .page-wrap{padding:calc(var(--topbar-h) + 32px) 32px 60px;margin-left:var(--sidebar-w);position:relative;z-index:1;max-width:1400px}
-  .page-header{margin-bottom:28px}
-  .page-header h1{font-size:24px;font-weight:800;margin-bottom:5px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
-  .page-header h1 .hdr-icon{width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:17px}
-  .page-header p{font-size:13.5px;color:var(--ink2)}
+  /* ── PAGE ── */
+  .page-wrap{
+    padding:calc(var(--topbar-h) + 28px) 28px 60px;
+    margin-left:var(--sidebar-w);
+    max-width:1360px;
+  }
+  .page-header{margin-bottom:24px}
+  .page-header h1{
+    font-family:'Source Serif 4',serif;
+    font-size:22px;font-weight:700;margin-bottom:5px;
+    color:var(--text);display:flex;align-items:center;gap:10px;
+  }
+  .page-header p{font-size:13px;color:var(--text2)}
 
-  .config-banner{background:var(--warning-soft);border:1px solid rgba(180,117,15,0.22);border-radius:var(--r-md);padding:16px 20px;margin-bottom:24px;display:flex;align-items:flex-start;gap:12px}
-  .config-banner i{font-size:18px;color:var(--warning);flex-shrink:0;margin-top:1px}
-  .config-banner h4{font-size:13px;font-weight:700;color:var(--warning);margin-bottom:3px}
-  .config-banner p{font-size:12.5px;color:var(--ink2);line-height:1.6}
-  .config-banner code{background:rgba(20,22,31,0.06);padding:1px 6px;border-radius:4px;font-size:11.5px;font-family:monospace;color:var(--ink)}
+  /* ── STATS ── */
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+  .stat-card{
+    padding:18px 20px;border-radius:var(--r2);
+    background:var(--card);border:1px solid var(--border);
+    transition:border-color .15s;
+  }
+  .stat-card:hover{border-color:var(--border2)}
+  .stat-card .s-val{font-family:'Source Serif 4',serif;font-size:26px;font-weight:700;margin-bottom:3px;color:var(--text)}
+  .stat-card .s-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
 
-  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
-  .stat-card{padding:18px 20px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
-  .stat-card .s-val{font-family:'Inter Tight',sans-serif;font-size:26px;font-weight:800;margin-bottom:3px;letter-spacing:-.02em}
-  .stat-card .s-lbl{font-size:11.5px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-
-  .grid-2{display:grid;grid-template-columns:400px 1fr;gap:20px;align-items:start}
+  /* ── PANELS ── */
+  .grid-2{display:grid;grid-template-columns:390px 1fr;gap:18px;align-items:start}
   @media(max-width:1000px){.grid-2{grid-template-columns:1fr}}
 
-  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;box-shadow:var(--shadow-sm)}
-  .panel-title{font-family:'Inter Tight',sans-serif;font-size:15px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px;color:var(--ink)}
-  .panel-title i{color:var(--accent);font-size:16px}
+  .panel{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:var(--r2);padding:22px;
+  }
+  .panel-title{
+    font-size:14px;font-weight:700;margin-bottom:16px;
+    display:flex;align-items:center;gap:8px;color:var(--text);
+  }
+  .panel-title i{color:var(--accent2);font-size:15px}
 
-  .form-group{margin-bottom:14px}
-  .form-group label{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:6px}
-  .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 13px;background:var(--surface-alt);border:1px solid var(--border-strong);border-radius:8px;color:var(--ink);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .15s,background .15s;-webkit-appearance:none}
-  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-soft)}
-  .form-group input::placeholder,.form-group textarea::placeholder{color:var(--ink3)}
-  .form-group textarea{resize:vertical;min-height:76px;line-height:1.5}
-  .form-group select option{background:var(--surface)}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  /* ── FORMS ── */
+  .form-group{margin-bottom:13px}
+  .form-group label{
+    display:block;font-size:11px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.5px;
+    color:var(--text3);margin-bottom:6px;
+  }
+  .form-group input,.form-group select,.form-group textarea{
+    width:100%;padding:9px 12px;
+    background:var(--bg2);border:1px solid var(--border2);
+    border-radius:8px;color:var(--text);font-size:13px;
+    font-family:inherit;outline:none;transition:border-color .15s;
+    -webkit-appearance:none;
+  }
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+  .form-group input::placeholder,.form-group textarea::placeholder{color:var(--text3)}
+  .form-group textarea{resize:vertical;min-height:74px;line-height:1.5}
+  .form-group select option{background:var(--card2)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 
-  .drop-zone{border:1.5px dashed var(--border-strong);border-radius:var(--r-md);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface-alt);position:relative;margin-bottom:14px}
-  .drop-zone:hover,.drop-zone.dragging{border-color:var(--accent);background:var(--accent-soft)}
+  /* ── DROP ZONE ── */
+  .drop-zone{
+    border:1.5px dashed rgba(91,127,255,0.25);border-radius:var(--r2);
+    padding:28px 20px;text-align:center;cursor:pointer;
+    transition:all .2s;background:rgba(91,127,255,0.02);
+    position:relative;margin-bottom:13px;
+  }
+  .drop-zone:hover,.drop-zone.dragging{border-color:rgba(91,127,255,0.5);background:rgba(91,127,255,0.05)}
   .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-  .drop-icon{font-size:30px;color:var(--accent);margin-bottom:8px}
-  .drop-zone h4{font-size:13.5px;font-weight:600;margin-bottom:3px;color:var(--ink)}
-  .drop-zone p{font-size:11.5px;color:var(--ink3)}
-  .file-chosen{background:var(--success-soft);border-color:rgba(14,159,110,0.35)!important;display:flex;align-items:center;justify-content:center;gap:9px;padding:15px 18px!important}
-  .file-chosen i{color:var(--success);font-size:20px}
-  .file-chosen span{font-size:12.5px;color:var(--success);font-weight:600}
+  .drop-icon{font-size:28px;color:var(--accent2);margin-bottom:8px}
+  .drop-zone h4{font-size:13px;font-weight:600;margin-bottom:3px;color:var(--text)}
+  .drop-zone p{font-size:11.5px;color:var(--text3)}
+  .file-chosen{
+    background:rgba(78,158,120,0.06);border-color:rgba(78,158,120,0.3)!important;
+    display:flex;align-items:center;justify-content:center;gap:9px;padding:14px 18px!important;
+  }
+  .file-chosen i{color:var(--green);font-size:20px}
+  .file-chosen span{font-size:12px;color:var(--green);font-weight:600}
 
-  .progress-wrap{margin-bottom:14px;display:none}
-  .progress-bar{height:6px;border-radius:99px;background:var(--border);overflow:hidden}
+  /* ── PROGRESS ── */
+  .progress-wrap{margin-bottom:13px;display:none}
+  .progress-bar{height:4px;border-radius:99px;background:var(--bg3);overflow:hidden}
   .progress-fill{height:100%;border-radius:99px;background:var(--accent);width:0%;transition:width .3s}
-  .progress-label{font-size:11.5px;color:var(--ink2);margin-bottom:6px;display:flex;justify-content:space-between;font-weight:500}
+  .progress-label{font-size:11px;color:var(--text2);margin-bottom:5px;display:flex;justify-content:space-between;font-weight:500}
 
-  .form-submit{width:100%;padding:12px;background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--shadow-sm)}
-  .form-submit:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
-  .form-submit:disabled{opacity:.55;cursor:not-allowed}
+  .form-submit{
+    width:100%;padding:11px;background:var(--accent);color:#fff;
+    border:none;border-radius:8px;font-size:13.5px;font-weight:600;
+    cursor:pointer;font-family:inherit;transition:background .15s;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+  }
+  .form-submit:hover{background:#4D6FE0}
+  .form-submit:disabled{opacity:.5;cursor:not-allowed}
 
-  .upload-error{background:var(--danger-soft);border:1px solid rgba(213,55,43,0.22);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--danger);margin-bottom:12px;display:none;font-weight:500}
+  .upload-error{
+    background:rgba(194,86,79,0.08);border:1px solid rgba(194,86,79,0.2);
+    border-radius:8px;padding:9px 13px;font-size:12px;color:var(--red);
+    margin-bottom:11px;display:none;font-weight:500;
+  }
   .upload-error.show{display:block}
-  .upload-success{background:var(--success-soft);border:1px solid rgba(14,159,110,0.25);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--success);margin-bottom:12px;display:none;align-items:center;gap:8px;font-weight:500}
+  .upload-success{
+    background:rgba(78,158,120,0.08);border:1px solid rgba(78,158,120,0.2);
+    border-radius:8px;padding:9px 13px;font-size:12px;color:var(--green);
+    margin-bottom:11px;display:none;align-items:center;gap:7px;font-weight:500;
+  }
   .upload-success.show{display:flex}
 
-  .search-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px}
-  .search-bar input{flex:1;padding:9px 13px;background:var(--surface-alt);border:1px solid var(--border-strong);border-radius:8px;color:var(--ink);font-size:13px;font-family:inherit;outline:none}
-  .search-bar input:focus{border-color:var(--accent);background:var(--surface)}
-  .search-bar input::placeholder{color:var(--ink3)}
-
-  .pdf-list{display:flex;flex-direction:column;gap:8px;max-height:620px;overflow-y:auto;padding-right:4px}
-  .pdf-item{padding:13px 14px;border-radius:var(--r-md);background:var(--surface-alt);border:1px solid var(--border);display:flex;align-items:center;gap:13px;transition:border-color .15s,background .15s}
-  .pdf-item:hover{border-color:var(--border-strong);background:var(--surface)}
-  .pdf-emoji{width:38px;height:38px;border-radius:9px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:var(--accent)}
-  .pdf-info{flex:1;min-width:0}
-  .pdf-info .pdf-title{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;color:var(--ink)}
-  .pdf-info .pdf-meta{font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-  .pdf-meta .tag{padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-dark);font-size:10px;font-weight:700}
-  .pdf-meta .tag.level-a{background:var(--danger-soft);color:var(--danger)}
-  .pdf-meta .tag.level-i{background:var(--warning-soft);color:var(--warning)}
-  .pdf-meta .tag.level-b{background:var(--success-soft);color:var(--success)}
-  .pdf-actions{display:flex;gap:6px;flex-shrink:0}
-  .icon-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:14px;cursor:pointer;transition:all .15s}
-  .icon-btn:hover{border-color:var(--border-strong);color:var(--ink);background:var(--surface-alt)}
-  .icon-btn.del:hover{border-color:rgba(213,55,43,0.35);color:var(--danger);background:var(--danger-soft)}
-  .empty-list{padding:38px 20px;text-align:center;color:var(--ink3)}
-  .empty-list i{font-size:32px;margin-bottom:10px;display:block;color:var(--border-strong)}
-  .empty-list p{font-size:12.5px}
-
-  /* ── Access gate ── */
-  #accessGate{display:none;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:0;text-align:center;padding:40px;position:relative;z-index:1;background:var(--bg)}
-  .gate-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:38px;width:100%;max-width:400px;text-align:left;box-shadow:var(--shadow-lg);animation:gateIn .3s ease}
-  @keyframes gateIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-  .gate-logo-row{display:flex;align-items:center;gap:12px;margin-bottom:26px}
-  .gate-logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;flex-shrink:0}
-  .gate-logo-text{font-family:'Inter Tight',sans-serif;font-size:17px;font-weight:800;color:var(--ink)}
-  .gate-logo-badge{padding:3px 9px;border-radius:6px;background:var(--danger-soft);border:1px solid rgba(213,55,43,0.18);color:var(--danger);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-left:2px}
-  .gate-title{font-family:'Inter Tight',sans-serif;font-size:20px;font-weight:800;margin-bottom:5px;color:var(--ink);letter-spacing:-.01em}
-  .gate-sub{font-size:13px;color:var(--ink2);margin-bottom:22px;line-height:1.6}
-  .gate-form-group{margin-bottom:13px}
-  .gate-form-group label{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:6px}
-  .gate-form-group input{width:100%;padding:11px 13px;background:var(--surface-alt);border:1px solid var(--border-strong);border-radius:8px;color:var(--ink);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .15s}
-  .gate-form-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  .gate-form-group input::placeholder{color:var(--ink3)}
-  .gate-error{background:var(--danger-soft);border:1px solid rgba(213,55,43,0.22);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--danger);margin-bottom:14px;display:none;font-weight:500}
-  .gate-error.show{display:block}
-  .gate-submit{width:100%;padding:12px;background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:2px;box-shadow:var(--shadow-sm)}
-  .gate-submit:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
-  .gate-submit:disabled{opacity:.55;cursor:not-allowed}
-  .gate-divider{display:flex;align-items:center;gap:10px;margin:18px 0}
-  .gate-divider span{font-size:11.5px;color:var(--ink3);white-space:nowrap;font-weight:500}
-  .gate-divider::before,.gate-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-  .gate-google{width:100%;padding:11px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink2);font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
-  .gate-google:hover{color:var(--ink);border-color:var(--ink3);background:var(--surface-alt)}
-  .gate-back{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;font-size:12.5px;color:var(--ink3);text-decoration:none;transition:color .15s;font-weight:500}
-  .gate-back:hover{color:var(--ink2)}
-  .gate-not-admin{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;width:100%;max-width:400px;text-align:center;margin-top:16px;box-shadow:var(--shadow-lg);animation:gateIn .3s ease}
-  .gate-not-admin i{font-size:30px;color:var(--danger);margin-bottom:10px;display:block}
-  .gate-not-admin h3{font-family:'Inter Tight',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;color:var(--ink)}
-  .gate-not-admin p{font-size:12.5px;color:var(--ink2);margin-bottom:16px;line-height:1.6}
-
-  /* ── Toast ── */
-  .toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:13px 18px;border-radius:10px;background:var(--ink);border:1px solid var(--ink);font-size:13px;font-weight:500;color:#fff;box-shadow:var(--shadow-lg);transform:translateY(20px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:9px;pointer-events:none}
-  .toast.show{transform:translateY(0);opacity:1}
-  .toast.success{background:#0B7A55;border-color:#0B7A55}
-  .toast.error{background:var(--danger);border-color:var(--danger)}
-
-  /* ── Modal ── */
-  .modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(20,22,31,0.45);backdrop-filter:blur(3px);align-items:center;justify-content:center}
-  .modal-backdrop.show{display:flex}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:32px;width:100%;max-width:460px;position:relative;box-shadow:var(--shadow-lg);animation:modalIn .2s ease}
-  @keyframes modalIn{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
-  .modal-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--ink2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-  .modal-close:hover{border-color:var(--border-strong);color:var(--ink);background:var(--surface-alt)}
-  .modal h3{font-family:'Inter Tight',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px;color:var(--ink)}
-
-  @media(max-width:900px){
-    .sidebar{position:static;width:100%;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:12px 16px}
-    .admin-section-nav{flex-direction:row;overflow-x:auto;gap:6px;margin-bottom:0}
-    .sidebar-label{display:none}
-    .adm-pill{white-space:nowrap;width:auto}
-    .page-wrap{margin-left:0;padding:calc(var(--topbar-h) + 20px) 20px 50px}
+  /* ── SEARCH ── */
+  .search-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .search-bar input{
+    flex:1;padding:8px 12px;background:var(--bg2);
+    border:1px solid var(--border2);border-radius:8px;
+    color:var(--text);font-size:12.5px;font-family:inherit;outline:none;
+    transition:border-color .15s;
   }
-  @media(max-width:640px){.page-wrap{padding:calc(var(--topbar-h) + 16px) 16px 44px}.form-row{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.gate-card{padding:26px}.user-info span{display:none}}
+  .search-bar input:focus{border-color:var(--accent)}
+  .search-bar input::placeholder{color:var(--text3)}
+
+  /* ── PDF ITEMS ── */
+  .pdf-list{display:flex;flex-direction:column;gap:8px;max-height:600px;overflow-y:auto;padding-right:4px}
+  .pdf-item{
+    padding:12px 14px;border-radius:var(--r2);
+    background:var(--bg2);border:1px solid var(--border);
+    display:flex;align-items:center;gap:12px;
+    transition:border-color .15s,background .15s;
+  }
+  .pdf-item:hover{border-color:var(--border2);background:var(--card2)}
+  .pdf-emoji{
+    width:36px;height:36px;border-radius:9px;
+    background:rgba(91,127,255,0.1);
+    display:flex;align-items:center;justify-content:center;
+    font-size:17px;flex-shrink:0;color:var(--accent2);
+  }
+  .pdf-info{flex:1;min-width:0}
+  .pdf-info .pdf-title{
+    font-size:13px;font-weight:600;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;
+  }
+  .pdf-info .pdf-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .pdf-meta .tag{
+    padding:2px 8px;border-radius:5px;
+    background:rgba(91,127,255,0.1);color:var(--accent2);
+    font-size:10px;font-weight:700;letter-spacing:.2px;
+  }
+  .pdf-meta .tag.level-a{background:rgba(194,86,79,0.1);color:var(--red)}
+  .pdf-meta .tag.level-i{background:rgba(201,163,86,0.1);color:var(--gold)}
+  .pdf-meta .tag.level-b{background:rgba(78,158,120,0.1);color:var(--green)}
+  .pdf-actions{display:flex;gap:5px;flex-shrink:0}
+
+  /* ── ICON BUTTONS ── */
+  .icon-btn{
+    width:30px;height:30px;border-radius:7px;
+    border:1px solid var(--border2);background:transparent;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text2);font-size:13px;cursor:pointer;transition:all .15s;
+  }
+  .icon-btn:hover{border-color:rgba(255,255,255,0.2);color:var(--text);background:rgba(255,255,255,0.04)}
+  .icon-btn.approve{color:var(--green);border-color:rgba(78,158,120,0.3);background:rgba(78,158,120,0.05)}
+  .icon-btn.approve:hover{background:rgba(78,158,120,0.12);border-color:rgba(78,158,120,0.5)}
+  .icon-btn.del{color:var(--text3);border-color:var(--border)}
+  .icon-btn.del:hover{border-color:rgba(194,86,79,0.4);color:var(--red);background:rgba(194,86,79,0.08)}
+
+  .empty-list{padding:36px 20px;text-align:center;color:var(--text3)}
+  .empty-list i{font-size:28px;margin-bottom:10px;display:block;color:var(--border2)}
+  .empty-list p{font-size:12.5px;line-height:1.6}
+
+  /* ── WAITING ROOM SPECIAL ITEMS ── */
+  .waiting-item{
+    padding:14px 16px;border-radius:var(--r2);
+    background:var(--bg2);border:1px solid var(--border);
+    border-left:3px solid var(--accent);
+    display:flex;align-items:center;gap:14px;
+    transition:all .15s;
+  }
+  .waiting-item:hover{background:var(--card2);border-color:var(--border2);border-left-color:var(--accent)}
+  .waiting-avatar{
+    width:40px;height:40px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:700;color:#fff;flex-shrink:0;
+  }
+  .waiting-info{flex:1;min-width:0}
+  .waiting-name{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:3px}
+  .waiting-meta{font-size:11.5px;color:var(--text3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .waiting-room-tag{
+    padding:2px 9px;border-radius:5px;
+    background:rgba(91,127,255,0.1);color:var(--accent2);
+    font-size:10.5px;font-weight:700;
+  }
+  .waiting-actions{display:flex;gap:8px;flex-shrink:0}
+  .btn-approve{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:8px 16px;border-radius:8px;
+    background:rgba(78,158,120,0.1);border:1px solid rgba(78,158,120,0.3);
+    color:var(--green);font-size:12.5px;font-weight:600;
+    cursor:pointer;font-family:inherit;transition:all .15s;
+  }
+  .btn-approve:hover{background:rgba(78,158,120,0.18);border-color:rgba(78,158,120,0.5)}
+  .btn-reject{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:8px 16px;border-radius:8px;
+    background:rgba(194,86,79,0.08);border:1px solid rgba(194,86,79,0.25);
+    color:var(--red);font-size:12.5px;font-weight:600;
+    cursor:pointer;font-family:inherit;transition:all .15s;
+  }
+  .btn-reject:hover{background:rgba(194,86,79,0.15);border-color:rgba(194,86,79,0.45)}
+
+  /* ── ACCESS GATE ── */
+  #accessGate{
+    display:none;align-items:center;justify-content:center;
+    min-height:100vh;flex-direction:column;gap:0;
+    text-align:center;padding:40px;position:relative;z-index:1;
+  }
+  .gate-card{
+    background:var(--card2);border:1px solid var(--border2);
+    border-radius:var(--r3);padding:38px;width:100%;max-width:400px;
+    text-align:left;animation:gateIn .3s ease;
+  }
+  @keyframes gateIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .gate-logo-row{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+  .gate-logo-icon{width:38px;height:38px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0}
+  .gate-logo-text{font-family:'Source Serif 4',serif;font-size:17px;font-weight:700;color:var(--text)}
+  .gate-logo-badge{
+    padding:2px 9px;border-radius:5px;
+    background:rgba(194,86,79,0.12);border:1px solid rgba(194,86,79,0.25);
+    color:var(--red);font-size:10px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.6px;margin-left:4px;
+  }
+  .gate-title{font-family:'Source Serif 4',serif;font-size:20px;font-weight:700;margin-bottom:5px;color:var(--text)}
+  .gate-sub{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.65}
+  .gate-form-group{margin-bottom:12px}
+  .gate-form-group label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px}
+  .gate-form-group input{
+    width:100%;padding:10px 13px;background:var(--bg2);
+    border:1px solid var(--border2);border-radius:8px;
+    color:var(--text);font-size:13.5px;font-family:inherit;
+    outline:none;transition:border-color .15s;
+  }
+  .gate-form-group input:focus{border-color:var(--accent)}
+  .gate-form-group input::placeholder{color:var(--text3)}
+  .gate-error{
+    background:rgba(194,86,79,0.08);border:1px solid rgba(194,86,79,0.2);
+    border-radius:8px;padding:9px 13px;font-size:12.5px;color:var(--red);
+    margin-bottom:13px;display:none;font-weight:500;
+  }
+  .gate-error.show{display:block}
+  .gate-submit{
+    width:100%;padding:12px;background:var(--accent);color:#fff;
+    border:none;border-radius:8px;font-size:14px;font-weight:600;
+    cursor:pointer;font-family:inherit;transition:background .15s;
+    display:flex;align-items:center;justify-content:center;gap:7px;margin-top:2px;
+  }
+  .gate-submit:hover{background:#4D6FE0}
+  .gate-submit:disabled{opacity:.5;cursor:not-allowed}
+  .gate-divider{display:flex;align-items:center;gap:10px;margin:16px 0}
+  .gate-divider span{font-size:11.5px;color:var(--text3);white-space:nowrap}
+  .gate-divider::before,.gate-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+  .gate-google{
+    width:100%;padding:10px;border-radius:8px;border:1px solid var(--border2);
+    background:transparent;color:var(--text2);font-size:13.5px;font-weight:500;
+    cursor:pointer;font-family:inherit;transition:all .15s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .gate-google:hover{color:var(--text);border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.03)}
+  .gate-back{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    margin-top:18px;font-size:12.5px;color:var(--text3);
+    text-decoration:none;transition:color .15s;font-weight:500;
+  }
+  .gate-back:hover{color:var(--text2)}
+  .gate-not-admin{
+    display:none;background:var(--card2);border:1px solid var(--border2);
+    border-radius:var(--r2);padding:26px;width:100%;max-width:400px;
+    text-align:center;margin-top:16px;animation:gateIn .3s ease;
+  }
+  .gate-not-admin i{font-size:28px;color:var(--red);margin-bottom:10px;display:block}
+  .gate-not-admin h3{font-family:'Source Serif 4',serif;font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)}
+  .gate-not-admin p{font-size:12.5px;color:var(--text2);margin-bottom:16px;line-height:1.6}
+
+  /* ── TOAST ── */
+  .toast{
+    position:fixed;bottom:24px;right:24px;z-index:999;
+    padding:12px 17px;border-radius:9px;
+    background:var(--card2);border:1px solid var(--border2);
+    font-size:13px;font-weight:500;color:var(--text);
+    box-shadow:0 16px 40px rgba(0,0,0,0.45);
+    transform:translateY(20px);opacity:0;transition:all .25s;
+    display:flex;align-items:center;gap:9px;pointer-events:none;
+  }
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{border-color:rgba(78,158,120,.35)}
+  .toast.error{border-color:rgba(194,86,79,.35)}
+
+  /* ── MODAL ── */
+  .modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(8,9,11,0.8);backdrop-filter:blur(6px);align-items:center;justify-content:center}
+  .modal-backdrop.show{display:flex}
+  .modal{
+    background:var(--card2);border:1px solid var(--border2);
+    border-radius:var(--r3);padding:30px;width:100%;max-width:460px;
+    position:relative;animation:modalIn .2s ease;
+  }
+  @keyframes modalIn{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .modal-close{
+    position:absolute;top:14px;right:14px;
+    width:28px;height:28px;border-radius:7px;
+    border:1px solid var(--border2);background:transparent;
+    color:var(--text2);font-size:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:all .15s;
+  }
+  .modal-close:hover{border-color:rgba(255,255,255,0.22);color:var(--text)}
+  .modal h3{font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;margin-bottom:18px;color:var(--text)}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:900px){
+    .sidebar{position:static;width:100%;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:10px 12px}
+    .admin-section-nav{flex-direction:row;overflow-x:auto;gap:4px;margin-bottom:0;padding-bottom:2px}
+    .sidebar-label{display:none}
+    .adm-pill{white-space:nowrap;width:auto;font-size:12.5px;padding:7px 11px}
+    .page-wrap{margin-left:0;padding:calc(var(--topbar-h) + 16px) 16px 44px}
+  }
+  @media(max-width:640px){.form-row{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.gate-card{padding:26px}.user-info span{display:none}.waiting-actions{flex-direction:column;gap:5px}}
 </style>
 <link rel="stylesheet" href="mobile.css"/>
 </head>
 
-<!-- ✅ EmailJS SDK loaded FIRST in <head> so it's ready before any script uses it -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="mobile-nav.js"></script>
 
@@ -227,13 +428,9 @@
     appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
   };
   window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
-  window.CLOUDINARY_CONFIG = {
-    cloudName:    "dwmvn4kj3",
-    uploadPreset: "preupload"
-  };
+  window.CLOUDINARY_CONFIG = { cloudName: "dwmvn4kj3", uploadPreset: "preupload" };
 </script>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -243,15 +440,13 @@
   <div class="gate-card" id="gateLoginCard">
     <div class="gate-logo-row">
       <div class="gate-logo-icon"><i class="ti ti-shield-check"></i></div>
-      <div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="gate-logo-text">StudyHub</span>
-          <span class="gate-logo-badge">Admin</span>
-        </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="gate-logo-text">StudyHub</span>
+        <span class="gate-logo-badge">Admin</span>
       </div>
     </div>
     <h2 class="gate-title">Welcome back, Admin</h2>
-    <p class="gate-sub">Sign in with your admin credentials to manage the PDF library.</p>
+    <p class="gate-sub">Sign in with your admin credentials to manage the library.</p>
     <div class="gate-error" id="gateError"></div>
     <div class="gate-form-group">
       <label>Email Address</label>
@@ -272,15 +467,13 @@
       <i class="ti ti-arrow-left" style="font-size:13px"></i> Back to StudyHub
     </a>
   </div>
-
   <div class="gate-not-admin" id="gateNotAdmin">
     <i class="ti ti-shield-x"></i>
     <h3>Access Denied</h3>
-    <p>Your account <span id="gateUserEmail" style="color:var(--ink);font-weight:600"></span> does not have admin privileges.</p>
+    <p>Your account <span id="gateUserEmail" style="color:var(--text);font-weight:600"></span> does not have admin privileges.</p>
     <button class="btn-danger" onclick="auth.signOut()" style="margin:0 auto;display:inline-flex">
       <i class="ti ti-logout"></i> Sign out & try another account
     </button>
-    <br/>
     <a href="index.html" class="gate-back" style="margin-top:12px">
       <i class="ti ti-arrow-left" style="font-size:13px"></i> Back to StudyHub
     </a>
@@ -298,14 +491,13 @@
     <div class="nav-right">
       <div class="user-info">
         <div class="user-av" id="adminInitials">A</div>
-        <span id="adminName" style="font-size:13px;color:var(--ink2);font-weight:500">Admin</span>
+        <span id="adminName" style="font-size:12.5px;color:var(--text2);font-weight:500">Admin</span>
       </div>
       <a href="index.html" class="btn-ghost"><i class="ti ti-home"></i> Home</a>
       <button class="btn-danger" onclick="handleLogout()"><i class="ti ti-logout"></i> Sign Out</button>
     </div>
   </nav>
 
-  <!-- SECTION NAV — sidebar -->
   <aside class="sidebar">
     <div class="sidebar-label">Manage</div>
     <div class="admin-section-nav">
@@ -320,191 +512,151 @@
 
   <div class="page-wrap">
     <div class="page-header">
-      <h1><span class="hdr-icon"><i class="ti ti-file-text"></i></span> PDF Management</h1>
+      <h1>PDF Management</h1>
       <p>Upload study materials to Cloudinary and publish them to the library.</p>
     </div>
 
+    <!-- UPLOAD SECTION -->
     <div id="adm-upload">
-    <div class="stats-row" id="statsRow">
-      <div class="stat-card"><div class="s-val" id="statTotal">—</div><div class="s-lbl">Total PDFs</div></div>
-      <div class="stat-card"><div class="s-val" id="statBeginner">—</div><div class="s-lbl">Beginner</div></div>
-      <div class="stat-card"><div class="s-val" id="statIntermediate">—</div><div class="s-lbl">Intermediate</div></div>
-      <div class="stat-card"><div class="s-val" id="statAdvanced">—</div><div class="s-lbl">Advanced</div></div>
-    </div>
-
-    <div class="grid-2">
-      <div class="panel">
-        <div class="panel-title"><i class="ti ti-cloud-upload"></i> Upload New PDF</div>
-        <div class="upload-error" id="uploadError"></div>
-        <div class="upload-success" id="uploadSuccess"><i class="ti ti-circle-check"></i><span id="uploadSuccessMsg"></span></div>
-
-        <div class="drop-zone" id="dropZone">
-          <input type="file" id="pdfFile" accept="image/*" onchange="handleFileSelect(this)"/>
-          <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
-          <h4>Drop PDF here or click to browse</h4>
-          <p>Maximum file size: 50 MB</p>
-        </div>
-
-        <div class="progress-wrap" id="progressWrap">
-          <div class="progress-label">
-            <span id="progressText">Uploading to Cloudinary…</span>
-            <span id="progressPct">0%</span>
-          </div>
-          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-        </div>
-
-        <div class="form-group">
-          <label>Title *</label>
-          <input type="text" id="pdfTitle" placeholder="e.g. Calculus Vol. III – Integration Techniques"/>
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="pdfDesc" placeholder="Brief description of the content (shown on cards)…"></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Subject *</label>
-            <select id="pdfSubject">
-              <option value="">Select subject…</option>
-              <option>Mathematics</option><option>Physics</option><option>Chemistry</option>
-              <option>Biology</option><option>CS & Tech</option><option>Economics</option>
-              <option>Literature</option><option>History</option><option>Psychology</option><option>Engineering</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Level *</label>
-            <select id="pdfLevel">
-              <option value="">Select level…</option>
-              <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Pages</label>
-            <input type="number" id="pdfPages" placeholder="e.g. 48" min="1"/>
-          </div>
-          <div class="form-group">
-            <label>Read Time</label>
-            <input type="text" id="pdfReadTime" placeholder="e.g. 2h 30m"/>
-          </div>
-        </div>
-
-        <button class="form-submit" id="uploadBtn" onclick="handleUpload()">
-          <i class="ti ti-upload"></i> Upload & Publish PDF
-        </button>
+      <div class="stats-row" id="statsRow">
+        <div class="stat-card"><div class="s-val" id="statTotal">—</div><div class="s-lbl">Total PDFs</div></div>
+        <div class="stat-card"><div class="s-val" id="statBeginner">—</div><div class="s-lbl">Beginner</div></div>
+        <div class="stat-card"><div class="s-val" id="statIntermediate">—</div><div class="s-lbl">Intermediate</div></div>
+        <div class="stat-card"><div class="s-val" id="statAdvanced">—</div><div class="s-lbl">Advanced</div></div>
       </div>
-
-      <div class="panel">
-        <div class="panel-title"><i class="ti ti-list"></i> Published PDFs</div>
-        <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="Search by title, subject…" oninput="filterList()"/>
-          <button class="btn-ghost" onclick="document.getElementById('searchInput').value='';filterList()"><i class="ti ti-x"></i></button>
-        </div>
-        <div class="pdf-list" id="pdfList">
-          <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="adm-views" style="display:none">
-    <div class="panel" style="margin-top:24px">
-      <div class="panel-title"><i class="ti ti-eye"></i> Recent Views</div>
-      <div id="viewsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
-        <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
-      </div>
-    </div>
-  </div><!-- closes adm-views -->
-
-    <div id="adm-downloads" style="display:none">
-    <div class="panel" style="margin-top:24px">
-      <div class="panel-title"><i class="ti ti-download"></i> Recent Downloads</div>
-      <div id="downloadsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
-        <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
-      </div>
-    </div>
-  </div><!-- closes adm-downloads -->
-
-  <div id="adm-premium" style="display:none">
-    <!-- ════════════════════════════════════════
-         IMPORTANT QUESTIONS — UPLOAD SECTION
-         ════════════════════════════════════════ -->
-    <div class="panel" style="margin-top:24px">
-      <div class="panel-title"><i class="ti ti-star"></i> Important Questions (Paid Content)</div>
-      <div class="upload-error" id="iqUploadError"></div>
-      <div class="upload-success" id="iqUploadSuccess"><i class="ti ti-circle-check"></i><span id="iqUploadSuccessMsg"></span></div>
-
-      <div class="grid-2" style="grid-template-columns:400px 1fr">
-        <div>
-          <div class="drop-zone" id="iqDropZone">
-            <input type="file" id="iqFile" accept="image/*" onchange="handleIqFileSelect(this)"/>
-            <div class="drop-icon"><i class="ti ti-star"></i></div>
-            <h4>Drop file here or click to browse</h4>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title"><i class="ti ti-cloud-upload"></i> Upload New PDF</div>
+          <div class="upload-error" id="uploadError"></div>
+          <div class="upload-success" id="uploadSuccess"><i class="ti ti-circle-check"></i><span id="uploadSuccessMsg"></span></div>
+          <div class="drop-zone" id="dropZone">
+            <input type="file" id="pdfFile" accept="image/*" onchange="handleFileSelect(this)"/>
+            <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
+            <h4>Drop PDF here or click to browse</h4>
             <p>Maximum file size: 50 MB</p>
           </div>
-
-          <div class="progress-wrap" id="iqProgressWrap">
-            <div class="progress-label">
-              <span id="iqProgressText">Uploading to Cloudinary…</span>
-              <span id="iqProgressPct">0%</span>
+          <div class="progress-wrap" id="progressWrap">
+            <div class="progress-label"><span id="progressText">Uploading…</span><span id="progressPct">0%</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          </div>
+          <div class="form-group"><label>Title *</label><input type="text" id="pdfTitle" placeholder="e.g. Calculus Vol. III – Integration Techniques"/></div>
+          <div class="form-group"><label>Description</label><textarea id="pdfDesc" placeholder="Brief description shown on cards…"></textarea></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Subject *</label>
+              <select id="pdfSubject">
+                <option value="">Select subject…</option>
+                <option>Mathematics</option><option>Physics</option><option>Chemistry</option>
+                <option>Biology</option><option>CS & Tech</option><option>Economics</option>
+                <option>Literature</option><option>History</option><option>Psychology</option><option>Engineering</option>
+              </select>
             </div>
-            <div class="progress-bar"><div class="progress-fill" id="iqProgressFill"></div></div>
+            <div class="form-group">
+              <label>Level *</label>
+              <select id="pdfLevel">
+                <option value="">Select level…</option>
+                <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+              </select>
+            </div>
           </div>
-
-          <div class="form-group">
-            <label>Title *</label>
-            <input type="text" id="iqTitle" placeholder="e.g. Mathematics – Semester 5 Important Questions"/>
+          <div class="form-row">
+            <div class="form-group"><label>Pages</label><input type="number" id="pdfPages" placeholder="e.g. 48" min="1"/></div>
+            <div class="form-group"><label>Read Time</label><input type="text" id="pdfReadTime" placeholder="e.g. 2h 30m"/></div>
           </div>
-          <div class="form-group">
-            <label>Description</label>
-            <textarea id="iqDesc" placeholder="Brief description shown on the card…"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Icon (Tabler icon name)</label>
-            <input type="text" id="iqIcon" placeholder="e.g. ti-math-function, ti-atom, ti-flask"/>
-          </div>
-
-          <button class="form-submit" id="iqUploadBtn" onclick="handleIqUpload()">
-            <i class="ti ti-upload"></i> Upload & Publish Question Set
+          <button class="form-submit" id="uploadBtn" onclick="handleUpload()">
+            <i class="ti ti-upload"></i> Upload & Publish PDF
           </button>
         </div>
-
-        <div>
+        <div class="panel">
+          <div class="panel-title"><i class="ti ti-list"></i> Published PDFs</div>
           <div class="search-bar">
-            <input type="text" id="iqSearchInput" placeholder="Search question sets…" oninput="filterIqList()"/>
-            <button class="btn-ghost" onclick="document.getElementById('iqSearchInput').value='';filterIqList()"><i class="ti ti-x"></i></button>
+            <input type="text" id="searchInput" placeholder="Search by title, subject…" oninput="filterList()"/>
+            <button class="btn-ghost" onclick="document.getElementById('searchInput').value='';filterList()"><i class="ti ti-x"></i></button>
           </div>
-          <div class="pdf-list" id="iqList">
+          <div class="pdf-list" id="pdfList">
             <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
           </div>
         </div>
       </div>
     </div>
 
-    </div><!-- closes adm-premium -->
-
-    <div id="adm-payments" style="display:none">
-    <div class="panel" style="margin-top:24px">
-      <div class="panel-title"><i class="ti ti-receipt"></i> Payment Approvals</div>
-      <div id="pendingPaymentsList" style="display:flex;flex-direction:column;gap:10px;max-height:600px;overflow-y:auto">
-        <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
-      </div>
-    </div>
-    </div><!-- closes adm-payments -->
-
-    <!-- WAITING ROOM PANEL -->
-    <div id="adm-waiting" style="display:none">
-      <div class="panel" style="margin-top:24px">
-        <div class="panel-title"><i class="ti ti-clock"></i> Waiting Room Requests</div>
-        <div id="waitingList" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto">
+    <!-- VIEWS -->
+    <div id="adm-views" style="display:none">
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-title"><i class="ti ti-eye"></i> Recent Views</div>
+        <div id="viewsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
           <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
         </div>
       </div>
     </div>
 
-  </div><!-- closes page-wrap -->
-</div><!-- closes adminUI -->
+    <!-- DOWNLOADS -->
+    <div id="adm-downloads" style="display:none">
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-title"><i class="ti ti-download"></i> Recent Downloads</div>
+        <div id="downloadsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
+          <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREMIUM -->
+    <div id="adm-premium" style="display:none">
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-title"><i class="ti ti-star"></i> Important Questions (Paid Content)</div>
+        <div class="upload-error" id="iqUploadError"></div>
+        <div class="upload-success" id="iqUploadSuccess"><i class="ti ti-circle-check"></i><span id="iqUploadSuccessMsg"></span></div>
+        <div class="grid-2" style="grid-template-columns:390px 1fr">
+          <div>
+            <div class="drop-zone" id="iqDropZone">
+              <input type="file" id="iqFile" accept="image/*" onchange="handleIqFileSelect(this)"/>
+              <div class="drop-icon"><i class="ti ti-star"></i></div>
+              <h4>Drop file here or click to browse</h4>
+              <p>Maximum file size: 50 MB</p>
+            </div>
+            <div class="progress-wrap" id="iqProgressWrap">
+              <div class="progress-label"><span id="iqProgressText">Uploading…</span><span id="iqProgressPct">0%</span></div>
+              <div class="progress-bar"><div class="progress-fill" id="iqProgressFill"></div></div>
+            </div>
+            <div class="form-group"><label>Title *</label><input type="text" id="iqTitle" placeholder="e.g. Mathematics – Semester 5 Important Questions"/></div>
+            <div class="form-group"><label>Description</label><textarea id="iqDesc" placeholder="Brief description shown on the card…"></textarea></div>
+            <div class="form-group"><label>Icon (Tabler icon name)</label><input type="text" id="iqIcon" placeholder="e.g. ti-math-function, ti-atom"/></div>
+            <button class="form-submit" id="iqUploadBtn" onclick="handleIqUpload()"><i class="ti ti-upload"></i> Upload & Publish Question Set</button>
+          </div>
+          <div>
+            <div class="search-bar">
+              <input type="text" id="iqSearchInput" placeholder="Search question sets…" oninput="filterIqList()"/>
+              <button class="btn-ghost" onclick="document.getElementById('iqSearchInput').value='';filterIqList()"><i class="ti ti-x"></i></button>
+            </div>
+            <div class="pdf-list" id="iqList"><div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div id="adm-payments" style="display:none">
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-title"><i class="ti ti-receipt"></i> Payment Approvals</div>
+        <div id="pendingPaymentsList" style="display:flex;flex-direction:column;gap:10px;max-height:600px;overflow-y:auto">
+          <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WAITING ROOM -->
+    <div id="adm-waiting" style="display:none">
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-title"><i class="ti ti-clock"></i> Waiting Room Requests</div>
+        <p style="font-size:12.5px;color:var(--text3);margin-bottom:16px">Approve or reject users waiting to join a video call. They receive the decision instantly.</p>
+        <div id="waitingList" style="display:flex;flex-direction:column;gap:10px;max-height:560px;overflow-y:auto">
+          <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- page-wrap -->
+</div><!-- adminUI -->
 
 <!-- EDIT MODAL -->
 <div class="modal-backdrop" id="editModal">
@@ -525,9 +677,7 @@
       </div>
       <div class="form-group">
         <label>Level</label>
-        <select id="editLevel">
-          <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
-        </select>
+        <select id="editLevel"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
       </div>
     </div>
     <div class="form-row">
@@ -538,25 +688,17 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"><i class="ti ti-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 
 <script>
-// ══════════════════════════════════════════
-// EMAILJS CONFIG  ← your real IDs are here
-// ══════════════════════════════════════════
 const EMAILJS_SERVICE_ID  = 'service_ni2xagc';
 const EMAILJS_TEMPLATE_ID = 'template_ckbvrir';
 const EMAILJS_PUBLIC_KEY  = 'tSeNtgGkF6IZXcDF4';
-
-// Init EmailJS once at top
 emailjs.init(EMAILJS_PUBLIC_KEY);
 
-// ── Init Firebase ──
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db   = firebase.firestore();
-
 let allPdfs = [];
 
 const subjectEmoji = {
@@ -565,7 +707,6 @@ const subjectEmoji = {
   'Psychology':'🧠','Engineering':'⚙️','Default':'📄'
 };
 
-// ── Auth Guard ──
 auth.onAuthStateChanged(user => {
   if (!user) { showLoginGate(); return; }
   if (!window.ADMIN_EMAILS.includes(user.email)) { showNotAdminGate(user.email); return; }
@@ -578,7 +719,6 @@ function showLoginGate(){
   document.getElementById('gateNotAdmin').style.display = 'none';
   document.getElementById('adminUI').style.display = 'none';
 }
-
 function showNotAdminGate(email){
   document.getElementById('accessGate').style.display = 'flex';
   document.getElementById('gateLoginCard').style.display = 'none';
@@ -586,829 +726,362 @@ function showNotAdminGate(email){
   document.getElementById('gateUserEmail').textContent = email;
   document.getElementById('adminUI').style.display = 'none';
 }
-
 function showAdmin(user){
   document.getElementById('accessGate').style.display = 'none';
   document.getElementById('adminUI').style.display = 'block';
   const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
   document.getElementById('adminInitials').textContent = initials;
   document.getElementById('adminName').textContent = user.displayName || user.email;
-  loadPdfs();
-  loadViews();
-  loadWaitingRoom();
-  loadDownloads();
-  loadIqSets();
-  loadPendingPayments(); 
+  loadPdfs(); loadViews(); loadDownloads(); loadIqSets(); loadPendingPayments(); loadWaitingRoom();
+  if(window.location.hash === '#waiting') admSwitch('waiting');
 }
 
-// ── Gate Login ──
 async function gateLogin(){
-  const email = document.getElementById('gateEmail').value.trim();
-  const pass  = document.getElementById('gatePass').value;
-  const errEl = document.getElementById('gateError');
-  errEl.classList.remove('show');
-  if(!email || !pass){ errEl.textContent='Please fill in both fields.'; errEl.classList.add('show'); return; }
-  const btn = document.getElementById('gateLoginBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Signing in…';
-  try {
-    await auth.signInWithEmailAndPassword(email, pass);
-  } catch(e) {
-    errEl.textContent = friendlyError(e.code);
-    errEl.classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="ti ti-login"></i> Sign In to Admin Panel';
-  }
+  const email=document.getElementById('gateEmail').value.trim(), pass=document.getElementById('gatePass').value;
+  const errEl=document.getElementById('gateError'); errEl.classList.remove('show');
+  if(!email||!pass){ errEl.textContent='Please fill in both fields.'; errEl.classList.add('show'); return; }
+  const btn=document.getElementById('gateLoginBtn');
+  btn.disabled=true; btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Signing in…';
+  try{ await auth.signInWithEmailAndPassword(email,pass); }
+  catch(e){ errEl.textContent=friendlyError(e.code); errEl.classList.add('show'); btn.disabled=false; btn.innerHTML='<i class="ti ti-login"></i> Sign In to Admin Panel'; }
 }
-
 async function gateGoogleLogin(){
-  const errEl = document.getElementById('gateError');
-  errEl.classList.remove('show');
-  try {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    await auth.signInWithPopup(provider);
-  } catch(e) {
-    errEl.textContent = friendlyError(e.code);
-    errEl.classList.add('show');
-  }
+  const errEl=document.getElementById('gateError'); errEl.classList.remove('show');
+  try{ const p=new firebase.auth.GoogleAuthProvider(); await auth.signInWithPopup(p); }
+  catch(e){ errEl.textContent=friendlyError(e.code); errEl.classList.add('show'); }
 }
-
-async function handleLogout(){
-  await auth.signOut();
-  window.location.href = 'index.html';
-}
-
+async function handleLogout(){ await auth.signOut(); window.location.href='index.html'; }
 function friendlyError(code){
-  const map = {
-    'auth/user-not-found':'No account found with this email.',
-    'auth/wrong-password':'Incorrect password.',
-    'auth/invalid-email':'Invalid email address.',
-    'auth/popup-closed-by-user':'Google sign-in was closed.',
-    'auth/network-request-failed':'Network error. Check your connection.',
-    'auth/invalid-credential':'Incorrect email or password.',
-    'auth/too-many-requests':'Too many attempts. Try again later.',
-  };
-  return map[code] || 'Something went wrong. Please try again.';
+  return({'auth/user-not-found':'No account found with this email.','auth/wrong-password':'Incorrect password.','auth/invalid-email':'Invalid email address.','auth/popup-closed-by-user':'Google sign-in was closed.','auth/network-request-failed':'Network error.','auth/invalid-credential':'Incorrect email or password.','auth/too-many-requests':'Too many attempts. Try again later.'})[code]||'Something went wrong.';
 }
 
-// ── Load PDFs ──
 function loadPdfs(){
-  db.collection('pdfs').orderBy('uploadedAt','desc').onSnapshot(snap => {
-    allPdfs = snap.docs.map(d => ({id:d.id,...d.data()}));
-    updateStats();
-    renderList(allPdfs);
-  }, err => {
-    showToast('Firestore error: '+err.message, 'error');
-  });
+  db.collection('pdfs').orderBy('uploadedAt','desc').onSnapshot(snap=>{
+    allPdfs=snap.docs.map(d=>({id:d.id,...d.data()}));
+    updateStats(); renderList(allPdfs);
+  },err=>showToast('Firestore error: '+err.message,'error'));
 }
-
 function loadViews(){
-  db.collection('views').orderBy('viewedAt','desc').limit(50).onSnapshot(snap => {
-    const el = document.getElementById('viewsList');
-    if(!snap.docs.length){
-      el.innerHTML = `<div class="empty-list"><i class="ti ti-eye-off"></i><p>No views yet.</p></div>`;
-      return;
-    }
-    el.innerHTML = snap.docs.map(d => {
-      const v = d.data();
-      const time = v.viewedAt ? new Date(v.viewedAt.seconds * 1000).toLocaleString() : 'Just now';
-      return `
-        <div class="pdf-item">
-          <div class="pdf-emoji">👁️</div>
-          <div class="pdf-info">
-            <div class="pdf-title">${escHtml(v.pdfTitle || 'Unknown PDF')}</div>
-            <div class="pdf-meta">
-              <span class="tag">${escHtml(v.userName || 'Unknown')}</span>
-              <span>${escHtml(v.userEmail || '')}</span>
-              <span>· ${time}</span>
-            </div>
-          </div>
-        </div>`;
+  db.collection('views').orderBy('viewedAt','desc').limit(50).onSnapshot(snap=>{
+    const el=document.getElementById('viewsList');
+    if(!snap.docs.length){ el.innerHTML=`<div class="empty-list"><i class="ti ti-eye-off"></i><p>No views yet.</p></div>`; return; }
+    el.innerHTML=snap.docs.map(d=>{
+      const v=d.data(), time=v.viewedAt?new Date(v.viewedAt.seconds*1000).toLocaleString():'Just now';
+      return `<div class="pdf-item"><div class="pdf-emoji">👁️</div><div class="pdf-info"><div class="pdf-title">${escHtml(v.pdfTitle||'Unknown PDF')}</div><div class="pdf-meta"><span class="tag">${escHtml(v.userName||'Unknown')}</span><span>${escHtml(v.userEmail||'')}</span><span>· ${time}</span></div></div></div>`;
     }).join('');
   });
 }
-
 function loadDownloads(){
-  db.collection('downloads').orderBy('downloadedAt','desc').limit(50).onSnapshot(snap => {
-    const el = document.getElementById('downloadsList');
-    if(!snap.docs.length){
-      el.innerHTML = `<div class="empty-list"><i class="ti ti-download-off"></i><p>No downloads yet.</p></div>`;
-      return;
-    }
-    el.innerHTML = snap.docs.map(d => {
-      const v = d.data();
-      const time = v.downloadedAt ? new Date(v.downloadedAt.seconds * 1000).toLocaleString() : 'Just now';
-      return `
-        <div class="pdf-item">
-          <div class="pdf-emoji">⬇️</div>
-          <div class="pdf-info">
-            <div class="pdf-title">${escHtml(v.pdfTitle || 'Unknown PDF')}</div>
-            <div class="pdf-meta">
-              <span class="tag">${escHtml(v.userName || 'Unknown')}</span>
-              <span>${escHtml(v.userEmail || '')}</span>
-              <span>· ${time}</span>
-            </div>
-          </div>
-        </div>`;
+  db.collection('downloads').orderBy('downloadedAt','desc').limit(50).onSnapshot(snap=>{
+    const el=document.getElementById('downloadsList');
+    if(!snap.docs.length){ el.innerHTML=`<div class="empty-list"><i class="ti ti-download-off"></i><p>No downloads yet.</p></div>`; return; }
+    el.innerHTML=snap.docs.map(d=>{
+      const v=d.data(), time=v.downloadedAt?new Date(v.downloadedAt.seconds*1000).toLocaleString():'Just now';
+      return `<div class="pdf-item"><div class="pdf-emoji">⬇️</div><div class="pdf-info"><div class="pdf-title">${escHtml(v.pdfTitle||'Unknown PDF')}</div><div class="pdf-meta"><span class="tag">${escHtml(v.userName||'Unknown')}</span><span>${escHtml(v.userEmail||'')}</span><span>· ${time}</span></div></div></div>`;
     }).join('');
   });
 }
-
 function updateStats(){
-  document.getElementById('statTotal').textContent = allPdfs.length;
-  document.getElementById('statBeginner').textContent = allPdfs.filter(p=>p.level==='Beginner').length;
-  document.getElementById('statIntermediate').textContent = allPdfs.filter(p=>p.level==='Intermediate').length;
-  document.getElementById('statAdvanced').textContent = allPdfs.filter(p=>p.level==='Advanced').length;
+  document.getElementById('statTotal').textContent=allPdfs.length;
+  document.getElementById('statBeginner').textContent=allPdfs.filter(p=>p.level==='Beginner').length;
+  document.getElementById('statIntermediate').textContent=allPdfs.filter(p=>p.level==='Intermediate').length;
+  document.getElementById('statAdvanced').textContent=allPdfs.filter(p=>p.level==='Advanced').length;
 }
-
-function filterList(){
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  renderList(allPdfs.filter(p => (p.title||'').toLowerCase().includes(q) || (p.subject||'').toLowerCase().includes(q)));
-}
-
+function filterList(){ const q=document.getElementById('searchInput').value.toLowerCase(); renderList(allPdfs.filter(p=>(p.title||'').toLowerCase().includes(q)||(p.subject||'').toLowerCase().includes(q))); }
 function renderList(pdfs){
-  const el = document.getElementById('pdfList');
-  if(!pdfs.length){
-    el.innerHTML = `<div class="empty-list"><i class="ti ti-file-off"></i><p>No PDFs uploaded yet.<br/>Use the form to upload your first one!</p></div>`;
-    return;
-  }
-  el.innerHTML = pdfs.map(pdf => {
-    const emoji = subjectEmoji[pdf.subject] || subjectEmoji['Default'];
-    const lvlClass = pdf.level === 'Advanced' ? 'level-a' : pdf.level === 'Intermediate' ? 'level-i' : 'level-b';
-    return `
-      <div class="pdf-item">
-        <div class="pdf-emoji">${emoji}</div>
-        <div class="pdf-info">
-          <div class="pdf-title">${escHtml(pdf.title)}</div>
-          <div class="pdf-meta">
-            <span class="tag">${escHtml(pdf.subject||'General')}</span>
-            <span class="tag ${lvlClass}">${escHtml(pdf.level||'All')}</span>
-            ${pdf.pages ? `<span>${pdf.pages} pages</span>` : ''}
-            ${pdf.readTime ? `<span>· ${pdf.readTime}</span>` : ''}
-          </div>
-        </div>
-        <div class="pdf-actions">
-          <button class="icon-btn" title="Preview" onclick="window.open('viewer.html?id=${pdf.id}','_blank')"><i class="ti ti-eye"></i></button>
-          <button class="icon-btn" title="Edit" onclick="openEditModal('${pdf.id}')"><i class="ti ti-pencil"></i></button>
-          <button class="icon-btn del" title="Delete" onclick="deletePdf('${pdf.id}','${escHtml(pdf.title)}')"><i class="ti ti-trash"></i></button>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-// ── File select ──
-let selectedFile = null;
-
-function handleFileSelect(input){
-  const file = input.files[0];
-  if(!file) return;
-  if(!file.type.startsWith('image/')){ showUploadError('Only image/PDF files are allowed.'); input.value=''; return; }
-  if(file.size > 52428800){ showUploadError('File exceeds 50 MB limit.'); input.value=''; return; }
-  selectedFile = file;
-  const dz = document.getElementById('dropZone');
-  dz.classList.add('file-chosen');
-  dz.innerHTML = `<i class="ti ti-circle-check" style="color:var(--success);font-size:26px"></i><span style="color:var(--success);font-size:12.5px;font-weight:600">${escHtml(file.name)} (${(file.size/1048576).toFixed(1)} MB)</span>`;
-  clearUploadMessages();
-}
-
-// Drag and drop
-const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('dragging'); });
-dz.addEventListener('dragleave', ()=> dz.classList.remove('dragging'));
-dz.addEventListener('drop', e=>{
-  e.preventDefault(); dz.classList.remove('dragging');
-  const file = e.dataTransfer.files[0];
-  if(file){ const inp = document.getElementById('pdfFile'); inp.files = e.dataTransfer.files; handleFileSelect(inp); }
-});
-
-// ── Upload ──
-async function handleUpload(){
-  clearUploadMessages();
-  const title    = document.getElementById('pdfTitle').value.trim();
-  const subject  = document.getElementById('pdfSubject').value;
-  const level    = document.getElementById('pdfLevel').value;
-  const desc     = document.getElementById('pdfDesc').value.trim();
-  const pages    = document.getElementById('pdfPages').value.trim();
-  const readTime = document.getElementById('pdfReadTime').value.trim();
-
-  if(!selectedFile){ showUploadError('Please select a file.'); return; }
-  if(!title)        { showUploadError('Title is required.'); return; }
-  if(!subject)      { showUploadError('Please select a subject.'); return; }
-  if(!level)        { showUploadError('Please select a level.'); return; }
-
-  const btn = document.getElementById('uploadBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Uploading…';
-
-  const pw = document.getElementById('progressWrap');
-  pw.style.display = 'block';
-  setProgress(0, 'Uploading to Cloudinary…');
-
-  try {
-    // Step 1: Upload file to Cloudinary
-    const cloudUrl = await uploadToCloudinary(
-      selectedFile,
-      pct => setProgress(pct * 0.85, 'Uploading to Cloudinary…')
-    );
-    setProgress(90, 'Saving to database…');
-
-    // Step 2: Save to Firestore
-    const pdfRef = await db.collection('pdfs').add({
-      title, subject, level,
-      description: desc,
-      pages: pages ? parseInt(pages) : null,
-      readTime: readTime || null,
-      cloudinaryUrl: cloudUrl,
-      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      uploadedBy: auth.currentUser.email
-    });
-
-    setProgress(95, 'Notifying followers…');
-
-    // Step 3: Send emails to followers
-    await notifyFollowers({ id: pdfRef.id, title, subject, level, cloudUrl });
-
-    setProgress(100, 'Done!');
-    setTimeout(()=>{ pw.style.display='none'; setProgress(0,''); }, 1200);
-
-    resetForm();
-    document.getElementById('uploadSuccessMsg').textContent = `"${title}" published successfully!`;
-    document.getElementById('uploadSuccess').classList.add('show');
-    setTimeout(()=> document.getElementById('uploadSuccess').classList.remove('show'), 4000);
-
-  } catch(err){
-    pw.style.display = 'none';
-    showUploadError('Upload failed: ' + err.message);
-    showToast('Upload failed', 'error');
-    console.error('Upload error:', err);
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = '<i class="ti ti-upload"></i> Upload & Publish PDF';
-}
-
-// ── Notify Followers via EmailJS ──
-// ── Notify Followers via EmailJS (DEBUG VERSION) ──
-async function notifyFollowers(pdf) {
-  try {
-    const adminUid = auth.currentUser.uid;
-    console.log('🔍 [notifyFollowers] Admin UID:', adminUid);
-    console.log('🔍 [notifyFollowers] Admin email:', auth.currentUser.email);
-
-    // Get all users following the admin
-    const followsSnap = await db.collection('follows')
-      .where('followingId', '==', adminUid)
-      .get();
-
-    console.log('🔍 [notifyFollowers] Matching follow docs:', followsSnap.size);
-    followsSnap.forEach(d => console.log('   →', d.id, JSON.stringify(d.data())));
-
-    if (followsSnap.empty) {
-      // Dump the whole collection so we can see what UIDs actually exist
-      const allFollows = await db.collection('follows').limit(25).get();
-      console.log('🔍 [notifyFollowers] Entire follows collection (up to 25 docs):');
-      if (allFollows.empty) {
-        console.log('   (collection is completely empty — no one has ever followed anyone)');
-      }
-      allFollows.forEach(d => console.log('   →', d.id, JSON.stringify(d.data())));
-      showToast('PDF published! (No followers yet) 🎉', 'success');
-      return;
-    }
-
-    const viewerUrl = `${location.origin}/viewer.html?id=${pdf.id}`;
-    let sent = 0;
-    let failed = 0;
-
-    for (const doc of followsSnap.docs) {
-      const data = doc.data();
-      let email = data.followerEmail || null;
-      let name  = data.followerName  || 'Learner';
-
-      if (!email) {
-        try {
-          const viewSnap = await db.collection('views')
-            .where('userId', '==', data.followerId)
-            .limit(1).get();
-          if (!viewSnap.empty) {
-            email = viewSnap.docs[0].data().userEmail || null;
-            name  = viewSnap.docs[0].data().userName  || name;
-          }
-        } catch(e) {}
-      }
-
-      if (!email) {
-        try {
-          const dlSnap = await db.collection('downloads')
-            .where('userId', '==', data.followerId)
-            .limit(1).get();
-          if (!dlSnap.empty) {
-            email = dlSnap.docs[0].data().userEmail || null;
-            name  = dlSnap.docs[0].data().userName  || name;
-          }
-        } catch(e) {}
-      }
-
-      if (!email) {
-        console.warn('No email found for follower:', name, data.followerId);
-        failed++;
-        continue;
-      }
-
-      try {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-          to_email:    email,
-          to_name:     name,
-          pdf_title:   pdf.title,
-          pdf_subject: pdf.subject,
-          pdf_level:   pdf.level || 'All levels',
-          pdf_url:     viewerUrl,
-        });
-        sent++;
-        console.log(`✅ Notified: ${email}`);
-      } catch(e) {
-        console.warn(`❌ Failed to email ${email}:`, e);
-        failed++;
-      }
-    }
-
-    if (sent > 0) {
-      showToast(`PDF published! Notified ${sent} follower${sent > 1 ? 's' : ''} 📧`, 'success');
-    } else {
-      showToast('PDF published! 🎉', 'success');
-    }
-    if (failed > 0) {
-      console.warn(`${failed} follower(s) could not be notified (no email found).`);
-    }
-
-  } catch(err) {
-    console.error('notifyFollowers error:', err);
-    showToast('PDF published! (Email notify failed) 🎉', 'success');
-  }
-}
-
-// ── Cloudinary Upload ──
-function uploadToCloudinary(file, onProgress){
-  return new Promise((resolve, reject) => {
-    const cfg = window.CLOUDINARY_CONFIG;
-    const fd  = new FormData();
-    fd.append('file', file);
-    fd.append('upload_preset', cfg.uploadPreset);
-    const xhr = new XMLHttpRequest();
-    xhr.upload.addEventListener('progress', e => {
-      if(e.lengthComputable) onProgress(e.loaded / e.total);
-    });
-    xhr.addEventListener('load', () => {
-      if(xhr.status >= 200 && xhr.status < 300){
-        const data = JSON.parse(xhr.responseText);
-        resolve(data.secure_url);
-      } else {
-        try {
-          const err = JSON.parse(xhr.responseText);
-          reject(new Error(err.error?.message || 'Cloudinary upload failed'));
-        } catch { reject(new Error('Cloudinary upload failed (status ' + xhr.status + ')')); }
-      }
-    });
-    xhr.addEventListener('error', ()=> reject(new Error('Network error during Cloudinary upload')));
-    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`);
-    xhr.send(fd);
-  });
-}
-
-function setProgress(pct, label){
-  const fill = document.getElementById('progressFill');
-  const pctEl = document.getElementById('progressPct');
-  const textEl = document.getElementById('progressText');
-  if(fill)  fill.style.width = pct + '%';
-  if(pctEl) pctEl.textContent = Math.round(pct) + '%';
-  if(textEl) textEl.textContent = label;
-}
-
-function resetForm(){
-  selectedFile = null;
-
-  // Rebuild dropzone FIRST (this recreates the pdfFile input)
-  const dz = document.getElementById('dropZone');
-  dz.classList.remove('file-chosen');
-  dz.innerHTML = `
-    <input type="file" id="pdfFile" accept="image/*" onchange="handleFileSelect(this)"/>
-    <div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div>
-    <h4>Drop PDF here or click to browse</h4>
-    <p>Maximum file size: 50 MB</p>`;
-
-  // Then reset other fields safely
-  ['pdfTitle','pdfDesc','pdfSubject','pdfLevel','pdfPages','pdfReadTime'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.value = '';
-  });
-}
-
-// ── Edit Modal ──
-function openEditModal(id){
-  const pdf = allPdfs.find(p=>p.id===id);
-  if(!pdf) return;
-  document.getElementById('editId').value       = id;
-  document.getElementById('editTitle').value    = pdf.title || '';
-  document.getElementById('editDesc').value     = pdf.description || '';
-  document.getElementById('editSubject').value  = pdf.subject || 'Mathematics';
-  document.getElementById('editLevel').value    = pdf.level || 'Beginner';
-  document.getElementById('editPages').value    = pdf.pages || '';
-  document.getElementById('editReadTime').value = pdf.readTime || '';
-  document.getElementById('editModal').classList.add('show');
-}
-function closeEditModal(){ document.getElementById('editModal').classList.remove('show'); }
-
-async function saveEdit(){
-  const id = document.getElementById('editId').value;
-  const data = {
-    title:       document.getElementById('editTitle').value.trim(),
-    description: document.getElementById('editDesc').value.trim(),
-    subject:     document.getElementById('editSubject').value,
-    level:       document.getElementById('editLevel').value,
-    pages:       parseInt(document.getElementById('editPages').value)||null,
-    readTime:    document.getElementById('editReadTime').value.trim()||null,
-  };
-  if(!data.title){ showToast('Title cannot be empty.','error'); return; }
-  try {
-    await db.collection('pdfs').doc(id).update(data);
-    closeEditModal();
-    showToast('PDF updated!','success');
-  } catch(e){ showToast('Error: '+e.message,'error'); }
-}
-
-// ── Delete ──
-async function deletePdf(id, title){
-  if(!confirm(`Delete "${title}"?\n\nThis removes it from the library.`)) return;
-  try {
-    await db.collection('pdfs').doc(id).delete();
-    showToast('PDF deleted.','success');
-  } catch(e){ showToast('Error: '+e.message,'error'); }
-}
-
-// ════════════════════════════════════════
-// IMPORTANT QUESTIONS — ADMIN SCRIPT
-// Paste this whole block into admin.html's <script>,
-// right after the existing PDF upload functions
-// (e.g. right after the closing of handleUpload() /
-// before the "// ── Notify Followers" comment, or
-// anywhere else in the same <script> tag).
-// ════════════════════════════════════════
-
-let allIqSets = [];
-let selectedIqFile = null;
-
-// ── Load Important Questions list ──
-function loadIqSets(){
-  db.collection('importantQuestions').orderBy('createdAt','desc').onSnapshot(snap => {
-    allIqSets = snap.docs.map(d => ({id:d.id, ...d.data()}));
-    renderIqList(allIqSets);
-  }, err => {
-    document.getElementById('iqList').innerHTML =
-      `<div class="empty-list"><i class="ti ti-alert-circle"></i><p>Error: ${err.message}</p></div>`;
-  });
-}
-
-function renderIqList(items){
-  const el = document.getElementById('iqList');
-  if(!items.length){
-    el.innerHTML = `<div class="empty-list"><i class="ti ti-star-off"></i><p>No question sets uploaded yet.<br/>Use the form to add your first one!</p></div>`;
-    return;
-  }
-  el.innerHTML = items.map(q => `
-    <div class="pdf-item">
-      <div class="pdf-emoji"><i class="ti ${escHtml(q.icon||'ti-file-text')}"></i></div>
+  const el=document.getElementById('pdfList');
+  if(!pdfs.length){ el.innerHTML=`<div class="empty-list"><i class="ti ti-file-off"></i><p>No PDFs uploaded yet.</p></div>`; return; }
+  el.innerHTML=pdfs.map(pdf=>{
+    const emoji=subjectEmoji[pdf.subject]||subjectEmoji['Default'];
+    const lc=pdf.level==='Advanced'?'level-a':pdf.level==='Intermediate'?'level-i':'level-b';
+    return `<div class="pdf-item">
+      <div class="pdf-emoji">${emoji}</div>
       <div class="pdf-info">
-        <div class="pdf-title">${escHtml(q.title||'Untitled')}</div>
+        <div class="pdf-title">${escHtml(pdf.title)}</div>
         <div class="pdf-meta">
-          <span class="tag">Important Questions</span>
-          ${q.description ? `<span>${escHtml(q.description.slice(0,40))}${q.description.length>40?'…':''}</span>` : ''}
+          <span class="tag">${escHtml(pdf.subject||'General')}</span>
+          <span class="tag ${lc}">${escHtml(pdf.level||'All')}</span>
+          ${pdf.pages?`<span>${pdf.pages} pages</span>`:''}
+          ${pdf.readTime?`<span>· ${pdf.readTime}</span>`:''}
         </div>
       </div>
       <div class="pdf-actions">
-        <button class="icon-btn" title="Preview" onclick="window.open('${escHtml(q.fileUrl||'#')}','_blank')"><i class="ti ti-eye"></i></button>
-        <button class="icon-btn del" title="Delete" onclick="deleteIqSet('${q.id}','${escHtml(q.title)}')"><i class="ti ti-trash"></i></button>
+        <button class="icon-btn" title="Preview" onclick="window.open('viewer.html?id=${pdf.id}','_blank')"><i class="ti ti-eye"></i></button>
+        <button class="icon-btn" title="Edit" onclick="openEditModal('${pdf.id}')"><i class="ti ti-pencil"></i></button>
+        <button class="icon-btn del" title="Delete" onclick="deletePdf('${pdf.id}','${escHtml(pdf.title)}')"><i class="ti ti-trash"></i></button>
       </div>
-    </div>`).join('');
-}
-
-function filterIqList(){
-  const q = document.getElementById('iqSearchInput').value.toLowerCase();
-  renderIqList(allIqSets.filter(s => (s.title||'').toLowerCase().includes(q)));
-}
-
-// ── File select (reuses same Cloudinary upload pattern as PDFs) ──
-function handleIqFileSelect(input){
-  const file = input.files[0];
-  if(!file) return;
-  if(!file.type.startsWith('image/')){ showIqUploadError('Only image/PDF files are allowed.'); input.value=''; return; }
-  if(file.size > 52428800){ showIqUploadError('File exceeds 50 MB limit.'); input.value=''; return; }
-  selectedIqFile = file;
-  const dz = document.getElementById('iqDropZone');
-  dz.classList.add('file-chosen');
-  dz.innerHTML = `<i class="ti ti-circle-check" style="color:var(--success);font-size:26px"></i><span style="color:var(--success);font-size:12.5px;font-weight:600">${escHtml(file.name)} (${(file.size/1048576).toFixed(1)} MB)</span>`;
-  clearIqUploadMessages();
-}
-
-const iqDz = document.getElementById('iqDropZone');
-if(iqDz){
-  iqDz.addEventListener('dragover', e=>{ e.preventDefault(); iqDz.classList.add('dragging'); });
-  iqDz.addEventListener('dragleave', ()=> iqDz.classList.remove('dragging'));
-  iqDz.addEventListener('drop', e=>{
-    e.preventDefault(); iqDz.classList.remove('dragging');
-    const file = e.dataTransfer.files[0];
-    if(file){ const inp = document.getElementById('iqFile'); inp.files = e.dataTransfer.files; handleIqFileSelect(inp); }
-  });
-}
-
-// ── Upload ──
-async function handleIqUpload(){
-  clearIqUploadMessages();
-  const title = document.getElementById('iqTitle').value.trim();
-  const desc  = document.getElementById('iqDesc').value.trim();
-  const icon  = document.getElementById('iqIcon').value.trim() || 'ti-file-text';
-
-  if(!selectedIqFile){ showIqUploadError('Please select a file.'); return; }
-  if(!title){ showIqUploadError('Title is required.'); return; }
-
-  const btn = document.getElementById('iqUploadBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Uploading…';
-
-  const pw = document.getElementById('iqProgressWrap');
-  pw.style.display = 'block';
-  setIqProgress(0, 'Uploading to Cloudinary…');
-
-  try {
-    const cloudUrl = await uploadToCloudinary(
-      selectedIqFile,
-      pct => setIqProgress(pct * 0.9, 'Uploading to Cloudinary…')
-    );
-    setIqProgress(95, 'Saving to database…');
-
-    await db.collection('importantQuestions').add({
-      title,
-      description: desc,
-      icon,
-      fileUrl: cloudUrl,
-      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      uploadedBy: auth.currentUser.email
-    });
-
-    setIqProgress(100, 'Done!');
-    setTimeout(()=>{ pw.style.display='none'; setIqProgress(0,''); }, 1200);
-
-    resetIqForm();
-    document.getElementById('iqUploadSuccessMsg').textContent = `"${title}" published successfully!`;
-    document.getElementById('iqUploadSuccess').classList.add('show');
-    setTimeout(()=> document.getElementById('iqUploadSuccess').classList.remove('show'), 4000);
-    showToast('Question set published! ⭐', 'success');
-
-  } catch(err){
-    pw.style.display = 'none';
-    showIqUploadError('Upload failed: ' + err.message);
-    showToast('Upload failed', 'error');
-    console.error('IQ upload error:', err);
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = '<i class="ti ti-upload"></i> Upload & Publish Question Set';
-}
-
-function setIqProgress(pct, label){
-  const fill = document.getElementById('iqProgressFill');
-  const pctEl = document.getElementById('iqProgressPct');
-  const textEl = document.getElementById('iqProgressText');
-  if(fill) fill.style.width = pct + '%';
-  if(pctEl) pctEl.textContent = Math.round(pct) + '%';
-  if(textEl) textEl.textContent = label;
-}
-
-function resetIqForm(){
-  selectedIqFile = null;
-  const dz = document.getElementById('iqDropZone');
-  dz.classList.remove('file-chosen');
-  dz.innerHTML = `
-    <input type="file" id="iqFile" accept="image/*" onchange="handleIqFileSelect(this)"/>
-    <div class="drop-icon"><i class="ti ti-star"></i></div>
-    <h4>Drop file here or click to browse</h4>
-    <p>Maximum file size: 50 MB</p>`;
-  ['iqTitle','iqDesc','iqIcon'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.value = '';
-  });
-}
-
-async function deleteIqSet(id, title){
-  if(!confirm(`Delete "${title}"?\n\nThis removes it from Important Questions.`)) return;
-  try {
-    await db.collection('importantQuestions').doc(id).delete();
-    showToast('Question set deleted.', 'success');
-  } catch(e){ showToast('Error: ' + e.message, 'error'); }
-}
-
-function showIqUploadError(msg){
-  const el = document.getElementById('iqUploadError');
-  el.textContent = msg; el.classList.add('show');
-}
-function clearIqUploadMessages(){
-  document.getElementById('iqUploadError').classList.remove('show');
-  document.getElementById('iqUploadSuccess').classList.remove('show');
-}
-
-// // ── Initialize: call this alongside your existing loadPdfs()/loadViews()/loadDownloads() ──
-// loadIqSets();
-
-// ════════════════════════════════════════
-// PAYMENT APPROVALS — ADMIN SCRIPT
-// Paste this into admin.html's <script>, anywhere
-// after the Important Questions admin script block.
-// Also add loadPendingPayments(); inside showAdmin(user)
-// alongside your other load___() calls.
-// ════════════════════════════════════════
-
-function loadPendingPayments(){
-  db.collection('pendingPayments').orderBy('submittedAt','desc').onSnapshot(snap => {
-    renderPendingPayments(snap.docs.map(d => ({id:d.id, ...d.data()})));
-  }, err => {
-    document.getElementById('pendingPaymentsList').innerHTML =
-      `<div class="empty-list"><i class="ti ti-alert-circle"></i><p>Error: ${err.message}</p></div>`;
-  });
-}
-
-function renderPendingPayments(items){
-  const el = document.getElementById('pendingPaymentsList');
-  if(!items.length){
-    el.innerHTML = `<div class="empty-list"><i class="ti ti-receipt-off"></i><p>No payment submissions yet.</p></div>`;
-    return;
-  }
-  el.innerHTML = items.map(p => {
-    const time = p.submittedAt ? new Date(p.submittedAt.seconds*1000).toLocaleString() : 'Just now';
-    const statusColor = p.status === 'approved' ? 'var(--success)' : p.status === 'rejected' ? 'var(--danger)' : 'var(--warning)';
-    const statusBg = p.status === 'approved' ? 'var(--success-soft)' : p.status === 'rejected' ? 'var(--danger-soft)' : 'var(--warning-soft)';
-    return `
-      <div class="pdf-item" style="flex-wrap:wrap;align-items:flex-start">
-        <div class="pdf-emoji">${p.status==='approved'?'✅':p.status==='rejected'?'❌':'⏳'}</div>
-        <div class="pdf-info">
-          <div class="pdf-title">${escHtml(p.userName||'Unknown')} — ₹${p.amount||'—'}</div>
-          <div class="pdf-meta">
-            <span>${escHtml(p.userEmail||'')}</span>
-            <span>· UTR: <strong style="color:var(--accent-dark)">${escHtml(p.utr||'—')}</strong></span>
-            <span>· ${time}</span>
-          </div>
-          <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <span class="tag" style="background:${statusBg};color:${statusColor}">${escHtml(p.status||'pending')}</span>
-            ${p.screenshotUrl ? `<a href="${escHtml(p.screenshotUrl)}" target="_blank" style="font-size:11px;color:var(--accent-dark)"><i class="ti ti-photo"></i> View screenshot</a>` : ''}
-          </div>
-        </div>
-        ${p.status === 'pending' ? `
-        <div class="pdf-actions">
-          <button class="icon-btn" title="Approve" style="border-color:rgba(14,159,110,0.4);color:var(--success)" onclick="approvePayment('${p.id}','${p.userId}','${p.itemId}','${escHtml(p.userEmail||'')}')"><i class="ti ti-check"></i></button>
-          <button class="icon-btn del" title="Reject" onclick="rejectPayment('${p.id}')"><i class="ti ti-x"></i></button>
-        </div>` : ''}
-      </div>`;
+    </div>`;
   }).join('');
 }
 
-async function approvePayment(pendingId, userId, itemId, userEmail){
-  if(!confirm('Confirm you have verified this payment in your UPI app before approving?')) return;
-  try {
-    const purchaseId = userId + '_' + itemId;
-    await db.collection('purchases').doc(purchaseId).set({
-      userId: userId,
-      userEmail: userEmail || null,
-      itemId: itemId,
-      status: 'completed',
-      method: 'manual_upi',
-      approvedBy: auth.currentUser.email,
-      purchasedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    await db.collection('pendingPayments').doc(pendingId).update({
-      status: 'approved',
-      approvedBy: auth.currentUser.email,
-      approvedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showToast('Payment approved — access unlocked! ✅', 'success');
-  } catch(e){
-    showToast('Error: ' + e.message, 'error');
-  }
+let selectedFile=null;
+function handleFileSelect(input){
+  const file=input.files[0]; if(!file) return;
+  if(!file.type.startsWith('image/')){ showUploadError('Only image/PDF files are allowed.'); input.value=''; return; }
+  if(file.size>52428800){ showUploadError('File exceeds 50 MB limit.'); input.value=''; return; }
+  selectedFile=file;
+  const dz=document.getElementById('dropZone'); dz.classList.add('file-chosen');
+  dz.innerHTML=`<i class="ti ti-circle-check" style="color:var(--green);font-size:26px"></i><span>${escHtml(file.name)} (${(file.size/1048576).toFixed(1)} MB)</span>`;
+  clearUploadMessages();
+}
+const dz=document.getElementById('dropZone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragging')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('dragging'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragging');const file=e.dataTransfer.files[0];if(file){const inp=document.getElementById('pdfFile');inp.files=e.dataTransfer.files;handleFileSelect(inp);}});
+
+async function handleUpload(){
+  clearUploadMessages();
+  const title=document.getElementById('pdfTitle').value.trim(), subject=document.getElementById('pdfSubject').value;
+  const level=document.getElementById('pdfLevel').value, desc=document.getElementById('pdfDesc').value.trim();
+  const pages=document.getElementById('pdfPages').value.trim(), readTime=document.getElementById('pdfReadTime').value.trim();
+  if(!selectedFile){showUploadError('Please select a file.');return;}
+  if(!title){showUploadError('Title is required.');return;}
+  if(!subject){showUploadError('Please select a subject.');return;}
+  if(!level){showUploadError('Please select a level.');return;}
+  const btn=document.getElementById('uploadBtn'); btn.disabled=true;
+  btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Uploading…';
+  const pw=document.getElementById('progressWrap'); pw.style.display='block'; setProgress(0,'Uploading to Cloudinary…');
+  try{
+    const cloudUrl=await uploadToCloudinary(selectedFile,pct=>setProgress(pct*0.85,'Uploading to Cloudinary…'));
+    setProgress(90,'Saving to database…');
+    const pdfRef=await db.collection('pdfs').add({title,subject,level,description:desc,pages:pages?parseInt(pages):null,readTime:readTime||null,cloudinaryUrl:cloudUrl,uploadedAt:firebase.firestore.FieldValue.serverTimestamp(),uploadedBy:auth.currentUser.email});
+    setProgress(95,'Notifying followers…');
+    await notifyFollowers({id:pdfRef.id,title,subject,level,cloudUrl});
+    setProgress(100,'Done!');
+    setTimeout(()=>{pw.style.display='none';setProgress(0,'');},1200);
+    resetForm();
+    document.getElementById('uploadSuccessMsg').textContent=`"${title}" published successfully!`;
+    document.getElementById('uploadSuccess').classList.add('show');
+    setTimeout(()=>document.getElementById('uploadSuccess').classList.remove('show'),4000);
+  }catch(err){pw.style.display='none';showUploadError('Upload failed: '+err.message);showToast('Upload failed','error');}
+  btn.disabled=false; btn.innerHTML='<i class="ti ti-upload"></i> Upload & Publish PDF';
 }
 
+async function notifyFollowers(pdf){
+  try{
+    const adminUid=auth.currentUser.uid;
+    const followsSnap=await db.collection('follows').where('followingId','==',adminUid).get();
+    if(followsSnap.empty){showToast('PDF published! 🎉','success');return;}
+    const viewerUrl=`${location.origin}/viewer.html?id=${pdf.id}`;
+    let sent=0;
+    for(const doc of followsSnap.docs){
+      const data=doc.data(); let email=data.followerEmail||null, name=data.followerName||'Learner';
+      if(!email){try{const s=await db.collection('views').where('userId','==',data.followerId).limit(1).get();if(!s.empty){email=s.docs[0].data().userEmail||null;name=s.docs[0].data().userName||name;}}catch(e){}}
+      if(!email) continue;
+      try{await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{to_email:email,to_name:name,pdf_title:pdf.title,pdf_subject:pdf.subject,pdf_level:pdf.level||'All levels',pdf_url:viewerUrl});sent++;}catch(e){}
+    }
+    showToast(sent>0?`PDF published! Notified ${sent} follower${sent>1?'s':''} 📧`:'PDF published! 🎉','success');
+  }catch(err){showToast('PDF published! 🎉','success');}
+}
+
+function uploadToCloudinary(file,onProgress){
+  return new Promise((resolve,reject)=>{
+    const cfg=window.CLOUDINARY_CONFIG, fd=new FormData();
+    fd.append('file',file); fd.append('upload_preset',cfg.uploadPreset);
+    const xhr=new XMLHttpRequest();
+    xhr.upload.addEventListener('progress',e=>{if(e.lengthComputable)onProgress(e.loaded/e.total);});
+    xhr.addEventListener('load',()=>{
+      if(xhr.status>=200&&xhr.status<300){resolve(JSON.parse(xhr.responseText).secure_url);}
+      else{try{reject(new Error(JSON.parse(xhr.responseText).error?.message||'Upload failed'));}catch{reject(new Error('Upload failed'));}}
+    });
+    xhr.addEventListener('error',()=>reject(new Error('Network error')));
+    xhr.open('POST',`https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`);
+    xhr.send(fd);
+  });
+}
+function setProgress(pct,label){
+  const f=document.getElementById('progressFill'),p=document.getElementById('progressPct'),t=document.getElementById('progressText');
+  if(f)f.style.width=pct+'%'; if(p)p.textContent=Math.round(pct)+'%'; if(t)t.textContent=label;
+}
+function resetForm(){
+  selectedFile=null;
+  const dz=document.getElementById('dropZone'); dz.classList.remove('file-chosen');
+  dz.innerHTML=`<input type="file" id="pdfFile" accept="image/*" onchange="handleFileSelect(this)"/><div class="drop-icon"><i class="ti ti-file-type-pdf"></i></div><h4>Drop PDF here or click to browse</h4><p>Maximum file size: 50 MB</p>`;
+  ['pdfTitle','pdfDesc','pdfSubject','pdfLevel','pdfPages','pdfReadTime'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+function openEditModal(id){
+  const pdf=allPdfs.find(p=>p.id===id); if(!pdf) return;
+  document.getElementById('editId').value=id; document.getElementById('editTitle').value=pdf.title||'';
+  document.getElementById('editDesc').value=pdf.description||''; document.getElementById('editSubject').value=pdf.subject||'Mathematics';
+  document.getElementById('editLevel').value=pdf.level||'Beginner'; document.getElementById('editPages').value=pdf.pages||'';
+  document.getElementById('editReadTime').value=pdf.readTime||''; document.getElementById('editModal').classList.add('show');
+}
+function closeEditModal(){document.getElementById('editModal').classList.remove('show');}
+async function saveEdit(){
+  const id=document.getElementById('editId').value;
+  const data={title:document.getElementById('editTitle').value.trim(),description:document.getElementById('editDesc').value.trim(),subject:document.getElementById('editSubject').value,level:document.getElementById('editLevel').value,pages:parseInt(document.getElementById('editPages').value)||null,readTime:document.getElementById('editReadTime').value.trim()||null};
+  if(!data.title){showToast('Title cannot be empty.','error');return;}
+  try{await db.collection('pdfs').doc(id).update(data);closeEditModal();showToast('PDF updated!','success');}
+  catch(e){showToast('Error: '+e.message,'error');}
+}
+async function deletePdf(id,title){
+  if(!confirm(`Delete "${title}"?`)) return;
+  try{await db.collection('pdfs').doc(id).delete();showToast('PDF deleted.','success');}
+  catch(e){showToast('Error: '+e.message,'error');}
+}
+
+// IMPORTANT QUESTIONS
+let allIqSets=[], selectedIqFile=null;
+function loadIqSets(){
+  db.collection('importantQuestions').orderBy('createdAt','desc').onSnapshot(snap=>{
+    allIqSets=snap.docs.map(d=>({id:d.id,...d.data()})); renderIqList(allIqSets);
+  },err=>{document.getElementById('iqList').innerHTML=`<div class="empty-list"><i class="ti ti-alert-circle"></i><p>Error: ${err.message}</p></div>`;});
+}
+function renderIqList(items){
+  const el=document.getElementById('iqList');
+  if(!items.length){el.innerHTML=`<div class="empty-list"><i class="ti ti-star-off"></i><p>No question sets uploaded yet.</p></div>`;return;}
+  el.innerHTML=items.map(q=>`<div class="pdf-item"><div class="pdf-emoji"><i class="ti ${escHtml(q.icon||'ti-file-text')}"></i></div><div class="pdf-info"><div class="pdf-title">${escHtml(q.title||'Untitled')}</div><div class="pdf-meta"><span class="tag">Important Questions</span>${q.description?`<span>${escHtml(q.description.slice(0,40))}…</span>`:''}</div></div><div class="pdf-actions"><button class="icon-btn" title="Preview" onclick="window.open('${escHtml(q.fileUrl||'#')}','_blank')"><i class="ti ti-eye"></i></button><button class="icon-btn del" title="Delete" onclick="deleteIqSet('${q.id}','${escHtml(q.title)}')"><i class="ti ti-trash"></i></button></div></div>`).join('');
+}
+function filterIqList(){const q=document.getElementById('iqSearchInput').value.toLowerCase();renderIqList(allIqSets.filter(s=>(s.title||'').toLowerCase().includes(q)));}
+function handleIqFileSelect(input){
+  const file=input.files[0]; if(!file) return;
+  if(!file.type.startsWith('image/')){ showIqUploadError('Only image/PDF files are allowed.'); input.value=''; return; }
+  if(file.size>52428800){ showIqUploadError('File exceeds 50 MB limit.'); input.value=''; return; }
+  selectedIqFile=file;
+  const dz=document.getElementById('iqDropZone'); dz.classList.add('file-chosen');
+  dz.innerHTML=`<i class="ti ti-circle-check" style="color:var(--green);font-size:26px"></i><span>${escHtml(file.name)} (${(file.size/1048576).toFixed(1)} MB)</span>`;
+  clearIqUploadMessages();
+}
+const iqDz=document.getElementById('iqDropZone');
+if(iqDz){iqDz.addEventListener('dragover',e=>{e.preventDefault();iqDz.classList.add('dragging')});iqDz.addEventListener('dragleave',()=>iqDz.classList.remove('dragging'));iqDz.addEventListener('drop',e=>{e.preventDefault();iqDz.classList.remove('dragging');const file=e.dataTransfer.files[0];if(file){const inp=document.getElementById('iqFile');inp.files=e.dataTransfer.files;handleIqFileSelect(inp);}});}
+async function handleIqUpload(){
+  clearIqUploadMessages();
+  const title=document.getElementById('iqTitle').value.trim(), desc=document.getElementById('iqDesc').value.trim(), icon=document.getElementById('iqIcon').value.trim()||'ti-file-text';
+  if(!selectedIqFile){showIqUploadError('Please select a file.');return;} if(!title){showIqUploadError('Title is required.');return;}
+  const btn=document.getElementById('iqUploadBtn'); btn.disabled=true; btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Uploading…';
+  const pw=document.getElementById('iqProgressWrap'); pw.style.display='block'; setIqProgress(0,'Uploading…');
+  try{
+    const cloudUrl=await uploadToCloudinary(selectedIqFile,pct=>setIqProgress(pct*0.9,'Uploading…'));
+    setIqProgress(95,'Saving…');
+    await db.collection('importantQuestions').add({title,description:desc,icon,fileUrl:cloudUrl,uploadedAt:firebase.firestore.FieldValue.serverTimestamp(),createdAt:firebase.firestore.FieldValue.serverTimestamp(),uploadedBy:auth.currentUser.email});
+    setIqProgress(100,'Done!'); setTimeout(()=>{pw.style.display='none';setIqProgress(0,'');},1200);
+    resetIqForm(); document.getElementById('iqUploadSuccessMsg').textContent=`"${title}" published!`;
+    document.getElementById('iqUploadSuccess').classList.add('show'); setTimeout(()=>document.getElementById('iqUploadSuccess').classList.remove('show'),4000);
+    showToast('Question set published! ⭐','success');
+  }catch(err){pw.style.display='none';showIqUploadError('Upload failed: '+err.message);showToast('Upload failed','error');}
+  btn.disabled=false; btn.innerHTML='<i class="ti ti-upload"></i> Upload & Publish Question Set';
+}
+function setIqProgress(pct,label){const f=document.getElementById('iqProgressFill'),p=document.getElementById('iqProgressPct'),t=document.getElementById('iqProgressText');if(f)f.style.width=pct+'%';if(p)p.textContent=Math.round(pct)+'%';if(t)t.textContent=label;}
+function resetIqForm(){
+  selectedIqFile=null; const dz=document.getElementById('iqDropZone'); dz.classList.remove('file-chosen');
+  dz.innerHTML=`<input type="file" id="iqFile" accept="image/*" onchange="handleIqFileSelect(this)"/><div class="drop-icon"><i class="ti ti-star"></i></div><h4>Drop file here or click to browse</h4><p>Maximum file size: 50 MB</p>`;
+  ['iqTitle','iqDesc','iqIcon'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+async function deleteIqSet(id,title){
+  if(!confirm(`Delete "${title}"?`)) return;
+  try{await db.collection('importantQuestions').doc(id).delete();showToast('Question set deleted.','success');}
+  catch(e){showToast('Error: '+e.message,'error');}
+}
+function showIqUploadError(msg){const el=document.getElementById('iqUploadError');el.textContent=msg;el.classList.add('show');}
+function clearIqUploadMessages(){document.getElementById('iqUploadError').classList.remove('show');document.getElementById('iqUploadSuccess').classList.remove('show');}
+
+// PAYMENTS
+function loadPendingPayments(){
+  db.collection('pendingPayments').orderBy('submittedAt','desc').onSnapshot(snap=>{
+    renderPendingPayments(snap.docs.map(d=>({id:d.id,...d.data()})));
+  },err=>{document.getElementById('pendingPaymentsList').innerHTML=`<div class="empty-list"><i class="ti ti-alert-circle"></i><p>Error: ${err.message}</p></div>`;});
+}
+function renderPendingPayments(items){
+  const el=document.getElementById('pendingPaymentsList');
+  if(!items.length){el.innerHTML=`<div class="empty-list"><i class="ti ti-receipt-off"></i><p>No payment submissions yet.</p></div>`;return;}
+  el.innerHTML=items.map(p=>{
+    const time=p.submittedAt?new Date(p.submittedAt.seconds*1000).toLocaleString():'Just now';
+    const sc=p.status==='approved'?'var(--green)':p.status==='rejected'?'var(--red)':'var(--gold)';
+    const sb=p.status==='approved'?'rgba(78,158,120,0.1)':p.status==='rejected'?'rgba(194,86,79,0.1)':'rgba(201,163,86,0.1)';
+    return `<div class="pdf-item" style="flex-wrap:wrap;align-items:flex-start">
+      <div class="pdf-emoji">${p.status==='approved'?'✅':p.status==='rejected'?'❌':'⏳'}</div>
+      <div class="pdf-info">
+        <div class="pdf-title">${escHtml(p.userName||'Unknown')} — ₹${p.amount||'—'}</div>
+        <div class="pdf-meta"><span>${escHtml(p.userEmail||'')}</span><span>· UTR: <strong style="color:var(--accent2)">${escHtml(p.utr||'—')}</strong></span><span>· ${time}</span></div>
+        <div style="margin-top:7px;display:flex;align-items:center;gap:8px">
+          <span class="tag" style="background:${sb};color:${sc}">${escHtml(p.status||'pending')}</span>
+          ${p.screenshotUrl?`<a href="${escHtml(p.screenshotUrl)}" target="_blank" style="font-size:11px;color:var(--accent2)"><i class="ti ti-photo"></i> View screenshot</a>`:''}
+        </div>
+      </div>
+      ${p.status==='pending'?`<div class="pdf-actions"><button class="icon-btn approve" title="Approve" onclick="approvePayment('${p.id}','${p.userId}','${p.itemId}','${escHtml(p.userEmail||'')}')"><i class="ti ti-check"></i></button><button class="icon-btn del" title="Reject" onclick="rejectPayment('${p.id}')"><i class="ti ti-x"></i></button></div>`:''}
+    </div>`;
+  }).join('');
+}
+async function approvePayment(pendingId,userId,itemId,userEmail){
+  if(!confirm('Confirm you have verified this payment before approving?')) return;
+  try{
+    await db.collection('purchases').doc(userId+'_'+itemId).set({userId,userEmail:userEmail||null,itemId,status:'completed',method:'manual_upi',approvedBy:auth.currentUser.email,purchasedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('pendingPayments').doc(pendingId).update({status:'approved',approvedBy:auth.currentUser.email,approvedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    showToast('Payment approved — access unlocked! ✅','success');
+  }catch(e){showToast('Error: '+e.message,'error');}
+}
 async function rejectPayment(pendingId){
   if(!confirm('Reject this payment submission?')) return;
-  try {
-    await db.collection('pendingPayments').doc(pendingId).update({
-      status: 'rejected',
-      rejectedBy: auth.currentUser.email,
-      rejectedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showToast('Payment rejected.', 'success');
-  } catch(e){
-    showToast('Error: ' + e.message, 'error');
-  }
+  try{await db.collection('pendingPayments').doc(pendingId).update({status:'rejected',rejectedBy:auth.currentUser.email,rejectedAt:firebase.firestore.FieldValue.serverTimestamp()});showToast('Payment rejected.','success');}
+  catch(e){showToast('Error: '+e.message,'error');}
 }
 
-// ── Waiting Room Host Panel ──
+// WAITING ROOM
 function loadWaitingRoom(){
-  const el = document.getElementById('waitingList');
-  el.innerHTML = `<div class="empty-list"><i class="ti ti-loader"></i><p>Connecting…</p></div>`;
-
-  // Debug: first check ALL docs in waitingRoom collection
-  db.collection('waitingRoom').get().then(snap => {
-    console.log('Total waitingRoom docs:', snap.size);
-    snap.forEach(d => console.log('Doc:', d.id, JSON.stringify(d.data())));
-  });
-
-  // Then listen for waiting ones
-  db.collection('waitingRoom')
-    .where('status','==','waiting')
-    .onSnapshot(snap => {
-      console.log('Waiting docs found:', snap.size);
-      
+  const el=document.getElementById('waitingList');
+  el.innerHTML=`<div class="empty-list"><i class="ti ti-loader"></i><p>Connecting…</p></div>`;
+  db.collection('waitingRoom').where('status','==','waiting')
+    .onSnapshot(snap=>{
       if(!snap.docs.length){
-        el.innerHTML = `<div class="empty-list"><i class="ti ti-checks"></i><p>No one waiting right now.<br/><small style="color:var(--ink3)">Check browser console for debug info</small></p></div>`;
+        el.innerHTML=`<div class="empty-list"><i class="ti ti-checks"></i><p>No one waiting right now.</p></div>`;
         return;
       }
-
-      el.innerHTML = snap.docs.map(d => {
-        const v = d.data();
-        const time = v.requestedAt ? new Date(v.requestedAt.seconds*1000).toLocaleTimeString() : 'Just now';
-        return `
-          <div class="pdf-item" style="border-left:3px solid var(--accent)">
-            <div class="pdf-emoji">👤</div>
-            <div class="pdf-info">
-              <div class="pdf-title">${escHtml(v.name||'Unknown')}</div>
-              <div class="pdf-meta">
-                <span class="tag">${escHtml(v.roomName||v.roomId||'?')}</span>
-                <span>${escHtml(v.email||'')}</span>
-                <span>· ${time}</span>
-              </div>
+      el.innerHTML=snap.docs.map(d=>{
+        const v=d.data(), time=v.requestedAt?new Date(v.requestedAt.seconds*1000).toLocaleTimeString():'Just now';
+        const initials=(v.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+        return `<div class="waiting-item">
+          <div class="waiting-avatar">${initials}</div>
+          <div class="waiting-info">
+            <div class="waiting-name">${escHtml(v.name||'Unknown')}</div>
+            <div class="waiting-meta">
+              <span class="waiting-room-tag">${escHtml(v.roomName||v.roomId||'General')}</span>
+              <span>${escHtml(v.email||'')}</span>
+              <span>· Waiting since ${time}</span>
             </div>
-            <div class="pdf-actions">
-              <button class="icon-btn" title="Approve"
-                style="border-color:rgba(14,159,110,.4);color:var(--success)"
-                onclick="handleWaitingRequest('${d.id}','approved')">
-                <i class="ti ti-check"></i>
-              </button>
-              <button class="icon-btn del" title="Reject"
-                onclick="handleWaitingRequest('${d.id}','rejected')">
-                <i class="ti ti-x"></i>
-              </button>
-            </div>
-          </div>`;
+          </div>
+          <div class="waiting-actions">
+            <button class="btn-approve" onclick="handleWaitingRequest('${d.id}','approved')">
+              <i class="ti ti-check"></i> Approve
+            </button>
+            <button class="btn-reject" onclick="handleWaitingRequest('${d.id}','rejected')">
+              <i class="ti ti-x"></i> Reject
+            </button>
+          </div>
+        </div>`;
       }).join('');
-
-    }, err => {
-      console.error('Waiting room listener error:', err);
-      el.innerHTML = `<div class="empty-list"><i class="ti ti-alert-circle"></i><p style="color:var(--danger)">${err.message}</p></div>`;
+    },err=>{
+      el.innerHTML=`<div class="empty-list"><i class="ti ti-alert-circle"></i><p style="color:var(--red)">${err.message}</p></div>`;
     });
 }
-
-async function handleWaitingRequest(docId, status){
-  try {
-    await db.collection('waitingRoom').doc(docId).update({ status });
-    showToast(status==='approved' ? 'User approved! ✅' : 'Request rejected.', status==='approved' ? 'success' : 'error');
-    if(status==='rejected'){
-      setTimeout(()=> db.collection('waitingRoom').doc(docId).delete().catch(()=>{}), 5000);
-    }
-  } catch(e){ showToast('Error: '+e.message,'error'); }
+async function handleWaitingRequest(docId,status){
+  try{
+    await db.collection('waitingRoom').doc(docId).update({status});
+    showToast(status==='approved'?'User approved! ✅':'Request rejected.',status==='approved'?'success':'error');
+    if(status==='rejected') setTimeout(()=>db.collection('waitingRoom').doc(docId).delete().catch(()=>{}),5000);
+  }catch(e){showToast('Error: '+e.message,'error');}
 }
 
-
-
-// ── Helpers ──
-function showUploadError(msg){
-  const el = document.getElementById('uploadError');
-  el.textContent = msg; el.classList.add('show');
+// HELPERS
+function showUploadError(msg){const el=document.getElementById('uploadError');el.textContent=msg;el.classList.add('show');}
+function clearUploadMessages(){document.getElementById('uploadError').classList.remove('show');document.getElementById('uploadSuccess').classList.remove('show');}
+function escHtml(str){return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastIcon').className=type==='success'?'ti ti-check':'ti ti-alert-circle';
+  t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3500);
 }
-function clearUploadMessages(){
-  document.getElementById('uploadError').classList.remove('show');
-  document.getElementById('uploadSuccess').classList.remove('show');
-}
-function escHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function showToast(msg, type='success'){
-  const t = document.getElementById('toast');
-  document.getElementById('toastMsg').textContent = msg;
-  document.getElementById('toastIcon').className = type==='success' ? 'ti ti-check' : 'ti ti-alert-circle';
-  t.className = `toast ${type} show`;
-  setTimeout(()=> t.classList.remove('show'), 3500);
-}
-
 function admSwitch(sec){
   ['upload','views','downloads','premium','payments','waiting'].forEach(s=>{
-    const el = document.getElementById('adm-'+s);
-    if(el) el.style.display = s===sec?'block':'none';
-    const pill = document.querySelector(`.adm-pill[data-sec="${s}"]`);
-    if(pill) pill.classList.toggle('active', s===sec);
+    const el=document.getElementById('adm-'+s); if(el)el.style.display=s===sec?'block':'none';
+    const pill=document.querySelector(`.adm-pill[data-sec="${s}"]`); if(pill)pill.classList.toggle('active',s===sec);
   });
 }
-
-document.getElementById('editModal').addEventListener('click', e=>{
-  if(e.target === document.getElementById('editModal')) closeEditModal();
-});
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeEditModal(); });
-
-const style = document.createElement('style');
-style.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+document.getElementById('editModal').addEventListener('click',e=>{if(e.target===document.getElementById('editModal'))closeEditModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEditModal();});
+const style=document.createElement('style');
+style.textContent='@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
 document.head.appendChild(style);
 </script>
 
