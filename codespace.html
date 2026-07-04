@@ -667,12 +667,13 @@ function openFile(fileId){
           <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">${esc(f.name)}</div>
           <div style="font-size:12px;color:var(--text3)">${sizeKb} · Binary file — cannot be previewed as text</div>
         </div>
-        <a href="${esc(f.fileUrl)}" target="_blank" download="${esc(f.name)}"
-          style="display:inline-flex;align-items:center;gap:7px;padding:9px 22px;border-radius:6px;background:var(--accent);color:#0D1117;font-size:13px;font-weight:700;text-decoration:none;transition:background .15s"
-          onmouseover="this.style.background='#79C0FF'" onmouseout="this.style.background='var(--accent)'">
-          <i class="ti ti-download"></i> Download file
-        </a>
+        <div id="dl-access-btn"></div>
       </div>`;
+      // ── Render gated download button ──
+    SHDownloadAccess.renderBtn(
+      f.id, f.name, f.fileUrl,
+      document.getElementById('dl-access-btn')
+    );
     return;
   }
   const ext=getExt(f.name);
@@ -980,6 +981,7 @@ function showToast(msg,type='success'){
   setTimeout(()=>t.classList.remove('show'),3000);
 }
 </script>
+<script src="codespace-download-access.js"></script>
 <script src="notifications.js"></script>
 </body>
 </html>
