@@ -712,7 +712,8 @@
               <i class="ti ti-door-enter" style="font-size:16px;color:#C9A356"></i>
             </div>
             <div class="sh-item-body">
-              <div class="sh-item-title">${esc(w.userName || w.userEmail || "Someone")} wants to join</div>
+              <div class="sh-item-title">${esc(w.name || w.userName || w.userEmail || "Someone")} wants to join</div>
+              <span>${esc(w.roomName || w.room || "Study Room")}</span>
               <div class="sh-item-meta">
                 <span class="sh-tag waiting">Waiting Room</span>
                 <span>${esc(w.room || "Study Room")}</span>
@@ -769,6 +770,23 @@
           </div>`;
       }).join('');
     }
+
+    window._shRejectDownload = async function(docId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Rejecting…'; }
+  try {
+    await firebase.firestore().collection('downloadRequests').doc(docId).update({
+      status: 'rejected',
+      resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      resolvedBy: currentUserEmail,
+    });
+    markItemRead(docId);
+    updateBadge();
+    renderList();
+  } catch(e) {
+    console.error('[Notif] reject download error:', e);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-x"></i> Deny'; }
+  }
+};
 
     /* ── Friend Requests ── */
     if (hasFriends) {
@@ -855,8 +873,8 @@
     const existing = document.getElementById("sh-wt-" + docId);
     if (existing) existing.remove();
 
-    const name = esc(data.userName || data.userEmail || "Someone");
-    const room = esc(data.room || "Study Room");
+    const name = esc(data.name || data.userName || data.userEmail || "Someone");
+    const room = esc(data.roomName || data.room || "Study Room");
 
     const t = document.createElement("div");
     t.className = "sh-waiting-toast";
@@ -918,6 +936,26 @@
   } catch(e) {
     console.error('[Notif] approve download error:', e);
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Approve'; }
+  }
+};
+
+window._shApproveWaiting = async function(docId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Approving…'; }
+  try {
+    await firebase.firestore().collection('waitingRoom').doc(docId).update({
+      status: 'approved',
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      approvedBy: currentUserEmail,
+    });
+    markItemRead(docId);
+    updateBadge();
+    renderList();
+  } catch(e) {
+    console.error('[Notif] approve waiting error:', e);
+    if (btn) { 
+      btn.disabled = false; 
+      btn.innerHTML = '<i class="ti ti-check"></i> Approve'; 
+    }
   }
 };
 
