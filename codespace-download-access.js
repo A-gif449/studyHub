@@ -116,12 +116,15 @@ window.SHDownloadAccess = (function () {
       return;
     }
 
-    // Check access
+   // Check access
     const access = await hasAccess(fileId);
     if (access) {
       containerEl.innerHTML = dlBtn(fileUrl, fileName);
       return;
     }
+
+    // Watch for access being granted in real time
+    watchDownloadAccess(fileId, fileName, fileUrl, containerEl);
 
     // Check request status
     const status = await getRequestStatus(fileId);
@@ -182,6 +185,20 @@ window.SHDownloadAccess = (function () {
       clearTimeout(t._t);
       t._t = setTimeout(() => t.classList.remove("show"), 3500);
     }
+  }
+
+  // Auto-refresh download buttons when access is granted
+  function watchDownloadAccess(fileId, fileName, fileUrl, containerEl) {
+    const user = auth();
+    if (!user) return;
+    firebase.firestore()
+      .collection('downloadAccess')
+      .doc(user.uid + '_' + fileId)
+      .onSnapshot(snap => {
+        if (snap.exists) {
+          containerEl.innerHTML = dlBtn(fileUrl, fileName);
+        }
+      });
   }
 
   return {

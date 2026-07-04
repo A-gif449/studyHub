@@ -888,19 +888,38 @@
   }
 
   /* ── Approve / Reject handlers ── */
-  window._shApproveWaiting = async function(docId, btn) {
-    if (btn) { btn.disabled = true; btn.textContent = "Approving…"; }
-    try {
-      await firebase.firestore().collection("waitingRoom").doc(docId).update({
-        status: "approved",
-        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        approvedBy: currentUserEmail
-      });
-      markItemRead(docId);
-      updateBadge();
-      renderList();
-    } catch(e) { console.error("[Notif] approve error:", e); if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-check"></i> Approve';} }
-  };
+ window._shApproveDownload = async function(reqId, uid, fileId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Approving…'; }
+  try {
+    const db = firebase.firestore();
+    const batch = db.batch();
+
+    // Update request status
+    batch.update(db.collection('downloadRequests').doc(reqId), {
+      status: 'approved',
+      resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      resolvedBy: currentUserEmail,
+    });
+
+    // Create access doc with correct ID format: uid_fileId
+    const accessDocId = uid + '_' + fileId;
+    batch.set(db.collection('downloadAccess').doc(accessDocId), {
+      uid: uid,
+      fileId: fileId,
+      grantedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      grantedBy: currentUserEmail,
+    });
+
+    await batch.commit();
+    markItemRead(reqId);
+    updateBadge();
+    renderList();
+    showApprovalToast('Download access granted ✓');
+  } catch(e) {
+    console.error('[Notif] approve download error:', e);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Approve'; }
+  }
+};
 
   window._shRejectWaiting = async function(docId, btn) {
     if (btn) { btn.disabled = true; btn.textContent = "Rejecting…"; }
@@ -946,6 +965,19 @@
       if (!panelOpen) panel.style.display = "";
       panel.removeEventListener("transitionend", hide);
     });
+  }
+
+function showApprovalToast(msg) {
+    // Try to reuse existing toast element on the page
+    const t = document.getElementById('toast');
+    if (t) {
+      const msgEl = document.getElementById('toastMsg');
+      const iconEl = document.getElementById('toastIcon');
+      if (msgEl) msgEl.textContent = msg;
+      if (iconEl) iconEl.className = 'ti ti-check';
+      t.className = 'toast success show';
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
   }
 
 })();
