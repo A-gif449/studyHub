@@ -274,7 +274,7 @@ nav{
 window.FIREBASE_CONFIG={apiKey:"AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",authDomain:"studyx-fd90c.firebaseapp.com",projectId:"studyx-fd90c",storageBucket:"studyx-fd90c.firebasestorage.app",messagingSenderId:"520877226051",appId:"1:520877226051:web:94cdfd86eb64623f5f7cf6"};
 window.ADMIN_EMAILS=["abhishekbasu188@gmail.com"];
 window.CLOUDINARY_CONFIG={cloudName:"dwmvn4kj3",uploadPreset:"preupload"};
-window.GITHUB_CONFIG={token:'',owner:'A-gif449',repo:'studyhub-files',branch:'main'};
+// window.GITHUB_CONFIG={token:'',owner:'A-gif449',repo:'studyhub-files',branch:'main'};
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -849,41 +849,27 @@ function uploadToGitHub(file, onProgress) {
     reader.onload = async (e) => {
       try {
         onProgress(30);
-        // Convert to base64
         const base64 = e.target.result.split(',')[1];
-        const cfg = window.GITHUB_CONFIG;
-        const path = `uploads/${Date.now()}_${file.name}`;
-        const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
-
         onProgress(60);
-        const res = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${cfg.token}`,
-            'Content-Type': 'application/json',
-          },
+        const res = await fetch('/api/upload-to-github', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            message: `Upload ${file.name}`,
-            content: base64,
-            branch: cfg.branch
+            fileName: file.name,
+            base64Content: base64,
+            commitMessage: `Upload ${file.name}`
           })
         });
-
         onProgress(90);
         if (!res.ok) {
           const err = await res.json();
-          reject(new Error(err.message || 'GitHub upload failed'));
+          reject(new Error(err.error || 'Upload failed'));
           return;
         }
-
         const data = await res.json();
-        // Return the raw download URL
-        const rawUrl = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${path}`;
         onProgress(100);
-        resolve(rawUrl);
-      } catch(err) {
-        reject(err);
-      }
+        resolve(data.url);
+      } catch(err) { reject(err); }
     };
     reader.onerror = () => reject(new Error('Could not read file'));
     reader.readAsDataURL(file);
