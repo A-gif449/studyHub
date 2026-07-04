@@ -15,6 +15,7 @@
   let prevUnreadCount     = 0;
   let currentUserEmail    = null;
   let currentUserUid      = null;
+  let downloadRequestNotifs = [];
   const ADMIN_EMAILS      = ["abhishekbasu188@gmail.com"];
 
   /* ─── read-state helpers ─── */
@@ -45,12 +46,14 @@
       ...friendRequestNotifs.filter(r => isUnread(r.id)),
       ...profileViewNotifs.filter(v => isUnread(v.id)),
       ...waitingRoomNotifs.filter(w => isUnread(w.id)),
+      ...downloadRequestNotifs.filter(d => isUnread(d.id)),
     ];
   }
   function pruneReadIds() {
     const allIds = new Set([
       ...allRecent, ...friendRequestNotifs,
-      ...profileViewNotifs, ...waitingRoomNotifs
+      ...profileViewNotifs, ...waitingRoomNotifs,
+        ...downloadRequestNotifs,
     ].map(x => x.id));
     const pruned = new Set([...getReadIds()].filter(id => allIds.has(id)));
     saveReadIds(pruned);
@@ -544,34 +547,26 @@
       }, err => console.warn("[Notif] waitingRoom:", err.message));
   }
 
-  function subscribeDownloadRequests(db) {
+ function subscribeDownloadRequests(db) {
     let initialLoad = true;
 
     db.collection('downloadRequests')
       .where('status', '==', 'pending')
       .orderBy('requestedAt', 'desc')
       .onSnapshot(snap => {
+        downloadRequestNotifs = snap.docs.map(d => ({id: d.id, _type: 'downloadRequest', ...d.data()}));
+
         if (!initialLoad) {
           snap.docChanges().forEach(change => {
             if (change.type !== 'added') return;
             const data = change.doc.data();
             const docId = change.doc.id;
-
-            let isRecent;
-            if (!data.requestedAt) {
-              isRecent = true;
-            } else {
-              const ts  = data.requestedAt.toDate ? data.requestedAt.toDate() : new Date(data.requestedAt);
-              isRecent  = Date.now() - ts.getTime() < 30000;
-            }
-
-            if (isRecent) {
-              showDownloadToast(docId, data);
-              ringBell();
-            }
+            let isRecent = !data.requestedAt || (Date.now() - (data.requestedAt.toDate?.() || new Date(data.requestedAt)).getTime() < 30000);
+            if (isRecent) { showDownloadToast(docId, data); ringBell(); }
           });
         }
         initialLoad = false;
+        pruneReadIds(); updateBadge(); renderList();
       }, err => console.warn('[Notif] downloadRequests:', err.message));
   }
 
@@ -737,6 +732,42 @@
             <div class="sh-unread-dot"></div>
           </div>`;
       }).join("");
+    }
+
+    /* ── Download Requests (admin) ── */
+    if (isAdmin && downloadRequestNotifs.length > 0) {
+      html += `<div class="sh-divider">Download Requests</div>`;
+      html += downloadRequestNotifs.map(d => {
+        const ts  = d.requestedAt ? (d.requestedAt.toDate?.() || new Date(d.requestedAt)) : new Date();
+        const ago = timeAgo(ts);
+        const unread = isUnread(d.id);
+        return `
+          <div class="sh-item sh-waiting ${unread ? 'sh-unread' : ''}"
+               onclick="window._shReadItem('${esc(d.id)}')">
+            <div class="sh-icon-box type-waiting">
+              <i class="ti ti-download" style="font-size:16px;color:#C9A356"></i>
+            </div>
+            <div class="sh-item-body">
+              <div class="sh-item-title">${esc(d.userName || d.userEmail || 'Someone')} wants to download</div>
+              <div class="sh-item-meta">
+                <span class="sh-tag waiting">Download Request</span>
+                <span>${esc(d.fileName || 'a file')}</span>
+                <span>· ${ago}</span>
+              </div>
+              <div class="sh-action-row">
+                <button class="sh-action-btn approve"
+                  onclick="event.stopPropagation(); window._shApproveDownload('${esc(d.id)}','${esc(d.uid)}','${esc(d.fileId)}', this)">
+                  <i class="ti ti-check" style="font-size:12px"></i> Approve
+                </button>
+                <button class="sh-action-btn reject"
+                  onclick="event.stopPropagation(); window._shRejectDownload('${esc(d.id)}', this)">
+                  <i class="ti ti-x" style="font-size:12px"></i> Deny
+                </button>
+              </div>
+            </div>
+            <div class="sh-unread-dot"></div>
+          </div>`;
+      }).join('');
     }
 
     /* ── Friend Requests ── */
