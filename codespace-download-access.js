@@ -1,19 +1,18 @@
 /* ═══════════════════════════════════════════════════════════════
    codespace-download-access.js
-   2-Factor Download Auth:
-     Step 1 — Admin approves the request in real-time
-     Step 2 — OTP sent to user's email via Resend, user verifies
+   NEW FLOW:
+     Step 1 — OTP sent to user's email immediately on click
+     Step 2 — User verifies OTP
+     Step 3 — Request sent to admin for approval
+     Step 4 — Admin approves → download starts / rejects → denied
    ═══════════════════════════════════════════════════════════════ */
 
-const RESEND_API_KEY = 're_JVRhAjDV_APaYhYXttj9ULoSpnS7my4Rk';
-const OTP_FROM       = 'onboarding@resend.dev';
 const OTP_EXPIRY_MS  = 5 * 60 * 1000; // 5 minutes
 const OTP_MAX_TRIES  = 3;
 
 /* ── Inject styles ── */
 (function injectStyles() {
   const css = `
-    /* ── Download access modal ── */
     #dlaBackdrop {
       display:none;position:fixed;inset:0;z-index:800;
       background:rgba(1,4,9,0.88);backdrop-filter:blur(6px);
@@ -41,16 +40,16 @@ const OTP_MAX_TRIES  = 3;
     .dla-step { display:none; }
     .dla-step.active { display:block; }
 
-    /* Step icons */
     .dla-icon {
       width:52px;height:52px;border-radius:12px;display:flex;
       align-items:center;justify-content:center;font-size:24px;
       margin:0 auto 18px;
     }
-    .dla-icon.wait  { background:rgba(210,153,34,0.12);border:1px solid rgba(210,153,34,0.2); }
-    .dla-icon.otp   { background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.2); }
-    .dla-icon.ok    { background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.2); }
-    .dla-icon.deny  { background:rgba(248,81,73,0.12);border:1px solid rgba(248,81,73,0.2); }
+    .dla-icon.sending { background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.2); }
+    .dla-icon.otp     { background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.2); }
+    .dla-icon.wait    { background:rgba(210,153,34,0.12);border:1px solid rgba(210,153,34,0.2); }
+    .dla-icon.ok      { background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.2); }
+    .dla-icon.deny    { background:rgba(248,81,73,0.12);border:1px solid rgba(248,81,73,0.2); }
 
     .dla-title {
       font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;
@@ -62,6 +61,15 @@ const OTP_MAX_TRIES  = 3;
     }
     .dla-sub b { color:#E6EDF3; }
 
+    /* Sending spinner */
+    .dla-send-ring {
+      width:56px;height:56px;border-radius:50%;
+      border:3px solid #30363D;border-top-color:#58A6FF;
+      animation:dlaRing 1s linear infinite;
+      margin:0 auto 18px;
+    }
+    @keyframes dlaRing { to{transform:rotate(360deg)} }
+
     /* Waiting animation */
     .dla-wait-ring {
       width:56px;height:56px;border-radius:50%;
@@ -69,8 +77,6 @@ const OTP_MAX_TRIES  = 3;
       animation:dlaRing 1s linear infinite;
       margin:0 auto 18px;
     }
-    @keyframes dlaRing { to{transform:rotate(360deg)} }
-
     .dla-status-pill {
       display:inline-flex;align-items:center;gap:7px;
       padding:6px 14px;border-radius:99px;font-size:12px;font-weight:600;
@@ -123,9 +129,7 @@ const OTP_MAX_TRIES  = 3;
       display:flex;align-items:center;justify-content:center;gap:7px;
       transition:all .15s;
     }
-    .dla-btn.primary {
-      background:#58A6FF;color:#0D1117;
-    }
+    .dla-btn.primary { background:#58A6FF;color:#0D1117; }
     .dla-btn.primary:hover { background:#79C0FF; }
     .dla-btn.primary:disabled { opacity:.45;cursor:not-allowed; }
     .dla-btn.ghost {
@@ -145,9 +149,7 @@ const OTP_MAX_TRIES  = 3;
     .dla-resend {
       font-size:12px;color:#484F58;text-align:center;margin-top:12px;
     }
-    .dla-resend a {
-      color:#58A6FF;cursor:pointer;text-decoration:none;
-    }
+    .dla-resend a { color:#58A6FF;cursor:pointer;text-decoration:none; }
     .dla-resend a:hover { text-decoration:underline; }
     .dla-resend a.disabled { color:#484F58;pointer-events:none; }
 
@@ -166,33 +168,35 @@ const OTP_MAX_TRIES  = 3;
   document.head.appendChild(s);
 })();
 
-/* ── Build modal HTML once ── */
+/* ── Build modal HTML ── */
 (function buildModal() {
   const div = document.createElement('div');
   div.id = 'dlaBackdrop';
   div.innerHTML = `
     <div class="dla-modal">
-      <button class="dla-modal-x" onclick="SHDownloadAccess.close()"><i class="ti ti-x"></i></button>
+      <button class="dla-modal-x" onclick="SHDownloadAccess.close()">
+        <i class="ti ti-x"></i>
+      </button>
 
-      <!-- STEP 1: Request sent, waiting for admin -->
+      <!-- STEP 1: Sending OTP spinner -->
       <div class="dla-step" id="dlaStep1">
         <div style="text-align:center">
-          <div class="dla-wait-ring"></div>
-          <div class="dla-title">Waiting for Admin Approval</div>
-          <p class="dla-sub">Your download request for <b id="dlaFileName"></b> has been sent to the admin. This usually takes a moment.</p>
-          <div class="dla-status-pill waiting">
-            <span class="pulse-dot"></span> Pending approval…
-          </div>
-          <p style="font-size:12px;color:#484F58;line-height:1.65">Keep this window open. You'll be moved to the next step automatically once approved.</p>
+          <div class="dla-send-ring"></div>
+          <div class="dla-title">Sending verification code…</div>
+          <p class="dla-sub">We're sending a 6-digit code to your email.<br/>This only takes a second.</p>
         </div>
-        <button class="dla-btn ghost" onclick="SHDownloadAccess.close()" style="margin-top:20px">Cancel request</button>
       </div>
 
-      <!-- STEP 2: OTP verification -->
+      <!-- STEP 2: OTP entry -->
       <div class="dla-step" id="dlaStep2">
-        <div class="dla-icon otp"><i class="ti ti-mail" style="font-size:22px;color:#58A6FF"></i></div>
+        <div class="dla-icon otp">
+          <i class="ti ti-mail" style="font-size:22px;color:#58A6FF"></i>
+        </div>
         <div class="dla-title">Check your email</div>
-        <p class="dla-sub">We sent a 6-digit code to <b id="dlaUserEmail"></b>. Enter it below to verify and download.</p>
+        <p class="dla-sub">
+          We sent a 6-digit code to <b id="dlaUserEmail"></b>.<br/>
+          Enter it below to verify, then your request will go to the admin.
+        </p>
         <div class="dla-err" id="dlaOtpErr"></div>
         <div class="otp-row" id="otpRow">
           <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
@@ -205,40 +209,69 @@ const OTP_MAX_TRIES  = 3;
         <div class="dla-timer">Code expires in <span id="dlaTimerVal">5:00</span></div>
         <div class="dla-tries" id="dlaTries"></div>
         <button class="dla-btn primary" id="dlaVerifyBtn" onclick="SHDownloadAccess.verifyOtp()">
-          <i class="ti ti-shield-check"></i> Verify & Download
+          <i class="ti ti-shield-check"></i> Verify & Submit Request
         </button>
         <div class="dla-resend">
           Didn't get it? <a id="dlaResendLink" onclick="SHDownloadAccess.resendOtp()">Resend code</a>
         </div>
+        <button class="dla-btn ghost" onclick="SHDownloadAccess.close()">Cancel</button>
       </div>
 
-      <!-- STEP 3: Success -->
+      <!-- STEP 3: Waiting for admin approval (after OTP verified) -->
       <div class="dla-step" id="dlaStep3">
-        <div class="dla-icon ok"><i class="ti ti-circle-check" style="font-size:24px;color:#3FB950"></i></div>
+        <div style="text-align:center">
+          <div class="dla-wait-ring"></div>
+          <div class="dla-title">Waiting for Admin Approval</div>
+          <p class="dla-sub">
+            Your identity is verified ✓<br/>
+            Your request for <b id="dlaFileName"></b> has been sent to the admin.
+          </p>
+          <div class="dla-status-pill waiting">
+            <span class="pulse-dot"></span> Pending approval…
+          </div>
+          <p style="font-size:12px;color:#484F58;line-height:1.65">
+            Keep this window open. You'll be moved to the next step automatically once approved.
+          </p>
+        </div>
+        <button class="dla-btn ghost" onclick="SHDownloadAccess.close()" style="margin-top:20px">
+          Cancel request
+        </button>
+      </div>
+
+      <!-- STEP 4: Success — download started -->
+      <div class="dla-step" id="dlaStep4">
+        <div class="dla-icon ok">
+          <i class="ti ti-circle-check" style="font-size:24px;color:#3FB950"></i>
+        </div>
         <div class="dla-title">Download started!</div>
         <p class="dla-sub">Your file <b id="dlaSuccessFile"></b> is downloading. Enjoy!</p>
         <button class="dla-btn primary" onclick="SHDownloadAccess.close()">Done</button>
       </div>
 
-      <!-- STEP 4: Rejected -->
-      <div class="dla-step" id="dlaStep4">
-        <div class="dla-icon deny"><i class="ti ti-shield-x" style="font-size:24px;color:#F85149"></i></div>
+      <!-- STEP 5: Rejected by admin -->
+      <div class="dla-step" id="dlaStep5">
+        <div class="dla-icon deny">
+          <i class="ti ti-shield-x" style="font-size:24px;color:#F85149"></i>
+        </div>
         <div class="dla-title">Request Rejected</div>
         <p class="dla-sub">The admin declined this download request. Contact them if you think this was a mistake.</p>
         <button class="dla-btn ghost" onclick="SHDownloadAccess.close()">Close</button>
       </div>
 
-      <!-- STEP 5: OTP expired -->
-      <div class="dla-step" id="dlaStep5">
-        <div class="dla-icon wait"><i class="ti ti-clock-x" style="font-size:24px;color:#D29922"></i></div>
+      <!-- STEP 6: OTP expired -->
+      <div class="dla-step" id="dlaStep6">
+        <div class="dla-icon wait">
+          <i class="ti ti-clock-x" style="font-size:24px;color:#D29922"></i>
+        </div>
         <div class="dla-title">Code Expired</div>
-        <p class="dla-sub">Your OTP has expired. Please start over to request a new one.</p>
+        <p class="dla-sub">Your OTP has expired. Please start over.</p>
         <button class="dla-btn primary" onclick="SHDownloadAccess.close()">Close</button>
       </div>
     </div>`;
+
   document.body.appendChild(div);
 
-  // OTP input auto-advance
+  /* OTP input — auto-advance & paste */
   const digits = div.querySelectorAll('.otp-digit');
   digits.forEach((inp, i) => {
     inp.addEventListener('input', e => {
@@ -254,7 +287,10 @@ const OTP_MAX_TRIES  = 3;
     inp.addEventListener('paste', e => {
       e.preventDefault();
       const pasted = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
-      digits.forEach((d, idx) => { d.value = pasted[idx] || ''; d.classList.toggle('filled', !!d.value); });
+      digits.forEach((d, idx) => {
+        d.value = pasted[idx] || '';
+        d.classList.toggle('filled', !!d.value);
+      });
       if (pasted.length === 6) SHDownloadAccess.verifyOtp();
     });
   });
@@ -270,19 +306,16 @@ window.SHDownloadAccess = (() => {
   let _timerInterval = null, _unsub = null;
   let _resendCooldown = false;
 
-  /* ── helpers ── */
+  /* ── Helpers ── */
   const $ = id => document.getElementById(id);
   function showStep(n) {
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 6; i++) {
       const el = $(`dlaStep${i}`);
       if (el) el.classList.toggle('active', i === n);
     }
   }
-  function showErr(msg) {
-    const el = $('dlaOtpErr');
-    el.textContent = msg; el.classList.add('show');
-  }
-  function clearErr() { $('dlaOtpErr').classList.remove('show'); }
+  function showErr(msg) { const el = $('dlaOtpErr'); el.textContent = msg; el.classList.add('show'); }
+  function clearErr()   { $('dlaOtpErr').classList.remove('show'); }
   function clearOtpInputs() {
     document.querySelectorAll('.otp-digit').forEach(d => {
       d.value = ''; d.classList.remove('filled', 'error');
@@ -293,9 +326,7 @@ window.SHDownloadAccess = (() => {
   }
   function shakeOtp() {
     document.querySelectorAll('.otp-digit').forEach(d => {
-      d.classList.remove('error');
-      void d.offsetWidth;
-      d.classList.add('error');
+      d.classList.remove('error'); void d.offsetWidth; d.classList.add('error');
     });
   }
   function generateOtp() {
@@ -310,73 +341,35 @@ window.SHDownloadAccess = (() => {
       const secs = Math.floor((remaining % 60000) / 1000);
       const el = $('dlaTimerVal');
       if (el) el.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-      if (remaining === 0) {
-        clearInterval(_timerInterval);
-        showStep(5);
-      }
+      if (remaining === 0) { clearInterval(_timerInterval); showStep(6); }
     }, 1000);
   }
   function updateTriesUI() {
-    const el = $('dlaTries');
-    if (!el) return;
+    const el = $('dlaTries'); if (!el) return;
     const left = OTP_MAX_TRIES - _otpTries;
     el.textContent = left < OTP_MAX_TRIES ? `${left} attempt${left !== 1 ? 's' : ''} remaining` : '';
     el.className = 'dla-tries' + (left <= 1 ? ' warn' : '');
   }
 
-  /* ── Send OTP via Resend ── */
+  /* ── Send OTP via our own serverless function (avoids CORS) ── */
   async function sendOtp(email, name, fileName) {
     _otpCode   = generateOtp();
     _otpExpiry = Date.now() + OTP_EXPIRY_MS;
     _otpTries  = 0;
 
-    const html = `
-      <div style="font-family:Inter,sans-serif;max-width:480px;margin:0 auto;background:#0D1117;color:#E6EDF3;border-radius:12px;overflow:hidden;border:1px solid #30363D">
-        <div style="padding:24px 28px;background:#161B22;border-bottom:1px solid #30363D">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:32px;height:32px;border-radius:8px;background:#21262D;border:1px solid #30363D;display:flex;align-items:center;justify-content:center;font-size:15px">⚛️</div>
-            <span style="font-family:serif;font-size:16px;font-weight:700;color:#E6EDF3">StudyHub</span>
-          </div>
-        </div>
-        <div style="padding:28px">
-          <h2 style="font-size:20px;font-weight:700;margin:0 0 8px;color:#E6EDF3">Your download code</h2>
-          <p style="font-size:13.5px;color:#8B949E;margin:0 0 24px;line-height:1.6">
-            Hi <strong style="color:#E6EDF3">${name}</strong>, your admin-approved download of <strong style="color:#58A6FF">${fileName}</strong> is ready. Use this code to verify:
-          </p>
-          <div style="background:#0D1117;border:1px solid #30363D;border-radius:10px;padding:20px;text-align:center;margin-bottom:24px">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;letter-spacing:10px;color:#58A6FF">${_otpCode}</div>
-            <div style="font-size:12px;color:#484F58;margin-top:8px">Expires in 5 minutes · Do not share</div>
-          </div>
-          <p style="font-size:12px;color:#484F58;line-height:1.65;margin:0">
-            If you didn't request this, ignore this email. This code will expire automatically.
-          </p>
-        </div>
-        <div style="padding:16px 28px;background:#161B22;border-top:1px solid #30363D;font-size:11.5px;color:#484F58;text-align:center">
-          StudyHub · Secure download verification
-        </div>
-      </div>`;
-
-    const res = await fetch('https://api.resend.com/emails', {
+    const res = await fetch('/api/send-otp', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: OTP_FROM,
-        to: [email],
-        subject: `${_otpCode} is your StudyHub download code`,
-        html,
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, name, fileName, otp: _otpCode }),
     });
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Resend error ${res.status}`);
+      throw new Error(err.error || `Server error ${res.status}`);
     }
   }
 
-  /* ── Public: render download button into a container element ── */
+  /* ── Public: render download button into a container ── */
   function renderBtn(fileId, fileName, fileUrl, container) {
     if (!container) return;
     const btn = document.createElement('button');
@@ -387,109 +380,111 @@ window.SHDownloadAccess = (() => {
     container.appendChild(btn);
   }
 
-  /* ── Public: open the 2FA flow ── */
+  /* ── Public: open the flow ── */
   async function open(fileId, fileName, fileUrl) {
     const user = firebase.auth().currentUser;
-    if (!user) {
-      alert('Please sign in to download files.');
-      return;
-    }
+    if (!user) { alert('Please sign in to download files.'); return; }
 
     _fileId   = fileId;
     _fileName = fileName;
     _fileUrl  = fileUrl;
+    _requestId = '';
 
-    // Show modal
+    // Show modal — Step 1: sending spinner
     $('dlaBackdrop').classList.add('show');
-    $('dlaFileName').textContent  = fileName;
-    $('dlaUserEmail').textContent = user.email;
+    $('dlaFileName').textContent    = fileName;
+    $('dlaUserEmail').textContent   = user.email;
     $('dlaSuccessFile').textContent = fileName;
     clearOtpInputs(); clearErr();
     showStep(1);
 
-    // ── Write download request to Firestore ──
+    // Send OTP immediately — before admin involvement
     try {
-      const ref = await firebase.firestore().collection('downloadRequests').add({
-        fileId, fileName, fileUrl,
-        userId:    user.uid,
-        userEmail: user.email,
-        userName:  user.displayName || user.email.split('@')[0],
-        status:    'pending',
-        requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      });
-      _requestId = ref.id;
+      const name = user.displayName || user.email.split('@')[0];
+      await sendOtp(user.email, name, fileName);
+      startTimer();
+      startResendCooldown();
+      showStep(2); // OTP entry screen
+      setTimeout(() => {
+        const first = document.querySelector('.otp-digit');
+        if (first) first.focus();
+      }, 100);
     } catch (e) {
-      alert('Could not send request: ' + e.message);
-      $('dlaBackdrop').classList.remove('show');
-      return;
+      // Show error on Step 2 instead of blocking entirely
+      showStep(2);
+      showErr('Could not send code: ' + e.message + ' — try resending.');
     }
-
-    // ── Listen for admin decision in real-time ──
-    if (_unsub) _unsub();
-    _unsub = firebase.firestore()
-      .collection('downloadRequests')
-      .doc(_requestId)
-      .onSnapshot(async snap => {
-        if (!snap.exists) return;
-        const data = snap.data();
-        if (data.status === 'approved') {
-          _unsub && _unsub(); _unsub = null;
-          showStep(2);
-          updateTriesUI();
-          // Send OTP
-          try {
-            const user = firebase.auth().currentUser;
-            await sendOtp(user.email, user.displayName || user.email.split('@')[0], fileName);
-            startTimer();
-            // Set resend cooldown
-            startResendCooldown();
-            setTimeout(() => {
-              const first = document.querySelector('.otp-digit');
-              if (first) first.focus();
-            }, 100);
-          } catch (e) {
-            showErr('Could not send OTP email: ' + e.message);
-          }
-        } else if (data.status === 'rejected') {
-          _unsub && _unsub(); _unsub = null;
-          clearInterval(_timerInterval);
-          showStep(4);
-        }
-      });
   }
 
   /* ── Public: verify OTP ── */
-  function verifyOtp() {
+  async function verifyOtp() {
     const entered = getOtpValue();
     if (entered.length < 6) { showErr('Enter all 6 digits.'); return; }
-    if (Date.now() > _otpExpiry) { showStep(5); return; }
+    if (Date.now() > _otpExpiry) { showStep(6); return; }
 
     clearErr();
     _otpTries++;
 
-    if (entered === _otpCode) {
-      clearInterval(_timerInterval);
-      // Mark request as completed
-      firebase.firestore().collection('downloadRequests').doc(_requestId)
-        .update({ status: 'completed', completedAt: firebase.firestore.FieldValue.serverTimestamp() })
-        .catch(() => {});
-      showStep(3);
-      // Trigger download
-      triggerDownload(_fileUrl, _fileName);
-    } else {
-      shakeOtp();
-      clearOtpInputs();
+    if (entered !== _otpCode) {
+      shakeOtp(); clearOtpInputs();
       setTimeout(() => { const f = document.querySelector('.otp-digit'); if (f) f.focus(); }, 50);
       if (_otpTries >= OTP_MAX_TRIES) {
         clearInterval(_timerInterval);
-        showErr(`Too many wrong attempts. Request a new download.`);
-        firebase.firestore().collection('downloadRequests').doc(_requestId)
-          .update({ status: 'otp_failed' }).catch(() => {});
-        setTimeout(() => showStep(5), 1500);
+        showErr('Too many wrong attempts.');
+        setTimeout(() => showStep(6), 1500);
       } else {
         showErr(`Incorrect code. ${OTP_MAX_TRIES - _otpTries} attempt${OTP_MAX_TRIES - _otpTries !== 1 ? 's' : ''} remaining.`);
         updateTriesUI();
       }
+      return;
+    }
+
+    // OTP correct — now create the download request for admin
+    clearInterval(_timerInterval);
+    showStep(3); // Waiting for admin
+
+    const user = firebase.auth().currentUser;
+    try {
+      const ref = await firebase.firestore().collection('downloadRequests').add({
+        fileId   : _fileId,
+        fileName : _fileName,
+        fileUrl  : _fileUrl,
+        userId   : user.uid,
+        userEmail: user.email,
+        userName : user.displayName || user.email.split('@')[0],
+        status   : 'pending',
+        otpVerified: true,           // lets admin know identity was verified
+        requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      _requestId = ref.id;
+    } catch (e) {
+      // Show waiting screen anyway — the admin can see incomplete requests
+      console.warn('[DLA] Firestore write failed:', e.message);
+    }
+
+    // Listen for admin decision
+    if (_requestId) {
+      if (_unsub) _unsub();
+      _unsub = firebase.firestore()
+        .collection('downloadRequests')
+        .doc(_requestId)
+        .onSnapshot(snap => {
+          if (!snap.exists) return;
+          const status = snap.data().status;
+          if (status === 'approved') {
+            _unsub && _unsub(); _unsub = null;
+            showStep(4);
+            triggerDownload(_fileUrl, _fileName);
+            // Mark completed
+            snap.ref.update({
+              status: 'completed',
+              completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            }).catch(() => {});
+          } else if (status === 'rejected') {
+            _unsub && _unsub(); _unsub = null;
+            showStep(5);
+          }
+        });
     }
   }
 
@@ -499,7 +494,8 @@ window.SHDownloadAccess = (() => {
     clearErr(); clearOtpInputs();
     const user = firebase.auth().currentUser;
     try {
-      await sendOtp(user.email, user.displayName || user.email.split('@')[0], _fileName);
+      const name = user.displayName || user.email.split('@')[0];
+      await sendOtp(user.email, name, _fileName);
       startTimer();
       startResendCooldown();
       _otpTries = 0; updateTriesUI();
@@ -510,8 +506,7 @@ window.SHDownloadAccess = (() => {
 
   function startResendCooldown() {
     _resendCooldown = true;
-    const link = $('dlaResendLink');
-    if (!link) return;
+    const link = $('dlaResendLink'); if (!link) return;
     let secs = 30;
     link.classList.add('disabled');
     link.textContent = `Resend in ${secs}s`;
@@ -519,8 +514,7 @@ window.SHDownloadAccess = (() => {
       secs--;
       if (link) link.textContent = `Resend in ${secs}s`;
       if (secs <= 0) {
-        clearInterval(iv);
-        _resendCooldown = false;
+        clearInterval(iv); _resendCooldown = false;
         if (link) { link.classList.remove('disabled'); link.textContent = 'Resend code'; }
       }
     }, 1000);
@@ -539,7 +533,7 @@ window.SHDownloadAccess = (() => {
     $('dlaBackdrop').classList.remove('show');
     clearInterval(_timerInterval);
     if (_unsub) { _unsub(); _unsub = null; }
-    // Cancel pending request if still waiting
+    // Cancel pending request if still waiting for admin
     if (_requestId) {
       firebase.firestore().collection('downloadRequests').doc(_requestId)
         .get().then(snap => {
@@ -547,8 +541,8 @@ window.SHDownloadAccess = (() => {
             snap.ref.update({ status: 'cancelled' }).catch(() => {});
           }
         }).catch(() => {});
+      _requestId = '';
     }
-    _requestId = '';
   }
 
   return { open, close, verifyOtp, resendOtp, renderBtn };
