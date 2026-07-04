@@ -507,6 +507,10 @@
       <button class="adm-pill" data-sec="premium" onclick="admSwitch('premium')"><i class="ti ti-star"></i> Premium</button>
       <button class="adm-pill" data-sec="payments" onclick="admSwitch('payments')"><i class="ti ti-receipt"></i> Payments</button>
       <button class="adm-pill" data-sec="waiting" onclick="admSwitch('waiting')"><i class="ti ti-clock"></i> Waiting Room</button>
+      <button class="adm-pill" data-sec="downloads2" onclick="admSwitch('downloads2')">
+      <i class="ti ti-download"></i> Download Requests
+      <span id="dlReqBadge" style="display:none;margin-left:auto;padding:1px 7px;border-radius:99px;background:rgba(88,166,255,0.15);color:#5B7FFF;font-size:10px;font-weight:700"></span>
+      </button>
     </div>
   </aside>
 
@@ -654,6 +658,27 @@
         </div>
       </div>
     </div>
+
+    <div id="adm-downloads2" style="display:none">
+  <div class="panel" style="margin-top:24px">
+    <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between">
+      <span><i class="ti ti-download"></i> Download Requests</span>
+      <span id="dlReqCount" style="font-size:12px;color:var(--ink3);font-weight:500"></span>
+    </div>
+ 
+    <!-- Filter tabs -->
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+      <button onclick="filterDlReqs('pending')"   id="dlf-pending"   class="btn-ghost" style="font-size:12px;padding:5px 12px;background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent-soft)">Pending</button>
+      <button onclick="filterDlReqs('approved')"  id="dlf-approved"  class="btn-ghost" style="font-size:12px;padding:5px 12px">Approved</button>
+      <button onclick="filterDlReqs('completed')" id="dlf-completed" class="btn-ghost" style="font-size:12px;padding:5px 12px">Completed</button>
+      <button onclick="filterDlReqs('all')"       id="dlf-all"       class="btn-ghost" style="font-size:12px;padding:5px 12px">All</button>
+    </div>
+ 
+    <div id="dlReqList" style="display:flex;flex-direction:column;gap:10px;max-height:600px;overflow-y:auto">
+      <div class="empty-list"><i class="ti ti-loader"></i><p>Loading…</p></div>
+    </div>
+  </div>
+</div>
 
   </div><!-- page-wrap -->
 </div><!-- adminUI -->
@@ -1053,6 +1078,139 @@ function loadWaitingRoom(){
       el.innerHTML=`<div class="empty-list"><i class="ti ti-alert-circle"></i><p style="color:var(--red)">${err.message}</p></div>`;
     });
 }
+
+/* ════════════════════════════════════════
+   DOWNLOAD REQUESTS — ADMIN SCRIPT
+════════════════════════════════════════ */
+ 
+let allDlReqs = [];
+let dlReqFilter = 'pending';
+ 
+function loadDownloadRequests() {
+  firebase.firestore().collection('downloadRequests')
+    .orderBy('requestedAt', 'desc')
+    .onSnapshot(snap => {
+      allDlReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const pending = allDlReqs.filter(r => r.status === 'pending').length;
+      // Badge on nav pill
+      const badge = document.getElementById('dlReqBadge');
+      if (badge) {
+        badge.textContent = pending;
+        badge.style.display = pending > 0 ? 'inline' : 'none';
+      }
+      renderDlReqs();
+    }, err => {
+      document.getElementById('dlReqList').innerHTML =
+        `<div class="empty-list"><i class="ti ti-alert-circle"></i><p>${err.message}</p></div>`;
+    });
+}
+ 
+function filterDlReqs(filter) {
+  dlReqFilter = filter;
+  // Update active tab style
+  ['pending','approved','completed','all'].forEach(f => {
+    const btn = document.getElementById('dlf-' + f);
+    if (!btn) return;
+    if (f === filter) {
+      btn.style.background = 'var(--accent-soft)';
+      btn.style.color = 'var(--accent-dark)';
+      btn.style.borderColor = 'var(--accent-soft)';
+    } else {
+      btn.style.background = 'var(--surface)';
+      btn.style.color = 'var(--ink2)';
+      btn.style.borderColor = 'var(--border-strong)';
+    }
+  });
+  renderDlReqs();
+}
+ 
+function renderDlReqs() {
+  const el = document.getElementById('dlReqList');
+  const countEl = document.getElementById('dlReqCount');
+  let filtered = allDlReqs;
+  if (dlReqFilter !== 'all') filtered = allDlReqs.filter(r => r.status === dlReqFilter);
+  if (countEl) countEl.textContent = `${filtered.length} request${filtered.length !== 1 ? 's' : ''}`;
+ 
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty-list"><i class="ti ti-download-off"></i><p>No ${dlReqFilter === 'all' ? '' : dlReqFilter} requests.</p></div>`;
+    return;
+  }
+ 
+  el.innerHTML = filtered.map(r => {
+    const time = r.requestedAt ? new Date(r.requestedAt.seconds * 1000).toLocaleString() : 'Just now';
+ 
+    // Status color mapping
+    const statusMap = {
+      pending:   { bg: 'var(--warning-soft)', color: 'var(--warning)',  icon: '⏳' },
+      approved:  { bg: 'var(--accent-soft)',  color: 'var(--accent)',   icon: '✅' },
+      completed: { bg: 'var(--success-soft)', color: 'var(--success)',  icon: '⬇️' },
+      rejected:  { bg: 'var(--danger-soft)',  color: 'var(--danger)',   icon: '❌' },
+      cancelled: { bg: 'var(--bg)',           color: 'var(--ink3)',     icon: '🚫' },
+      otp_failed:{ bg: 'var(--danger-soft)',  color: 'var(--danger)',   icon: '🔐' },
+    };
+    const s = statusMap[r.status] || statusMap['pending'];
+ 
+    const approveBtn = r.status === 'pending' ? `
+      <button
+        class="icon-btn"
+        title="Approve"
+        style="border-color:rgba(14,159,110,0.4);color:var(--success)"
+        onclick="approveDlReq('${r.id}','${escHtml(r.userEmail||'')}','${escHtml(r.userName||'')}','${escHtml(r.fileName||'')}')"
+      ><i class="ti ti-check"></i></button>
+      <button
+        class="icon-btn del"
+        title="Reject"
+        onclick="rejectDlReq('${r.id}')"
+      ><i class="ti ti-x"></i></button>` : '';
+ 
+    return `
+      <div class="pdf-item" style="align-items:flex-start;flex-wrap:wrap;border-left:3px solid ${s.color}">
+        <div class="pdf-emoji">${s.icon}</div>
+        <div class="pdf-info" style="flex:1;min-width:200px">
+          <div class="pdf-title">${escHtml(r.fileName || 'Unknown file')}</div>
+          <div class="pdf-meta">
+            <span class="tag">${escHtml(r.userName || 'Unknown')}</span>
+            <span>${escHtml(r.userEmail || '')}</span>
+            <span>· ${time}</span>
+          </div>
+          <div style="margin-top:6px">
+            <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:5px;font-size:10.5px;font-weight:700;background:${s.bg};color:${s.color}">
+              ${r.status}
+            </span>
+          </div>
+        </div>
+        ${approveBtn ? `<div class="pdf-actions" style="flex-shrink:0">${approveBtn}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+ 
+async function approveDlReq(reqId, userEmail, userName, fileName) {
+  try {
+    await firebase.firestore().collection('downloadRequests').doc(reqId).update({
+      status: 'approved',
+      approvedBy: auth.currentUser.email,
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    showToast(`Approved — OTP will be sent to ${userEmail} ✅`, 'success');
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+ 
+async function rejectDlReq(reqId) {
+  if (!confirm('Reject this download request?')) return;
+  try {
+    await firebase.firestore().collection('downloadRequests').doc(reqId).update({
+      status: 'rejected',
+      rejectedBy: auth.currentUser.email,
+      rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    showToast('Request rejected.', 'success');
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
 async function handleWaitingRequest(docId,status){
   try{
     await db.collection('waitingRoom').doc(docId).update({status});
