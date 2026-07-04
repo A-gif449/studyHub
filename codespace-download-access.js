@@ -163,6 +163,7 @@ const OTP_MAX_TRIES  = 3;
       transition:all .15s;
     }
     .dla-dl-btn:hover { background:#79C0FF; }
+    @keyframes spin { to { transform: rotate(360deg) } }
   `;
   const s = document.createElement('style');
   s.textContent = css;
@@ -314,6 +315,7 @@ window.SHDownloadAccess = (() => {
   let _otpCode = '', _otpExpiry = 0, _otpTries = 0;
   let _timerInterval = null, _unsub = null;
   let _resendCooldown = false;
+  let _guestEmail = '';
 
   /* ── Helpers ── */
   const $ = id => document.getElementById(id);
@@ -389,8 +391,40 @@ window.SHDownloadAccess = (() => {
     container.appendChild(btn);
   }
 
+  /* ── Internal: proceed with a known email ── */
+  async function _proceedWithEmail(email, name, fileName) {
+    // Store guest email for later use in download request
+    _guestEmail = email;
+
+    $('dlaBackdrop').classList.add('show');
+    $('dlaFileName').textContent    = fileName;
+    $('dlaUserEmail').textContent   = email;
+    $('dlaSuccessFile').textContent = fileName;
+    clearOtpInputs(); clearErr();
+
+    // Hide email step if shown
+    const emailStep = $('dlaStepEmail');
+    if (emailStep) emailStep.classList.remove('active');
+
+    showStep(1); // sending spinner
+
+    try {
+      await sendOtp(email, name, fileName);
+      startTimer();
+      startResendCooldown();
+      showStep(2);
+      setTimeout(() => {
+        const first = document.querySelector('.otp-digit');
+        if (first) first.focus();
+      }, 100);
+    } catch (e) {
+      showStep(2);
+      showErr('Could not send code: ' + e.message + ' — try resending.');
+    }
+  }
+
   /* ── Public: open the flow ── */
-  async function open(fileId, fileName, fileUrl) {
+async function open(fileId, fileName, fileUrl) {
     const user = firebase.auth().currentUser;
     if (!user) { alert('Please sign in to download files.'); return; }
 
@@ -399,30 +433,16 @@ window.SHDownloadAccess = (() => {
     _fileUrl  = fileUrl;
     _requestId = '';
 
-    // Show modal — Step 1: sending spinner
-    $('dlaBackdrop').classList.add('show');
-    $('dlaFileName').textContent    = fileName;
-    $('dlaUserEmail').textContent   = user.email;
-    $('dlaSuccessFile').textContent = fileName;
-    clearOtpInputs(); clearErr();
-    showStep(1);
-
-    // Send OTP immediately — before admin involvement
-    try {
-      const name = user.displayName || user.email.split('@')[0];
-      await sendOtp(user.email, name, fileName);
-      startTimer();
-      startResendCooldown();
-      showStep(2); // OTP entry screen
-      setTimeout(() => {
-        const first = document.querySelector('.otp-digit');
-        if (first) first.focus();
-      }, 100);
-    } catch (e) {
-      // Show error on Step 2 instead of blocking entirely
-      showStep(2);
-      showErr('Could not send code: ' + e.message + ' — try resending.');
+    // Check if user has an email (registered) or not (anonymous/guest)
+    if (!user.email) {
+      // Show email collection step first
+      $('dlaBackdrop').classList.add('show');
+      showEmailCollectionStep(fileName);
+      return;
     }
+
+    // User has email — proceed normally
+    _proceedWithEmail(user.email, user.displayName || user.email.split('@')[0], fileName);
   }
 
   /* ── Public: verify OTP ── */
@@ -459,8 +479,8 @@ window.SHDownloadAccess = (() => {
         fileName : _fileName,
         fileUrl  : _fileUrl,
         userId   : user.uid,
-        userEmail: user.email,
-        userName : user.displayName || user.email.split('@')[0],
+        userEmail: user.email || _guestEmail,
+        userName : user.displayName || (user.email || _guestEmail).split('@')[0],
         status   : 'pending',
         otpVerified: true,           // lets admin know identity was verified
         requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -514,8 +534,9 @@ window.SHDownloadAccess = (() => {
     clearErr(); clearOtpInputs();
     const user = firebase.auth().currentUser;
     try {
-      const name = user.displayName || user.email.split('@')[0];
-      await sendOtp(user.email, name, _fileName);
+      const email = user.email || _guestEmail;
+      const name = user.displayName || email.split('@')[0];
+      await sendOtp(email, name, _fileName);
       startTimer();
       startResendCooldown();
       _otpTries = 0; updateTriesUI();
@@ -565,5 +586,72 @@ window.SHDownloadAccess = (() => {
     }
   }
 
-  return { open, close, verifyOtp, resendOtp, renderBtn };
+  /* ── Show email collection step for anonymous users ── */
+  function showEmailCollectionStep(fileName) {
+    // Inject email step if not already there
+    if (!$('dlaStepEmail')) {
+      const modal = document.querySelector('.dla-modal');
+      const emailStep = document.createElement('div');
+      emailStep.className = 'dla-step';
+      emailStep.id = 'dlaStepEmail';
+      emailStep.innerHTML = `
+        <div class="dla-icon otp">
+          <i class="ti ti-mail" style="font-size:22px;color:#58A6FF"></i>
+        </div>
+        <div class="dla-title">Enter your email</div>
+        <p class="dla-sub">
+          You're signed in as a guest. Enter your email address to receive a verification code for downloading <b>${fileName}</b>.
+        </p>
+        <div class="dla-err" id="dlaEmailErr"></div>
+        <input
+          type="email"
+          id="dlaGuestEmail"
+          placeholder="your@email.com"
+          style="width:100%;padding:11px 14px;background:#0D1117;border:1.5px solid #30363D;
+                 border-radius:8px;color:#E6EDF3;font-size:14px;font-family:inherit;
+                 outline:none;transition:border-color .15s;margin-bottom:14px;"
+          onfocus="this.style.borderColor='#58A6FF'"
+          onblur="this.style.borderColor='#30363D'"
+          onkeydown="if(event.key==='Enter') SHDownloadAccess.submitGuestEmail()"
+        />
+        <button class="dla-btn primary" onclick="SHDownloadAccess.submitGuestEmail()">
+          <i class="ti ti-send"></i> Send Verification Code
+        </button>
+        <button class="dla-btn ghost" onclick="SHDownloadAccess.close()">Cancel</button>
+      `;
+      // Insert before the closing div of modal
+      modal.insertBefore(emailStep, modal.querySelector('.dla-modal-x').nextSibling);
+    }
+
+    // Hide all steps, show email step
+    for (let i = 1; i <= 6; i++) {
+      const el = $(`dlaStep${i}`);
+      if (el) el.classList.remove('active');
+    }
+    $('dlaStepEmail').classList.add('active');
+    setTimeout(() => { const e = $('dlaGuestEmail'); if(e) { e.value=''; e.focus(); } }, 100);
+  }
+
+  /* ── Public: submit guest email ── */
+  async function submitGuestEmail() {
+    const emailInput = $('dlaGuestEmail');
+    const errEl = $('dlaEmailErr');
+    const email = emailInput ? emailInput.value.trim() : '';
+
+    // Validate
+    errEl.classList.remove('show');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.textContent = 'Please enter a valid email address.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    // Disable button while sending
+    const btn = $('dlaStepEmail').querySelector('.dla-btn.primary');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Sending…'; }
+
+    await _proceedWithEmail(email, 'Guest', _fileName);
+  }
+
+  return { open, close, verifyOtp, resendOtp, renderBtn, submitGuestEmail };
 })();
