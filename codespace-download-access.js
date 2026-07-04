@@ -239,15 +239,23 @@ const OTP_MAX_TRIES  = 3;
         </button>
       </div>
 
-      <!-- STEP 4: Success — download started -->
-      <div class="dla-step" id="dlaStep4">
-        <div class="dla-icon ok">
-          <i class="ti ti-circle-check" style="font-size:24px;color:#3FB950"></i>
-        </div>
-        <div class="dla-title">Download started!</div>
-        <p class="dla-sub">Your file <b id="dlaSuccessFile"></b> is downloading. Enjoy!</p>
-        <button class="dla-btn primary" onclick="SHDownloadAccess.close()">Done</button>
-      </div>
+     <!-- STEP 4: Success — download started -->
+<div class="dla-step" id="dlaStep4">
+  <div class="dla-icon ok">
+    <i class="ti ti-circle-check" style="font-size:24px;color:#3FB950"></i>
+  </div>
+  <div class="dla-title">Request Approved! 🎉</div>
+  <p class="dla-sub">Your file <b id="dlaSuccessFile"></b> is ready.<br/>
+    Your download should start automatically — if not, use the button below.</p>
+  <a id="dlaManualLink" href="#" target="_blank" download
+    style="display:flex;align-items:center;justify-content:center;gap:8px;
+           width:100%;padding:11px;border-radius:7px;background:#3FB950;
+           color:#0D1117;font-size:13.5px;font-weight:700;
+           text-decoration:none;margin-bottom:10px">
+    <i class="ti ti-download"></i> Download Now
+  </a>
+  <button class="dla-btn ghost" onclick="SHDownloadAccess.close()">Done</button>
+</div>
 
       <!-- STEP 5: Rejected by admin -->
       <div class="dla-step" id="dlaStep5">
@@ -472,16 +480,27 @@ window.SHDownloadAccess = (() => {
         .onSnapshot(snap => {
           if (!snap.exists) return;
           const status = snap.data().status;
-          if (status === 'approved') {
-            _unsub && _unsub(); _unsub = null;
-            showStep(4);
-            triggerDownload(_fileUrl, _fileName);
-            // Mark completed
-            snap.ref.update({
-              status: 'completed',
-              completedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            }).catch(() => {});
-          } else if (status === 'rejected') {
+         if (status === 'approved') {
+  _unsub && _unsub(); _unsub = null;
+
+  // Set the manual download link first (always works)
+  const manualLink = document.getElementById('dlaManualLink');
+  if (manualLink) {
+    manualLink.href     = _fileUrl;
+    manualLink.download = _fileName;
+  }
+
+  showStep(4);
+
+  // Try auto-download (may be blocked by browser)
+  try { triggerDownload(_fileUrl, _fileName); } catch(e) {}
+
+  snap.ref.update({
+    status: 'completed',
+    completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(() => {});
+}
+           else if (status === 'rejected') {
             _unsub && _unsub(); _unsub = null;
             showStep(5);
           }
