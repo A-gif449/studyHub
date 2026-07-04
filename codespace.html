@@ -6,348 +6,266 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <title>Codespace – StudyHub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
+<!-- Highlight.js for syntax highlighting (view only, no compiler) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0E0F12;--bg2:#13141A;--bg3:#181A21;--card:#15161C;--card2:#1B1D25;
-  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
-  --accent:#5B7FFF;--accent2:#8FA3D6;--accent3:#3FA9CC;
-  --gold:#C9A356;--green:#4E9E78;--red:#C2564F;
-  --text:#ECEDF1;--text2:#9498A6;--text3:#62656F;
-  --r:8px;--r2:12px;--r3:16px;
-  --mono:'JetBrains Mono',monospace;
-  --nav-h:52px;
-  --sidebar-w:220px;
-  --panel-w:260px;
-  --terminal-h:220px;
+  --bg:#0D1117;
+  --bg2:#161B22;
+  --bg3:#21262D;
+  --border:#30363D;
+  --border2:#444C56;
+  --accent:#58A6FF;
+  --accent2:#79C0FF;
+  --green:#3FB950;
+  --red:#F85149;
+  --gold:#D29922;
+  --text:#E6EDF3;
+  --text2:#8B949E;
+  --text3:#484F58;
+  --nav-h:56px;
+  --sidebar-w:280px;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
 }
 html,body{height:100%;overflow:hidden}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:13px}
-::-webkit-scrollbar{width:5px;height:5px}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
-::-webkit-scrollbar-thumb:hover{background:var(--text3)}
 
 /* ── TOP NAV ── */
 nav{
   position:fixed;top:0;left:0;right:0;z-index:200;
   height:var(--nav-h);display:flex;align-items:center;
-  justify-content:space-between;padding:0 14px;
-  background:var(--bg);border-bottom:1px solid var(--border);
+  padding:0 16px;gap:16px;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text);font-family:'Source Serif 4',serif;font-size:15px;font-weight:700;flex-shrink:0}
+.logo-box{width:28px;height:28px;border-radius:7px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--accent)}
+.nav-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
+.nav-path{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2)}
+.nav-path .repo-name{color:var(--accent);font-weight:500;font-family:var(--mono);font-size:13px}
+.nav-path .branch-pill{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border);font-size:12px;color:var(--text2);margin-left:4px}
+.nav-spacer{flex:1}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;text-decoration:none;white-space:nowrap}
+.nav-btn:hover{border-color:var(--border2);color:var(--text);background:var(--bg)}
+.nav-btn.primary{background:var(--accent);border-color:var(--accent);color:#0D1117;font-weight:600}
+.nav-btn.primary:hover{background:#79C0FF;border-color:#79C0FF}
+.nav-user{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);font-size:12.5px;color:var(--text2);cursor:pointer}
+.nav-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.role-badge{padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;flex-shrink:0}
+.role-badge.admin{background:rgba(88,166,255,0.12);color:var(--accent);border:1px solid rgba(88,166,255,0.2)}
+.role-badge.editor{background:rgba(63,185,80,0.12);color:var(--green);border:1px solid rgba(63,185,80,0.2)}
+.role-badge.viewer{background:rgba(139,148,158,0.1);color:var(--text2);border:1px solid var(--border)}
+
+/* ── LAYOUT ── */
+.layout{
+  position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;
+  display:flex;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);
+  flex-shrink:0;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sidebar-head{
+  padding:12px 14px 10px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.sidebar-head h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.sidebar-head-actions{display:flex;gap:4px}
+.icon-btn{width:26px;height:26px;border-radius:5px;border:1px solid transparent;background:transparent;color:var(--text3);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.icon-btn:hover{background:var(--bg3);border-color:var(--border);color:var(--text2)}
+.icon-btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* Search bar */
+.sidebar-search{padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.search-wrap{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--border);transition:border-color .15s}
+.search-wrap:focus-within{border-color:var(--accent)}
+.search-wrap i{color:var(--text3);font-size:13px;flex-shrink:0}
+.search-wrap input{flex:1;background:transparent;border:none;outline:none;font-size:12.5px;font-family:inherit;color:var(--text)}
+.search-wrap input::placeholder{color:var(--text3)}
+
+/* File tree */
+.file-tree{flex:1;overflow-y:auto;padding:6px 0}
+.tree-section{margin-bottom:2px}
+.tree-item{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 14px;cursor:pointer;
+  font-size:13px;color:var(--text2);
+  transition:background .1s,color .1s;
+  user-select:none;position:relative;
+  border-left:2px solid transparent;
+}
+.tree-item:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.tree-item.active{background:rgba(88,166,255,0.08);color:var(--text);border-left-color:var(--accent)}
+.tree-item.folder{font-weight:500}
+.tree-item .ti{font-size:15px;flex-shrink:0;width:17px;text-align:center}
+.tree-item .item-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);font-size:12.5px}
+.tree-item .item-actions{display:none;align-items:center;gap:2px;flex-shrink:0}
+.tree-item:hover .item-actions{display:flex}
+.item-del{width:20px;height:20px;border-radius:4px;border:none;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s}
+.item-del:hover{color:var(--red);background:rgba(248,81,73,0.1)}
+.tree-children{padding-left:16px}
+.tree-empty{padding:24px 14px;text-align:center;color:var(--text3);font-size:12.5px;line-height:1.7}
+.tree-empty i{font-size:22px;display:block;margin-bottom:8px;color:var(--text3);opacity:.4}
+
+/* ── MAIN AREA ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+
+/* Breadcrumb bar */
+.breadcrumb-bar{
+  flex-shrink:0;padding:10px 20px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg2);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;font-family:var(--mono);min-width:0}
+.breadcrumb .bc-part{color:var(--accent);cursor:pointer}
+.breadcrumb .bc-part:hover{text-decoration:underline}
+.breadcrumb .bc-sep{color:var(--text3)}
+.breadcrumb .bc-current{color:var(--text);font-weight:500}
+.breadcrumb-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* Last commit bar */
+.commit-bar{
+  flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  background:var(--bg2);
+  padding:8px 20px;
+  display:flex;align-items:center;gap:12px;
+  font-size:12.5px;color:var(--text2);
+}
+.commit-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:#fff;flex-shrink:0}
+.commit-author{color:var(--text);font-weight:600}
+.commit-msg{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.commit-time{flex-shrink:0;color:var(--text3)}
+
+/* File list table (directory view) */
+.file-table-wrap{flex:1;overflow-y:auto}
+.file-table{width:100%;border-collapse:collapse}
+.file-table thead th{
+  padding:10px 16px;text-align:left;font-size:12px;font-weight:600;
+  color:var(--text2);border-bottom:1px solid var(--border);
+  background:var(--bg2);position:sticky;top:0;z-index:2;
+}
+.file-table tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+.file-table tbody tr:last-child{border-bottom:none}
+.file-table tbody tr:hover{background:rgba(255,255,255,0.02)}
+.file-table td{padding:9px 16px;font-size:13px;color:var(--text2)}
+.file-table .td-name{display:flex;align-items:center;gap:9px;color:var(--accent);font-family:var(--mono);font-size:13px}
+.file-table .td-name:hover{text-decoration:underline}
+.file-table .td-name i{font-size:15px;color:var(--text3);flex-shrink:0}
+.file-table .td-msg{color:var(--text2);max-width:400px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-table .td-time{color:var(--text3);text-align:right;font-size:12px;white-space:nowrap}
+
+/* File viewer */
+.file-viewer{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.viewer-head{
+  flex-shrink:0;padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg3);
+  display:flex;align-items:center;justify-content:space-between;
   gap:12px;
 }
-.nav-left{display:flex;align-items:center;gap:10px;min-width:0}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);font-family:'Source Serif 4',serif;font-size:15px;font-weight:700;flex-shrink:0}
-.nav-logo .logo-box{width:26px;height:26px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--accent2)}
-.nav-sep{width:1px;height:16px;background:var(--border2);flex-shrink:0}
-.breadcrumb{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);min-width:0}
-.breadcrumb .bc-name{color:var(--text2);font-weight:500;font-family:var(--mono);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
-.breadcrumb i{font-size:11px;flex-shrink:0}
-.role-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:600;letter-spacing:.2px;flex-shrink:0}
-.role-badge.viewer{background:rgba(201,163,86,0.1);color:var(--gold);border:1px solid rgba(201,163,86,0.2)}
-.role-badge.editor{background:rgba(78,158,120,0.1);color:var(--green);border:1px solid rgba(78,158,120,0.2)}
-.role-badge.admin{background:rgba(91,127,255,0.1);color:var(--accent);border:1px solid rgba(91,127,255,0.2)}
+.viewer-head-left{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text2)}
+.viewer-head-left .line-count{color:var(--text3)}
+.viewer-copy-btn{display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .12s}
+.viewer-copy-btn:hover{border-color:var(--border2);color:var(--text)}
+.code-wrap{flex:1;overflow:auto;font-family:var(--mono);font-size:13px;line-height:1.6}
+.code-table{width:100%;border-collapse:collapse;min-width:max-content}
+.code-table td{padding:0;vertical-align:top}
+.line-nums{background:#161B22;border-right:1px solid var(--border);user-select:none;text-align:right;padding:0 16px 0 16px;color:var(--text3);font-size:12px;white-space:pre;min-width:52px}
+.line-nums span{display:block;line-height:1.6;padding:0 4px}
+.line-nums span:hover{color:var(--text2);cursor:pointer}
+.code-lines{padding:0 20px;white-space:pre;background:#0D1117;flex:1}
+.code-lines .hljs{background:transparent!important;padding:0!important;font-family:var(--mono)!important;font-size:13px!important;line-height:1.6!important}
+.code-lines .code-line{display:block;line-height:1.6}
 
-.nav-center{display:flex;align-items:center;gap:2px;flex:1;justify-content:center}
-.menu-btn{padding:5px 9px;border-radius:5px;border:none;background:transparent;color:var(--text2);font-size:12px;font-family:inherit;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px}
-.menu-btn:hover{background:rgba(255,255,255,0.05);color:var(--text)}
-.menu-btn i{font-size:13px}
-
-.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.presence-stack{display:flex;align-items:center}
-.pav{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;margin-left:-6px;flex-shrink:0;cursor:default}
-.pav:first-child{margin-left:0}
-.save-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border);font-size:11px;color:var(--text3)}
-.save-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);transition:all .3s;flex-shrink:0}
-.save-dot.saving{background:var(--gold);animation:pulse .9s infinite}
-.save-dot.saved{background:var(--green)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.nav-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-family:inherit;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
-.nav-btn:hover{color:var(--text);background:rgba(255,255,255,0.04)}
-.nav-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.nav-btn.primary:hover{background:#4D6FE0}
-.nav-btn.run-btn{background:rgba(78,158,120,0.15);border-color:rgba(78,158,120,0.3);color:var(--green);font-weight:600}
-.nav-btn.run-btn:hover{background:rgba(78,158,120,0.25)}
-.nav-btn.run-btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* ── ACTIVITY BAR (leftmost icon column) ── */
-.activity-bar{
-  position:fixed;top:var(--nav-h);left:0;bottom:0;
-  width:44px;background:var(--bg);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;align-items:center;
-  padding:8px 0;gap:2px;z-index:100;
+/* Empty / welcome state */
+.welcome-state{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:16px;color:var(--text3);padding:40px;text-align:center;
 }
-.ab-btn{width:36px;height:36px;border-radius:7px;border:none;background:transparent;color:var(--text3);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;position:relative}
-.ab-btn:hover{background:rgba(255,255,255,0.05);color:var(--text2)}
-.ab-btn.active{color:var(--text);background:rgba(255,255,255,0.07)}
-.ab-btn.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:2px;height:20px;background:var(--accent);border-radius:0 2px 2px 0}
-.ab-btn .ab-tip{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:var(--card2);border:1px solid var(--border2);padding:4px 10px;border-radius:6px;font-size:11px;color:var(--text);white-space:nowrap;display:none;font-family:inherit;pointer-events:none;z-index:300}
-.ab-btn:hover .ab-tip{display:block}
-.ab-spacer{flex:1}
+.welcome-state i{font-size:48px;color:var(--text3);opacity:.3}
+.welcome-state h3{font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;color:var(--text2)}
+.welcome-state p{font-size:13px;line-height:1.65;max-width:280px}
 
-/* ── SIDEBAR PANEL ── */
-.sidebar{
-  position:fixed;top:var(--nav-h);left:44px;bottom:0;
-  width:var(--sidebar-w);background:var(--bg2);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;overflow:hidden;
-  transition:width .2s;z-index:90;
-}
-.sidebar.collapsed{width:0;border-right:none}
-.sidebar-section{flex-shrink:0}
-.sidebar-head{padding:9px 12px 7px;display:flex;align-items:center;justify-content:space-between}
-.sidebar-head h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3)}
-.sidebar-head-actions{display:flex;gap:3px}
-.sb-icon-btn{width:22px;height:22px;border-radius:5px;border:none;background:transparent;color:var(--text3);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.sb-icon-btn:hover{background:rgba(255,255,255,0.06);color:var(--text2)}
-.sb-icon-btn:disabled{opacity:.3;cursor:not-allowed}
-.file-list{flex:1;overflow-y:auto;padding:4px 6px}
-.file-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .12s;position:relative;margin-bottom:1px}
-.file-item:hover{background:rgba(255,255,255,0.04)}
-.file-item.active{background:rgba(91,127,255,0.12)}
-.file-item .fi-icon{font-size:13px;flex-shrink:0;width:16px;text-align:center}
-.file-item .fi-name{flex:1;min-width:0;font-size:12px;font-family:var(--mono);color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
-.file-item.active .fi-name{color:var(--text)}
-.file-item .fi-del{width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:var(--text3);font-size:11px;display:none;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.file-item:hover .fi-del{display:flex}
-.fi-del:hover{color:var(--red)}
-.file-empty{padding:20px 12px;text-align:center;color:var(--text3);font-size:11.5px;line-height:1.7}
-.file-empty i{font-size:20px;display:block;margin-bottom:8px;color:var(--border2)}
+/* ── UPLOAD MODAL ── */
+.modal-bd{display:none;position:fixed;inset:0;z-index:500;background:rgba(1,4,9,0.8);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.modal-bd.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px;width:100%;max-width:440px;position:relative}
+.modal-x{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.modal-x:hover{border-color:var(--border2);color:var(--text);background:var(--bg3)}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text);display:flex;align-items:center;gap:8px}
+.modal p.modal-sub{font-size:12.5px;color:var(--text2);margin-bottom:22px;line-height:1.6}
+.form-grp{margin-bottom:14px}
+.form-grp label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px}
+.form-grp input,.form-grp select,.form-grp textarea{width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.form-grp input:focus,.form-grp select:focus,.form-grp textarea:focus{border-color:var(--accent)}
+.form-grp input::placeholder,.form-grp textarea::placeholder{color:var(--text3)}
+.form-grp textarea{resize:vertical;min-height:120px;font-family:var(--mono);font-size:12.5px;line-height:1.6}
+.drop-zone{border:1.5px dashed var(--border);border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);position:relative;margin-bottom:14px}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:rgba(88,166,255,0.04)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-zone i{font-size:26px;color:var(--text3);margin-bottom:8px;display:block}
+.drop-zone h4{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:3px}
+.drop-zone p{font-size:11.5px;color:var(--text3)}
+.drop-zone.chosen{border-color:var(--green);background:rgba(63,185,80,0.04)}
+.drop-zone.chosen i{color:var(--green)}
+.btn-submit{width:100%;padding:10px;background:var(--accent);color:#0D1117;border:none;border-radius:6px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
+.btn-submit:hover{background:#79C0FF}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.upload-err{background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.25);border-radius:6px;padding:9px 12px;font-size:12.5px;color:var(--red);margin-bottom:12px;display:none}
+.upload-err.show{display:block}
 
-/* ── MAIN EDITOR AREA ── */
-.editor-root{
-  position:fixed;
-  top:var(--nav-h);
-  left:calc(44px + var(--sidebar-w));
-  right:var(--panel-w);
-  bottom:0;
-  display:flex;flex-direction:column;
-  transition:left .2s, right .2s;
-}
-.editor-root.sidebar-collapsed{left:44px}
-.editor-root.panel-collapsed{right:0}
-
-/* Tab bar */
-.tab-bar{
-  flex-shrink:0;height:36px;display:flex;align-items:stretch;
-  background:var(--bg);border-bottom:1px solid var(--border);
-  overflow-x:auto;
-}
-.tab-bar::-webkit-scrollbar{height:0}
-.editor-tab{display:flex;align-items:center;gap:7px;padding:0 14px;
-  font-size:12px;font-family:var(--mono);color:var(--text3);
-  border-right:1px solid var(--border);white-space:nowrap;
-  cursor:pointer;flex-shrink:0;min-width:0;transition:background .12s;position:relative}
-.editor-tab:hover{background:rgba(255,255,255,0.03);color:var(--text2)}
-.editor-tab.active{background:var(--bg2);color:var(--text);border-bottom:2px solid var(--accent)}
-.editor-tab .tab-close{width:16px;height:16px;border-radius:3px;border:none;background:transparent;color:var(--text3);font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity .12s}
-.editor-tab:hover .tab-close,.editor-tab.active .tab-close{opacity:1}
-.tab-close:hover{background:rgba(255,255,255,0.08);color:var(--text)}
-
-/* Toolbar strip */
-.editor-toolbar{
-  flex-shrink:0;padding:5px 10px;display:flex;align-items:center;gap:6px;
-  background:var(--bg3);border-bottom:1px solid var(--border);
-}
-.tb-btn{padding:3px 9px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;font-family:inherit;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-.tb-btn:hover{color:var(--text);background:rgba(255,255,255,0.04)}
-.tb-btn i{font-size:12px}
-.tb-sep{width:1px;height:14px;background:var(--border2);margin:0 2px}
-.tb-lang{padding:3px 9px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;font-family:inherit;cursor:pointer;outline:none}
-.tb-lang:hover,.tb-lang:focus{border-color:var(--accent)}
-.tb-spacer{flex:1}
-
-/* Editor */
-.editor-wrap{flex:1;min-height:0;overflow:hidden;position:relative}
-.CodeMirror{height:100% !important;font-family:var(--mono) !important;font-size:13px;line-height:1.65;background:#1A1B21 !important}
-.CodeMirror-scroll{padding-bottom:40px}
-.CodeMirror-gutters{background:#1A1B21 !important;border-right:1px solid rgba(255,255,255,0.06) !important}
-.CodeMirror-linenumber{color:#42455A !important;font-size:11.5px}
-
-/* No-file state */
-.editor-empty{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--text3);background:var(--bg)}
-.editor-empty i{font-size:40px;color:var(--border2)}
-.editor-empty h3{font-family:'Source Serif 4',serif;font-size:17px;font-weight:700;color:var(--text2)}
-.editor-empty p{font-size:12.5px;max-width:240px;text-align:center;line-height:1.65}
-.editor-empty kbd{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:var(--card2);border:1px solid var(--border2);font-size:11px;font-family:var(--mono);color:var(--text2);margin-top:4px}
-
-/* Status bar */
-.status-bar{
-  flex-shrink:0;height:24px;padding:0 12px;display:flex;align-items:center;
-  justify-content:space-between;background:var(--accent);font-size:11px;color:rgba(255,255,255,0.8);
-}
-.status-left,.status-right{display:flex;align-items:center;gap:12px}
-.status-item{display:flex;align-items:center;gap:4px;cursor:default;transition:color .12s}
-.status-item:hover{color:#fff}
-.status-item i{font-size:11px}
-
-/* Terminal/Output panel */
-.terminal-panel{
-  flex-shrink:0;border-top:1px solid var(--border);
-  display:flex;flex-direction:column;overflow:hidden;
-  height:var(--terminal-h);
-  transition:height .2s;
-}
-.terminal-panel.collapsed{height:0;border-top:none}
-.terminal-header{
-  flex-shrink:0;height:34px;display:flex;align-items:center;
-  background:var(--bg3);border-bottom:1px solid var(--border);padding:0 10px;gap:0;
-}
-.terminal-tab{padding:0 14px;height:34px;display:flex;align-items:center;gap:6px;
-  font-size:11.5px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s}
-.terminal-tab.active{color:var(--text);border-bottom-color:var(--accent)}
-.terminal-tab:hover:not(.active){color:var(--text2)}
-.terminal-actions{margin-left:auto;display:flex;gap:4px}
-.term-btn{width:22px;height:22px;border-radius:4px;border:none;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
-.term-btn:hover{background:rgba(255,255,255,0.06);color:var(--text2)}
-.terminal-body{flex:1;overflow-y:auto;padding:10px 14px;font-family:var(--mono);font-size:12px;line-height:1.6;background:#12131A}
-.term-line{margin-bottom:2px;display:flex;gap:8px}
-.term-line .tl-time{color:#42455A;flex-shrink:0;font-size:10.5px;padding-top:1px}
-.term-line .tl-msg{flex:1;word-break:break-all}
-.term-line.info .tl-msg{color:var(--text2)}
-.term-line.success .tl-msg{color:var(--green)}
-.term-line.error .tl-msg{color:var(--red)}
-.term-line.warn .tl-msg{color:var(--gold)}
-.term-line.code .tl-msg{color:#A3B3D4}
-.term-line.sys .tl-msg{color:var(--text3);font-style:italic}
-.term-prompt{display:flex;align-items:center;gap:8px;padding:6px 0 2px;border-top:1px solid var(--border);margin-top:6px}
-.term-prompt-sym{color:var(--green);font-size:13px;flex-shrink:0}
-.term-input{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--text)}
-.term-input::placeholder{color:var(--text3)}
-
-/* ── RIGHT PANEL ── */
-.right-panel{
-  position:fixed;top:var(--nav-h);right:0;bottom:0;
-  width:var(--panel-w);background:var(--bg2);
-  border-left:1px solid var(--border);
-  display:flex;flex-direction:column;overflow:hidden;
-  transition:width .2s;z-index:90;
-}
-.right-panel.collapsed{width:0;border-left:none}
-.rp-tabs{flex-shrink:0;display:flex;border-bottom:1px solid var(--border)}
-.rp-tab{flex:1;padding:9px 8px;text-align:center;font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s}
-.rp-tab.active{color:var(--text);border-bottom-color:var(--accent)}
-.rp-tab:hover:not(.active){color:var(--text2)}
-.rp-body{flex:1;overflow-y:auto;padding:10px}
-
-/* Activity feed */
-.act-row{display:flex;gap:9px;padding:8px 6px;border-radius:7px;transition:background .12s;margin-bottom:2px}
-.act-row:hover{background:rgba(255,255,255,0.03)}
-.act-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#fff;flex-shrink:0}
-.act-body .act-text{font-size:11.5px;color:var(--text2);line-height:1.5}
-.act-body .act-text b{color:var(--text);font-weight:600}
-.act-body .act-text .fname{color:var(--accent2);font-family:var(--mono);font-size:11px}
-.act-body .act-time{font-size:10px;color:var(--text3);margin-top:1px}
-.rp-empty{padding:28px 10px;text-align:center;color:var(--text3);font-size:11.5px;line-height:1.7}
-.rp-empty i{font-size:22px;display:block;margin-bottom:8px;color:var(--border2)}
-
-/* Online users */
-.online-row{display:flex;align-items:center;gap:9px;padding:8px 6px;border-radius:7px;margin-bottom:2px}
-.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
-.online-info .on-name{font-size:12px;font-weight:500;color:var(--text)}
-.online-info .on-file{font-size:10.5px;color:var(--text3);font-family:var(--mono)}
-
-/* Snippets */
-.snip-item{padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:var(--card);margin-bottom:8px;cursor:pointer;transition:all .12s}
-.snip-item:hover{border-color:var(--border2);background:var(--card2)}
-.snip-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
-.snip-preview{font-size:10.5px;color:var(--text3);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.snip-tag{display:inline-flex;padding:1px 7px;border-radius:4px;font-size:9.5px;font-weight:600;background:rgba(91,127,255,0.1);color:var(--accent2);margin-bottom:4px}
-
-/* ── MODALS ── */
-.modal-backdrop{display:none;position:fixed;inset:0;z-index:500;background:rgba(8,9,11,0.82);backdrop-filter:blur(6px);align-items:center;justify-content:center}
-.modal-backdrop.show{display:flex}
-.modal{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:28px;width:100%;max-width:420px;position:relative}
-.modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
-.modal-close:hover{color:var(--text);background:rgba(255,255,255,0.04)}
-.modal h3{font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px;color:var(--text)}
-.form-group{margin-bottom:14px}
-.form-group label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
-.form-group input::placeholder,.form-group textarea::placeholder{color:var(--text3)}
-.form-group textarea{resize:vertical;min-height:80px;font-family:var(--mono);font-size:12px}
-.form-submit{width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;transition:background .15s}
-.form-submit:hover{background:#4D6FE0}
-
-/* Access modal */
-.access-list{max-height:300px;overflow-y:auto;margin-bottom:14px}
-.access-row{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border)}
-.access-row:last-child{border-bottom:none}
-.acc-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
-.acc-info{flex:1;min-width:0}
-.acc-name{font-size:12px;font-weight:600;color:var(--text)}
-.acc-email{font-size:10.5px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.acc-select{padding:4px 8px;background:var(--bg2);border:1px solid var(--border2);border-radius:5px;color:var(--text2);font-size:11px;font-family:inherit;outline:none;cursor:pointer}
-
-/* Gate */
+/* ── GATE ── */
 .gate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--bg);z-index:600;padding:24px}
 .gate.show{display:flex}
-.gate-card{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r3);padding:40px;max-width:400px;width:100%;text-align:center}
-.gate-card i{font-size:38px;color:var(--accent2);display:block;margin-bottom:16px}
+.gate-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:40px;max-width:400px;width:100%;text-align:center}
+.gate-card i{font-size:36px;color:var(--accent);display:block;margin-bottom:16px}
 .gate-card h2{font-family:'Source Serif 4',serif;font-size:20px;font-weight:700;margin-bottom:8px}
 .gate-card p{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:22px}
-.gate-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:var(--r);background:var(--accent);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;transition:background .15s}
-.gate-btn:hover{background:#4D6FE0}
+.gate-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 24px;border-radius:6px;background:var(--accent);color:#0D1117;border:none;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;transition:background .15s}
+.gate-btn:hover{background:#79C0FF}
 
-/* Toast */
-.toast{position:fixed;bottom:22px;right:22px;z-index:9999;padding:12px 16px;border-radius:var(--r2);background:var(--card2);border:1px solid var(--border2);font-size:12.5px;color:var(--text);box-shadow:0 16px 40px rgba(0,0,0,0.45);transform:translateY(20px);opacity:0;transition:all .25s;display:flex;align-items:center;gap:9px;pointer-events:none}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;z-index:9999;padding:11px 16px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);font-size:12.5px;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,0.5);transform:translateY(12px);opacity:0;transition:all .22s;display:flex;align-items:center;gap:8px;pointer-events:none;max-width:320px}
 .toast.show{transform:translateY(0);opacity:1}
-.toast.success{border-color:rgba(78,158,120,.35)}
-.toast.error{border-color:rgba(194,86,79,.35)}
+.toast.success{border-color:rgba(63,185,80,.3)}
+.toast.error{border-color:rgba(248,81,73,.3)}
 
-/* Search overlay */
-.search-overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(8,9,11,0.7);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding-top:80px}
-.search-overlay.show{display:flex}
-.search-box{width:100%;max-width:560px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden}
-.search-input-wrap{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border)}
-.search-input-wrap i{color:var(--text3);font-size:16px}
-.search-input{flex:1;background:transparent;border:none;outline:none;font-size:14px;font-family:inherit;color:var(--text)}
-.search-input::placeholder{color:var(--text3)}
-.search-results{max-height:340px;overflow-y:auto}
-.search-result{padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .1s}
-.search-result:hover{background:rgba(255,255,255,0.04)}
-.sr-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
-.sr-info .sr-name{font-size:13px;font-weight:500;color:var(--text);font-family:var(--mono)}
-.sr-info .sr-match{font-size:11px;color:var(--text3)}
-.search-empty{padding:28px;text-align:center;color:var(--text3);font-size:12.5px}
+/* ── PROGRESS BAR ── */
+.prog-wrap{margin-bottom:12px;display:none}
+.prog-bar{height:4px;border-radius:99px;background:var(--border);overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;background:var(--accent);width:0%;transition:width .3s}
+.prog-label{font-size:11.5px;color:var(--text2);margin-bottom:5px;display:flex;justify-content:space-between}
 
-/* Resize handle */
-.resize-handle{position:absolute;bottom:0;left:0;right:0;height:4px;cursor:ns-resize;background:transparent;transition:background .15s;z-index:10}
-.resize-handle:hover{background:var(--accent)}
+/* ── ACCESS GATE for non-admin new file ── */
+.no-perm{padding:14px 16px;border-radius:8px;background:rgba(210,153,34,0.08);border:1px solid rgba(210,153,34,0.2);font-size:12.5px;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.spin{animation:spin 1s linear infinite;display:inline-block}
+.spin{animation:spin .9s linear infinite;display:inline-block}
 
-/* ── MOBILE ── */
 @media(max-width:768px){
-  :root{--sidebar-w:0px;--panel-w:0px}
-  .activity-bar{display:none}
-  .sidebar{left:0;width:240px;transform:translateX(-100%);transition:transform .25s;z-index:150}
-  .sidebar.mobile-open{transform:translateX(0)}
-  .right-panel{display:none}
-  .editor-root{left:0 !important;right:0 !important}
-  .mobile-sidebar-btn{display:flex !important}
+  :root{--sidebar-w:0px}
+  .sidebar{position:fixed;left:0;top:var(--nav-h);bottom:0;width:260px;transform:translateX(-100%);transition:transform .22s;z-index:150}
+  .sidebar.open{transform:translateX(0)}
+  .mob-sidebar-btn{display:flex!important}
 }
-.mobile-sidebar-btn{display:none}
+.mob-sidebar-btn{display:none}
 </style>
 </head>
 <body>
@@ -355,6 +273,7 @@ nav{
 <script>
 window.FIREBASE_CONFIG={apiKey:"AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",authDomain:"studyx-fd90c.firebaseapp.com",projectId:"studyx-fd90c",storageBucket:"studyx-fd90c.firebasestorage.app",messagingSenderId:"520877226051",appId:"1:520877226051:web:94cdfd86eb64623f5f7cf6"};
 window.ADMIN_EMAILS=["abhishekbasu188@gmail.com"];
+window.CLOUDINARY_CONFIG={cloudName:"dwmvn4kj3",uploadPreset:"preupload"};
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -364,236 +283,219 @@ window.ADMIN_EMAILS=["abhishekbasu188@gmail.com"];
 <div class="gate" id="gate">
   <div class="gate-card">
     <i class="ti ti-code"></i>
-    <h2>Sign in to use Codespace</h2>
-    <p>Codespace is available to all registered StudyHub members. Sign in to view, edit, and run code collaboratively.</p>
+    <h2>Sign in to view Codespace</h2>
+    <p>Codespace is available to all StudyHub members. Browse, read, and collaborate on code files.</p>
     <a href="index.html?login=1" class="gate-btn"><i class="ti ti-login"></i> Sign In</a>
   </div>
 </div>
 
-<!-- NAV -->
+<!-- TOP NAV -->
 <nav id="mainNav" style="display:none">
-  <div class="nav-left">
-    <a href="index.html" class="nav-logo">
-      <div class="logo-box"><i class="ti ti-atom"></i></div>
-      StudyHub
-    </a>
-    <div class="nav-sep"></div>
-    <div class="breadcrumb">
-      <i class="ti ti-code" style="color:var(--accent2)"></i>
-      <span style="color:var(--text3)">Codespace</span>
-      <i class="ti ti-chevron-right"></i>
-      <span class="bc-name" id="breadFile">No file open</span>
+  <button class="nav-btn mob-sidebar-btn" onclick="toggleMobileSidebar()" style="margin-right:4px"><i class="ti ti-menu-2"></i></button>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-box"><i class="ti ti-atom"></i></div>
+    StudyHub
+  </a>
+  <div class="nav-sep"></div>
+  <div class="nav-path">
+    <span class="repo-name">codespace</span>
+    <div class="branch-pill"><i class="ti ti-git-branch" style="font-size:11px"></i> main</div>
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-right">
+    <div id="navUser" class="nav-user">
+      <div class="nav-av" id="navAv" style="background:linear-gradient(135deg,#5B7FFF,#8FA3D6)">?</div>
+      <span id="navName" style="font-size:12.5px">Loading…</span>
     </div>
     <span class="role-badge viewer" id="roleBadge">Viewer</span>
-  </div>
-
-  <div class="nav-center">
-    <button class="menu-btn" onclick="openNewFileModal()"><i class="ti ti-file-plus"></i> New File</button>
-    <button class="menu-btn" onclick="openSearchOverlay()"><i class="ti ti-search"></i> Find <span style="color:var(--text3);font-size:10px;margin-left:2px">⌘P</span></button>
-    <button class="menu-btn" onclick="formatCode()"><i class="ti ti-brackets"></i> Format</button>
-    <button class="menu-btn" onclick="openAccessModal()"><i class="ti ti-users"></i> Access</button>
-  </div>
-
-  <div class="nav-right">
-    <div class="presence-stack" id="presenceStack"></div>
-    <div class="save-pill" id="savePill">
-      <span class="save-dot" id="saveDot"></span>
-      <span id="saveLabel">Ready</span>
-    </div>
-    <button class="nav-btn run-btn" id="runBtn" onclick="runCode()" disabled>
-      <i class="ti ti-player-play"></i> Run
+    <button class="nav-btn primary" id="addFileBtn" onclick="openUploadModal()" style="display:none">
+      <i class="ti ti-plus"></i> Add file
     </button>
-    <button class="nav-btn mobile-sidebar-btn" onclick="toggleMobileSidebar()"><i class="ti ti-menu-2"></i></button>
+    <a href="index.html" class="nav-btn"><i class="ti ti-home"></i> Home</a>
   </div>
 </nav>
 
-<!-- ACTIVITY BAR -->
-<div class="activity-bar" id="activityBar" style="display:none">
-  <button class="ab-btn active" id="abFiles" onclick="setABTab('files')" title="">
-    <i class="ti ti-files"></i>
-    <span class="ab-tip">Explorer</span>
-  </button>
-  <button class="ab-btn" id="abSearch" onclick="openSearchOverlay()" title="">
-    <i class="ti ti-search"></i>
-    <span class="ab-tip">Search</span>
-  </button>
-  <button class="ab-btn" id="abSnippets" onclick="setABTab('snippets')" title="">
-    <i class="ti ti-layout-cards"></i>
-    <span class="ab-tip">Snippets</span>
-  </button>
-  <div class="ab-spacer"></div>
-  <button class="ab-btn" id="abActivity" onclick="setABTab('activity')" title="">
-    <i class="ti ti-activity"></i>
-    <span class="ab-tip">Activity</span>
-  </button>
-  <button class="ab-btn" onclick="toggleSidebar()" title="">
-    <i class="ti ti-layout-sidebar"></i>
-    <span class="ab-tip">Toggle Sidebar</span>
-  </button>
-</div>
+<!-- LAYOUT -->
+<div class="layout" id="layout" style="display:none">
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar" style="display:none">
-  <!-- Explorer -->
-  <div id="panelExplorer" style="display:flex;flex-direction:column;height:100%">
-    <div class="sidebar-section">
-      <div class="sidebar-head">
-        <h4>Explorer</h4>
-        <div class="sidebar-head-actions">
-          <button class="sb-icon-btn" id="newFileBtn" onclick="openNewFileModal()" title="New File"><i class="ti ti-plus"></i></button>
-          <button class="sb-icon-btn" onclick="subscribeFiles()" title="Refresh"><i class="ti ti-refresh"></i></button>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <h4><i class="ti ti-files" style="font-size:14px"></i> Files</h4>
+      <div class="sidebar-head-actions">
+        <button class="icon-btn" id="newFileSideBtn" title="Add file" onclick="openUploadModal()" style="display:none"><i class="ti ti-plus"></i></button>
+        <button class="icon-btn" title="Refresh" onclick="loadFiles()"><i class="ti ti-refresh"></i></button>
+      </div>
+    </div>
+    <div class="sidebar-search">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" placeholder="Go to file…" id="fileSearch" oninput="filterFiles(this.value)"/>
+      </div>
+    </div>
+    <div class="file-tree" id="fileTree">
+      <div class="tree-empty"><i class="ti ti-loader spin"></i>Loading…</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="mainArea">
+    <!-- Directory view (default) -->
+    <div id="dirView" style="display:flex;flex-direction:column;height:100%">
+      <div class="breadcrumb-bar">
+        <div class="breadcrumb">
+          <span class="bc-part" onclick="showDirView()">codespace</span>
+          <span class="bc-sep">/</span>
+          <span class="bc-current" id="dirBreadcrumb">root</span>
+        </div>
+        <div class="breadcrumb-actions">
+          <span id="fileCount" style="font-size:12px;color:var(--text3)"></span>
+        </div>
+      </div>
+      <div class="commit-bar" id="commitBar" style="display:none">
+        <div class="commit-av" id="commitAv" style="background:linear-gradient(135deg,#5B7FFF,#8FA3D6)">?</div>
+        <span class="commit-author" id="commitAuthor"></span>
+        <span class="commit-msg" id="commitMsg"></span>
+        <span class="commit-time" id="commitTime"></span>
+      </div>
+      <div class="file-table-wrap">
+        <table class="file-table">
+          <thead>
+            <tr>
+              <th style="width:40%">Name</th>
+              <th style="width:40%">Last commit message</th>
+              <th style="width:20%">Last commit date</th>
+            </tr>
+          </thead>
+          <tbody id="fileTableBody">
+            <tr><td colspan="3" style="text-align:center;padding:40px;color:var(--text3)"><i class="ti ti-loader spin" style="font-size:20px;display:block;margin-bottom:10px"></i>Loading files…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- File viewer -->
+    <div id="fileView" style="display:none;flex-direction:column;height:100%">
+      <div class="breadcrumb-bar">
+        <div class="breadcrumb">
+          <span class="bc-part" onclick="showDirView()">codespace</span>
+          <span class="bc-sep">/</span>
+          <span class="bc-current" id="fileBreadcrumb">file.py</span>
+        </div>
+        <div class="breadcrumb-actions">
+          <button class="viewer-copy-btn" onclick="copyCurrentFile()"><i class="ti ti-copy"></i> Copy</button>
+          <button class="nav-btn" id="editFileBtn" onclick="openEditModal()" style="display:none;font-size:12px;padding:4px 12px"><i class="ti ti-pencil"></i> Edit</button>
+          <button class="nav-btn" id="deleteFileBtn" onclick="deleteCurrentFile()" style="display:none;font-size:12px;padding:4px 12px;color:var(--red);border-color:rgba(248,81,73,0.3)"><i class="ti ti-trash"></i> Delete</button>
+        </div>
+      </div>
+      <div class="file-viewer">
+        <div class="viewer-head">
+          <div class="viewer-head-left">
+            <span id="viewerLang" style="font-size:12px;font-weight:600;color:var(--accent2)"></span>
+            <span class="line-count" id="viewerLines"></span>
+          </div>
+          <button class="viewer-copy-btn" onclick="copyCurrentFile()"><i class="ti ti-copy"></i> Copy raw</button>
+        </div>
+        <div class="code-wrap" id="codeWrap">
+          <table class="code-table">
+            <tbody>
+              <tr>
+                <td class="line-nums" id="lineNums"></td>
+                <td style="width:100%">
+                  <div class="code-lines">
+                    <code class="hljs" id="codeDisplay"></code>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-    <div class="file-list" id="fileList">
-      <div class="file-empty"><i class="ti ti-loader spin"></i>Loading…</div>
+
+    <!-- Welcome empty state -->
+    <div class="welcome-state" id="welcomeState" style="display:none">
+      <i class="ti ti-code"></i>
+      <h3>No files yet</h3>
+      <p>Add the first file to get started. Viewers can read all code — editors and admins can add files.</p>
     </div>
-  </div>
-  <!-- Snippets -->
-  <div id="panelSnippets" style="display:none;flex-direction:column;height:100%">
-    <div class="sidebar-section">
-      <div class="sidebar-head"><h4>Code Snippets</h4></div>
-    </div>
-    <div class="file-list" id="snippetList"></div>
-  </div>
-  <!-- Activity -->
-  <div id="panelActivity" style="display:none;flex-direction:column;height:100%">
-    <div class="sidebar-section">
-      <div class="sidebar-head"><h4>Live Activity</h4></div>
-    </div>
-    <div class="file-list" id="actFeed">
-      <div class="rp-empty"><i class="ti ti-loader spin"></i>Loading…</div>
-    </div>
-  </div>
+  </main>
 </div>
 
-<!-- EDITOR ROOT -->
-<div class="editor-root" id="editorRoot" style="display:none">
-  <!-- Tab bar -->
-  <div class="tab-bar" id="tabBar"></div>
+<!-- UPLOAD / ADD FILE MODAL -->
+<div class="modal-bd" id="uploadModal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeUploadModal()"><i class="ti ti-x"></i></button>
+    <h3><i class="ti ti-file-plus" style="color:var(--accent)"></i> Add new file</h3>
+    <p class="modal-sub">Upload a code file or paste content directly. Supports any language.</p>
 
-  <!-- Toolbar -->
-  <div class="editor-toolbar">
-    <select class="tb-lang" id="langSelect" onchange="changeLang(this.value)">
-      <option value="javascript">JavaScript</option>
-      <option value="python">Python</option>
-      <option value="htmlmixed">HTML</option>
-      <option value="css">CSS</option>
-      <option value="text/x-java">Java</option>
-      <option value="text/x-csrc">C</option>
-      <option value="text/x-c++src">C++</option>
-      <option value="markdown">Markdown</option>
-    </select>
-    <div class="tb-sep"></div>
-    <button class="tb-btn" onclick="formatCode()"><i class="ti ti-brackets"></i> Format</button>
-    <button class="tb-btn" onclick="commentLine()"><i class="ti ti-message-code"></i> Comment</button>
-    <button class="tb-btn" onclick="copyCode()"><i class="ti ti-copy"></i> Copy</button>
-    <div class="tb-sep"></div>
-    <button class="tb-btn" onclick="insertSnippet('for')"><i class="ti ti-code"></i> for</button>
-    <button class="tb-btn" onclick="insertSnippet('func')"><i class="ti ti-function"></i> fn</button>
-    <button class="tb-btn" onclick="insertSnippet('class')"><i class="ti ti-cube"></i> class</button>
-    <div class="tb-spacer"></div>
-    <button class="tb-btn" onclick="toggleTerminal()"><i class="ti ti-terminal"></i> Terminal</button>
-    <button class="tb-btn" onclick="toggleRightPanel()"><i class="ti ti-layout-sidebar-right"></i> Panel</button>
-  </div>
+    <div class="upload-err" id="uploadErr"></div>
 
-  <!-- Editor -->
-  <div class="editor-wrap" id="editorWrap">
-    <div class="editor-empty" id="editorEmpty">
-      <i class="ti ti-file-code"></i>
-      <h3>No file open</h3>
-      <p>Open a file from the Explorer or create a new one to start coding.</p>
-      <kbd><i class="ti ti-command" style="font-size:10px"></i> P — Quick open</kbd>
+    <!-- Mode tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button id="modeUploadBtn" onclick="setUploadMode('upload')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--accent);background:rgba(88,166,255,0.1);color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit">
+        <i class="ti ti-upload"></i> Upload file
+      </button>
+      <button id="modePasteBtn" onclick="setUploadMode('paste')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit">
+        <i class="ti ti-clipboard"></i> Paste code
+      </button>
     </div>
-  </div>
 
-  <!-- Terminal -->
-  <div class="terminal-panel" id="terminalPanel">
-    <div class="terminal-header">
-      <div class="terminal-tab active" onclick="setTermTab('output')">Output</div>
-      <div class="terminal-tab" onclick="setTermTab('console')">Console</div>
-      <div class="terminal-tab" onclick="setTermTab('problems')">Problems</div>
-      <div class="terminal-actions">
-        <button class="term-btn" onclick="clearTerminal()" title="Clear"><i class="ti ti-trash"></i></button>
-        <button class="term-btn" onclick="toggleTerminal()" title="Close"><i class="ti ti-x"></i></button>
+    <!-- Upload mode -->
+    <div id="modeUpload">
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" onchange="handleFileSelect(this)"/>
+        <i class="ti ti-file-upload"></i>
+        <h4>Drop file here or click to browse</h4>
+        <p>Any file type — .py, .js, .html, .cpp, .java, .txt…</p>
       </div>
     </div>
-    <div class="terminal-body" id="terminalBody">
-      <div class="term-line sys"><span class="tl-time"></span><span class="tl-msg">StudyHub Codespace ready. Press Run to execute your code.</span></div>
-    </div>
-  </div>
 
-  <!-- Status bar -->
-  <div class="status-bar" id="statusBar" style="display:none">
-    <div class="status-left">
-      <span class="status-item" id="statusBranch"><i class="ti ti-git-branch"></i> main</span>
-      <span class="status-item" id="statusErrors"><i class="ti ti-circle-check"></i> 0 errors</span>
+    <!-- Paste mode -->
+    <div id="modePaste" style="display:none">
+      <div class="form-grp">
+        <label>File name *</label>
+        <input type="text" id="pasteFileName" placeholder="e.g. main.py, index.js, solution.cpp"/>
+      </div>
+      <div class="form-grp">
+        <label>Code *</label>
+        <textarea id="pasteContent" placeholder="Paste your code here…" style="min-height:160px"></textarea>
+      </div>
     </div>
-    <div class="status-right">
-      <span class="status-item" id="statusLang">JS</span>
-      <span class="status-item" id="statusCursor">Ln 1, Col 1</span>
-      <span class="status-item" id="statusEncoding">UTF-8</span>
-      <span class="status-item" id="statusReadonly" style="display:none"><i class="ti ti-eye"></i> Read Only</span>
+
+    <div class="form-grp" style="margin-top:8px">
+      <label>Commit message</label>
+      <input type="text" id="commitMessage" placeholder="e.g. Add sorting algorithm, Fix bug in parser…"/>
     </div>
+
+    <div class="prog-wrap" id="progWrap">
+      <div class="prog-label"><span id="progLabel">Uploading…</span><span id="progPct">0%</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    </div>
+
+    <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">
+      <i class="ti ti-git-commit"></i> Commit file
+    </button>
   </div>
 </div>
 
-<!-- RIGHT PANEL -->
-<div class="right-panel" id="rightPanel" style="display:none">
-  <div class="rp-tabs">
-    <div class="rp-tab active" onclick="setRPTab('online')">Online</div>
-    <div class="rp-tab" onclick="setRPTab('activity')">Activity</div>
-  </div>
-  <div class="rp-body" id="rpBody">
-    <div class="rp-empty"><i class="ti ti-loader spin"></i>Loading…</div>
-  </div>
-</div>
-
-<!-- SEARCH OVERLAY -->
-<div class="search-overlay" id="searchOverlay" onclick="closeSearchIfOutside(event)">
-  <div class="search-box" id="searchBox">
-    <div class="search-input-wrap">
-      <i class="ti ti-search"></i>
-      <input class="search-input" id="searchInput" placeholder="Search files…" oninput="doSearch(this.value)" onkeydown="searchKeydown(event)"/>
-      <span style="font-size:11px;color:var(--text3)">ESC to close</span>
-    </div>
-    <div class="search-results" id="searchResults">
-      <div class="search-empty">Start typing to search files…</div>
-    </div>
-  </div>
-</div>
-
-<!-- NEW FILE MODAL -->
-<div class="modal-backdrop" id="newFileModal">
+<!-- EDIT MODAL (admin/editor only) -->
+<div class="modal-bd" id="editModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('newFileModal')"><i class="ti ti-x"></i></button>
-    <h3><i class="ti ti-file-plus" style="color:var(--accent2)"></i> New File</h3>
-    <div class="form-group">
-      <label>File name</label>
-      <input type="text" id="newFileName" placeholder="main.py, index.html, script.js…" onkeydown="if(event.key==='Enter')createNewFile()"/>
+    <button class="modal-x" onclick="closeEditModal()"><i class="ti ti-x"></i></button>
+    <h3><i class="ti ti-pencil" style="color:var(--accent)"></i> Edit file</h3>
+    <p class="modal-sub">Editing: <strong id="editFileName" style="color:var(--text);font-family:var(--mono)"></strong></p>
+    <div class="form-grp">
+      <label>Code</label>
+      <textarea id="editContent" style="min-height:240px;font-family:var(--mono);font-size:12.5px"></textarea>
     </div>
-    <div class="form-group">
-      <label>Template (optional)</label>
-      <select id="newFileTemplate">
-        <option value="">Empty file</option>
-        <option value="html">HTML boilerplate</option>
-        <option value="python">Python hello world</option>
-        <option value="javascript">JavaScript starter</option>
-        <option value="java">Java class</option>
-        <option value="cpp">C++ starter</option>
-      </select>
+    <div class="form-grp">
+      <label>Commit message</label>
+      <input type="text" id="editCommitMsg" placeholder="e.g. Fix logic error in line 42…"/>
     </div>
-    <button class="form-submit" onclick="createNewFile()">Create File</button>
-  </div>
-</div>
-
-<!-- ACCESS MODAL -->
-<div class="modal-backdrop" id="accessModal">
-  <div class="modal" style="max-width:480px">
-    <button class="modal-close" onclick="closeModal('accessModal')"><i class="ti ti-x"></i></button>
-    <h3><i class="ti ti-users" style="color:var(--accent2)"></i> Manage Access</h3>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.65">All signed-in members can view. Grant <b style="color:var(--green)">editor</b> access to allow modifications.</p>
-    <div class="access-list" id="accessList"><div class="rp-empty"><i class="ti ti-loader spin"></i>Loading…</div></div>
+    <button class="btn-submit" id="editSubmitBtn" onclick="saveEdit()">
+      <i class="ti ti-device-floppy"></i> Save changes
+    </button>
   </div>
 </div>
 
@@ -607,451 +509,373 @@ const db   = firebase.firestore();
 
 /* ── State ── */
 let currentUser = null, myRole = 'viewer';
-let allFiles = [], activeFileId = null;
-let cmEditor = null, saveTimeout = null, filesUnsub = null;
-let suppressChange = false, activeTermTab = 'output', activeRPTab = 'online';
-let sidebarVisible = true, rightPanelVisible = true, terminalVisible = true;
-let curABTab = 'files';
+let allFiles = [], activeFileId = null, selectedFile = null, uploadMode = 'upload';
 
 /* ── Helpers ── */
-const $ = id => document.getElementById(id);
-function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function avatarColor(uid){const c=['linear-gradient(135deg,#5B7FFF,#8FA3D6)','linear-gradient(135deg,#3FA9CC,#2D8FAF)','linear-gradient(135deg,#4E9E78,#3A7A5C)','linear-gradient(135deg,#C9A356,#A8832E)','linear-gradient(135deg,#C2564F,#A03C35)'];let h=0;for(let x of(uid||'x'))h=(h<<5)-h+x.charCodeAt(0);return c[Math.abs(h)%c.length];}
+const $=id=>document.getElementById(id);
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function avatarBg(uid){const c=['linear-gradient(135deg,#5B7FFF,#8FA3D6)','linear-gradient(135deg,#3FA9CC,#2D8FAF)','linear-gradient(135deg,#3FB950,#2D8A3E)','linear-gradient(135deg,#D29922,#A8832E)','linear-gradient(135deg,#F85149,#C0302A)'];let h=0;for(let x of(uid||'?'))h=(h<<5)-h+x.charCodeAt(0);return c[Math.abs(h)%c.length];}
 function initials(n){return String(n||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
-function isAdminUser(u){return u&&window.ADMIN_EMAILS.includes(u.email);}
-function timeAgo(d){const s=Math.floor((Date.now()-d.getTime())/1000);if(s<60)return 'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
-function nowStr(){return new Date().toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function isAdmin(u){return u&&window.ADMIN_EMAILS.includes(u.email);}
+function canEdit(){return myRole==='admin'||myRole==='editor';}
+function timeAgo(d){const s=Math.floor((Date.now()-d.getTime())/1000);if(s<60)return 'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';if(s<604800)return Math.floor(s/86400)+'d ago';return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
 
-/* ── Templates ── */
-const TEMPLATES = {
-  html:`<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8"/>\n  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n  <title>My Page</title>\n  <style>\n    body { font-family: sans-serif; margin: 40px; }\n  </style>\n</head>\n<body>\n  <h1>Hello World</h1>\n  <p>Edit this file to get started.</p>\n</body>\n</html>`,
-  python:`# Python Starter\n\ndef greet(name):\n    return f"Hello, {name}!"\n\nif __name__ == "__main__":\n    print(greet("StudyHub"))\n`,
-  javascript:`// JavaScript Starter\n\nconst greet = (name) => {\n  return \`Hello, \${name}!\`;\n};\n\nconsole.log(greet("StudyHub"));\n`,
-  java:`public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, StudyHub!");\n  }\n}\n`,
-  cpp:`#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, StudyHub!" << endl;\n  return 0;\n}\n`,
-};
-
-/* ── Extension maps ── */
-const EXT_LANG = {js:'javascript',jsx:'javascript',ts:'javascript',tsx:'javascript',html:'htmlmixed',htm:'htmlmixed',css:'css',py:'python',java:'text/x-java',c:'text/x-csrc',cpp:'text/x-c++src',cs:'text/x-csharp',md:'markdown',json:'javascript',txt:null};
-const EXT_ICON = {js:'🟨',jsx:'⚛️',ts:'🔷',tsx:'⚛️',html:'🧡',htm:'🧡',css:'🎨',py:'🐍',java:'☕',c:'🔵',cpp:'🔵',cs:'🟣',md:'📝',json:'📦',txt:'📄'};
-const LANG_LABEL = {'javascript':'JS','python':'PY','htmlmixed':'HTML','css':'CSS','text/x-java':'Java','text/x-csrc':'C','text/x-c++src':'C++','markdown':'MD'};
-const SNIPPETS = [
-  {name:'For Loop',lang:'javascript',tag:'JS',code:'for (let i = 0; i < arr.length; i++) {\n  console.log(arr[i]);\n}'},
-  {name:'Arrow Function',lang:'javascript',tag:'JS',code:'const fn = (param) => {\n  return param;\n};'},
-  {name:'Async/Await',lang:'javascript',tag:'JS',code:'const fetchData = async () => {\n  try {\n    const res = await fetch(url);\n    const data = await res.json();\n    return data;\n  } catch (err) {\n    console.error(err);\n  }\n};'},
-  {name:'Python For Loop',lang:'python',tag:'PY',code:'for item in items:\n    print(item)'},
-  {name:'Python Function',lang:'python',tag:'PY',code:'def function_name(param):\n    """Docstring here."""\n    return param'},
-  {name:'HTML Template',lang:'html',tag:'HTML',code:'<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8"/>\n  <title>Page</title>\n</head>\n<body>\n</body>\n</html>'},
-  {name:'CSS Flexbox',lang:'css',tag:'CSS',code:'.container {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n}'},
-  {name:'Java Class',lang:'java',tag:'Java',code:'public class ClassName {\n  private String field;\n\n  public ClassName(String field) {\n    this.field = field;\n  }\n\n  public String getField() {\n    return field;\n  }\n}'},
-];
+/* ── Extension → display info ── */
+const EXT_LANG={js:'JavaScript',jsx:'JavaScript (JSX)',ts:'TypeScript',tsx:'TypeScript (TSX)',html:'HTML',htm:'HTML',css:'CSS',scss:'SCSS',py:'Python',java:'Java',c:'C',cpp:'C++',cs:'C#',go:'Go',rs:'Rust',rb:'Ruby',php:'PHP',swift:'Swift',kt:'Kotlin',md:'Markdown',json:'JSON',xml:'XML',yaml:'YAML',yml:'YAML',sh:'Shell',bash:'Shell',txt:'Plain Text',sql:'SQL'};
+const EXT_HLJS={js:'javascript',jsx:'javascript',ts:'typescript',tsx:'typescript',html:'html',htm:'html',css:'css',scss:'scss',py:'python',java:'java',c:'c',cpp:'cpp',cs:'csharp',go:'go',rs:'rust',rb:'ruby',php:'php',swift:'swift',kt:'kotlin',md:'markdown',json:'json',xml:'xml',yaml:'yaml',yml:'yaml',sh:'bash',bash:'bash',sql:'sql'};
+const FILE_ICON={js:'<i class="ti ti-brand-javascript" style="color:#F7DF1E"></i>',jsx:'<i class="ti ti-brand-react" style="color:#61DAFB"></i>',ts:'<i class="ti ti-brand-typescript" style="color:#3178C6"></i>',tsx:'<i class="ti ti-brand-react" style="color:#3178C6"></i>',html:'<i class="ti ti-brand-html5" style="color:#E34F26"></i>',htm:'<i class="ti ti-brand-html5" style="color:#E34F26"></i>',css:'<i class="ti ti-brand-css3" style="color:#1572B6"></i>',py:'<i class="ti ti-brand-python" style="color:#3776AB"></i>',java:'<i class="ti ti-coffee" style="color:#ED8B00"></i>',c:'<i class="ti ti-letter-c" style="color:#A8B9CC"></i>',cpp:'<i class="ti ti-letter-c" style="color:#00599C"></i>',cs:'<i class="ti ti-brand-c-sharp" style="color:#239120"></i>',go:'<i class="ti ti-brand-golang" style="color:#00ADD8"></i>',rs:'<i class="ti ti-brand-rust" style="color:#CE422B"></i>',md:'<i class="ti ti-markdown" style="color:#8B949E"></i>',json:'<i class="ti ti-braces" style="color:#FBBF24"></i>',sql:'<i class="ti ti-database" style="color:#336791"></i>',sh:'<i class="ti ti-terminal" style="color:#4EE4A0"></i>',bash:'<i class="ti ti-terminal" style="color:#4EE4A0"></i>',txt:'<i class="ti ti-file-text" style="color:#8B949E"></i>'};
+function getExt(name){const p=name.split('.');return p.length>1?p.pop().toLowerCase():'';}
+function fileIcon(name){const e=getExt(name);return FILE_ICON[e]||'<i class="ti ti-file-code" style="color:#8B949E"></i>';}
 
 /* ── Auth ── */
-auth.onAuthStateChanged(async user => {
-  currentUser = user;
-  if (!user) { $('gate').classList.add('show'); return; }
+auth.onAuthStateChanged(async user=>{
+  currentUser=user;
+  if(!user){$('gate').classList.add('show');return;}
   $('gate').classList.remove('show');
-  ['mainNav','activityBar','sidebar','editorRoot','rightPanel'].forEach(id=>$(id).style.display='');
-  $('mainNav').style.display='flex';
-  $('activityBar').style.display='flex';
-  $('sidebar').style.display='flex';
-  $('editorRoot').style.display='flex';
-  $('rightPanel').style.display='flex';
   await resolveRole(user);
-  initEditor();
-  subscribeFiles();
-  subscribePresence();
-  subscribeActivity();
-  setPresence(user);
-  renderSnippets();
-  loadOnlineUsers();
+  setupUI(user);
+  loadFiles();
 });
 
-async function resolveRole(user) {
-  if (isAdminUser(user)) { myRole='admin'; }
-  else {
-    try { const s=await db.collection('codespaceAccess').doc(user.uid).get(); myRole=(s.exists&&s.data().role==='editor')?'editor':'viewer'; }
-    catch(e){ myRole='viewer'; }
+async function resolveRole(user){
+  if(isAdmin(user)){myRole='admin';}
+  else{
+    try{const s=await db.collection('codespaceAccess').doc(user.uid).get();myRole=(s.exists&&s.data().role==='editor')?'editor':'viewer';}
+    catch(e){myRole='viewer';}
   }
-  const b=$('roleBadge');
-  const labels={admin:'👑 Admin',editor:'✓ Editor',viewer:'👁 Viewer'};
-  b.textContent=labels[myRole]; b.className='role-badge '+myRole;
-  $('newFileBtn').disabled=!canEdit();
-  $('runBtn').disabled=false;
-}
-function canEdit(){return myRole==='admin'||myRole==='editor';}
-function ext(name){const p=name.split('.');return p.length>1?p.pop().toLowerCase():'txt';}
-
-/* ── Editor ── */
-function initEditor() {
-  const wrap=$('editorWrap');
-  const ta=document.createElement('textarea'); ta.id='cmHost';
-  $('editorEmpty').after(ta);
-  cmEditor=CodeMirror.fromTextArea(ta,{
-    theme:'dracula',lineNumbers:true,autoCloseBrackets:true,
-    styleActiveLine:true,tabSize:2,indentWithTabs:false,
-    mode:'javascript',readOnly:true,viewportMargin:Infinity,
-    extraKeys:{"Ctrl-/":"toggleComment","Cmd-/":"toggleComment","Ctrl-S":()=>saveCurrentFile(),"Cmd-S":()=>saveCurrentFile()}
-  });
-  cmEditor.getWrapperElement().style.height='100%';
-  cmEditor.on('change',()=>{
-    if(suppressChange||!activeFileId||!canEdit()) return;
-    scheduleAutosave();
-  });
-  cmEditor.on('cursorActivity',()=>{
-    const c=cmEditor.getCursor();
-    $('statusCursor').textContent=`Ln ${c.line+1}, Col ${c.ch+1}`;
-  });
 }
 
-/* ── Files ── */
-function subscribeFiles(){
-  if(filesUnsub) filesUnsub();
-  filesUnsub=db.collection('codespaceFiles').orderBy('name').onSnapshot(snap=>{
+function setupUI(user){
+  $('mainNav').style.display='flex';
+  $('layout').style.display='flex';
+  // Nav user
+  $('navAv').style.background=avatarBg(user.uid);
+  $('navAv').textContent=initials(user.displayName||user.email);
+  $('navName').textContent=user.displayName||user.email.split('@')[0];
+  // Role badge
+  const rb=$('roleBadge');
+  rb.textContent=myRole==='admin'?'👑 Admin':myRole==='editor'?'✓ Editor':'👁 Viewer';
+  rb.className='role-badge '+myRole;
+  // Show add file btn for editors/admins
+  if(canEdit()){
+    $('addFileBtn').style.display='inline-flex';
+    $('newFileSideBtn').style.display='flex';
+    $('editFileBtn').style.display='';
+    $('deleteFileBtn').style.display='';
+  }
+}
+
+/* ── Load files from Firestore ── */
+function loadFiles(){
+  db.collection('codespaceFiles').orderBy('name').onSnapshot(snap=>{
     allFiles=snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderFileList();
-    if(activeFileId){
-      const f=allFiles.find(x=>x.id===activeFileId);
-      if(f&&f.lastEditedBy!==currentUser.uid){
-        const cur=cmEditor.getCursor();
-        suppressChange=true; cmEditor.setValue(f.content||''); cmEditor.setCursor(cur); suppressChange=false;
-        updateStatusBar(f);
-      }
-    }
-  },err=>{ $('fileList').innerHTML=`<div class="file-empty"><i class="ti ti-wifi-off"></i>Cannot load files</div>`; });
+    renderSidebarTree(allFiles);
+    renderDirView(allFiles);
+  },err=>{
+    $('fileTree').innerHTML=`<div class="tree-empty"><i class="ti ti-wifi-off"></i>Cannot load files</div>`;
+  });
 }
 
-function ext_icon(name){return EXT_ICON[ext(name)]||'📄';}
-
-function renderFileList(){
-  const el=$('fileList');
-  if(!allFiles.length){
-    el.innerHTML=`<div class="file-empty"><i class="ti ti-file-off"></i>No files yet.${canEdit()?'<br/>Click + to create one.':''}</div>`;
+/* ── Sidebar tree ── */
+function renderSidebarTree(files){
+  const el=$('fileTree');
+  if(!files.length){
+    el.innerHTML=`<div class="tree-empty"><i class="ti ti-file-off"></i>No files yet${canEdit()?'<br/><small>Click + to add one</small>':''}</div>`;
     return;
   }
-  el.innerHTML=allFiles.map(f=>`
-    <div class="file-item ${f.id===activeFileId?'active':''}" onclick="openFile('${f.id}')">
-      <span class="fi-icon">${ext_icon(f.name)}</span>
-      <span class="fi-name">${escHtml(f.name)}</span>
-      ${myRole==='admin'?`<button class="fi-del" onclick="event.stopPropagation();deleteFile('${f.id}','${escHtml(f.name)}')"><i class="ti ti-trash"></i></button>`:''}
+  el.innerHTML=files.map(f=>`
+    <div class="tree-item ${f.id===activeFileId?'active':''}" onclick="openFile('${f.id}')">
+      ${fileIcon(f.name)}
+      <span class="item-name">${esc(f.name)}</span>
+      ${canEdit()?`<div class="item-actions"><button class="item-del" title="Delete" onclick="event.stopPropagation();confirmDelete('${f.id}','${esc(f.name)}')"><i class="ti ti-trash"></i></button></div>`:''}
     </div>`).join('');
 }
 
+function filterFiles(q){
+  const filtered=q?allFiles.filter(f=>f.name.toLowerCase().includes(q.toLowerCase())):allFiles;
+  renderSidebarTree(filtered);
+}
+
+/* ── Directory view ── */
+function renderDirView(files){
+  $('dirView').style.display='flex';
+  $('fileView').style.display='none';
+  $('welcomeState').style.display='none';
+  activeFileId=null;
+  renderSidebarTree(allFiles);
+
+  if(!files.length){
+    $('dirView').style.display='none';
+    $('welcomeState').style.display='flex';
+    return;
+  }
+
+  $('fileCount').textContent=`${files.length} file${files.length!==1?'s':''}`;
+
+  // Show latest commit info
+  const latest=files.sort((a,b)=>{
+    const ta=a.lastEditedAt?.seconds||0, tb=b.lastEditedAt?.seconds||0;
+    return tb-ta;
+  })[0];
+  if(latest&&latest.lastEditedBy){
+    $('commitBar').style.display='flex';
+    $('commitAv').style.background=avatarBg(latest.lastEditedBy);
+    $('commitAv').textContent=initials(latest.lastEditedByName||'?');
+    $('commitAuthor').textContent=latest.lastEditedByName||'Someone';
+    $('commitMsg').textContent=latest.lastCommitMsg||'Initial commit';
+    const ts=latest.lastEditedAt?new Date(latest.lastEditedAt.seconds*1000):new Date();
+    $('commitTime').textContent=timeAgo(ts);
+  }
+
+  const files_sorted=[...allFiles].sort((a,b)=>a.name.localeCompare(b.name));
+  $('fileTableBody').innerHTML=files_sorted.map(f=>{
+    const ts=f.lastEditedAt?new Date(f.lastEditedAt.seconds*1000):null;
+    return`<tr onclick="openFile('${f.id}')">
+      <td><div class="td-name">${fileIcon(f.name)} ${esc(f.name)}</div></td>
+      <td class="td-msg">${esc(f.lastCommitMsg||'Add '+f.name)}</td>
+      <td class="td-time">${ts?timeAgo(ts):'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function showDirView(){renderDirView(allFiles);}
+
+/* ── File viewer ── */
 function openFile(fileId){
   const f=allFiles.find(x=>x.id===fileId); if(!f) return;
   activeFileId=fileId;
-  $('editorEmpty').style.display='none';
-  $('statusBar').style.display='flex';
-  $('breadFile').textContent=f.name;
-  const e=ext(f.name), lang=EXT_LANG[e]||null;
-  $('langSelect').value=lang||'javascript';
-  suppressChange=true; cmEditor.setOption('mode',lang); cmEditor.setValue(f.content||''); suppressChange=false;
-  cmEditor.setOption('readOnly',!canEdit());
-  cmEditor.refresh(); cmEditor.focus();
-  $('statusLang').textContent=LANG_LABEL[lang]||e.toUpperCase()||'TXT';
-  $('statusReadonly').style.display=canEdit()?'none':'flex';
-  $('runBtn').disabled=false;
-  updateStatusBar(f); renderFileList(); renderTabBar();
-  updatePresenceFile(f.name);
-}
+  renderSidebarTree(allFiles);
 
-function renderTabBar(){
-  const bar=$('tabBar');
-  if(!activeFileId){bar.innerHTML='';return;}
-  const f=allFiles.find(x=>x.id===activeFileId); if(!f){bar.innerHTML='';return;}
-  bar.innerHTML=`<div class="editor-tab active"><span>${ext_icon(f.name)}</span> ${escHtml(f.name)}<button class="tab-close" onclick="closeTab(event)"><i class="ti ti-x"></i></button></div>`;
-}
+  $('dirView').style.display='none';
+  $('welcomeState').style.display='none';
+  $('fileView').style.display='flex';
 
-function closeTab(e){e.stopPropagation();activeFileId=null;$('editorEmpty').style.display='flex';$('statusBar').style.display='none';$('breadFile').textContent='No file open';$('tabBar').innerHTML='';if(cmEditor){suppressChange=true;cmEditor.setValue('');suppressChange=false;}}
+  $('fileBreadcrumb').textContent=f.name;
+  const ext=getExt(f.name);
+  const langLabel=EXT_LANG[ext]||ext.toUpperCase()||'Plain Text';
+  $('viewerLang').textContent=langLabel;
 
-function updateStatusBar(f){
-  if(f.lastEditedAt){
-    const d=f.lastEditedAt.toDate?f.lastEditedAt.toDate():new Date(f.lastEditedAt);
-    $('statusBranch').innerHTML=`<i class="ti ti-git-branch"></i> edited by ${escHtml(f.lastEditedByName||'someone')} ${timeAgo(d)}`;
+  const content=f.content||'';
+  const lines=content.split('\n');
+  $('viewerLines').textContent=`${lines.length} line${lines.length!==1?'s':''}`;
+
+  // Build line numbers
+  $('lineNums').innerHTML=lines.map((_,i)=>`<span>${i+1}</span>`).join('');
+
+  // Syntax highlight
+  const hljsLang=EXT_HLJS[ext];
+  let highlighted;
+  if(hljsLang&&hljs.getLanguage(hljsLang)){
+    highlighted=hljs.highlight(content,{language:hljsLang}).value;
+  } else {
+    highlighted=esc(content);
+  }
+  $('codeDisplay').innerHTML=highlighted;
+
+  // Edit/delete btns
+  if(canEdit()){
+    $('editFileBtn').style.display='inline-flex';
+    $('deleteFileBtn').style.display='inline-flex';
   }
 }
 
-/* ── Save ── */
-function scheduleAutosave(){setSaveState('saving');clearTimeout(saveTimeout);saveTimeout=setTimeout(saveCurrentFile,1400);}
-async function saveCurrentFile(){
-  if(!activeFileId||!canEdit()) return;
-  const content=cmEditor.getValue();
-  try{
-    await db.collection('codespaceFiles').doc(activeFileId).update({content,lastEditedBy:currentUser.uid,lastEditedByName:currentUser.displayName||currentUser.email,lastEditedAt:firebase.firestore.FieldValue.serverTimestamp()});
-    setSaveState('saved'); logActivity('edited',activeFileId);
-  }catch(e){setSaveState('error');showToast('Save failed: '+e.message,'error');}
-}
-function setSaveState(s){
-  const dot=$('saveDot'),lbl=$('saveLabel'); dot.className='save-dot';
-  if(s==='saving'){dot.classList.add('saving');lbl.textContent='Saving…';}
-  else if(s==='saved'){dot.classList.add('saved');lbl.textContent='Saved';}
-  else if(s==='error'){lbl.textContent='Save failed';}
-  else{lbl.textContent='Ready';}
+function copyCurrentFile(){
+  const f=allFiles.find(x=>x.id===activeFileId);
+  if(!f) return;
+  navigator.clipboard.writeText(f.content||'').then(()=>showToast('Copied to clipboard','success'));
 }
 
-/* ── New file ── */
-function openNewFileModal(){
-  if(!canEdit()){showToast('View-only access','error');return;}
-  $('newFileName').value=''; $('newFileTemplate').value='';
-  $('newFileModal').classList.add('show');
-  setTimeout(()=>$('newFileName').focus(),80);
+/* ── Upload / Add file ── */
+function openUploadModal(){
+  if(!canEdit()){showToast('You need editor access to add files','error');return;}
+  setUploadMode('upload');
+  $('uploadErr').classList.remove('show');
+  $('commitMessage').value='';
+  $('uploadModal').classList.add('show');
 }
-async function createNewFile(){
-  const name=$('newFileName').value.trim(), tpl=$('newFileTemplate').value;
-  if(!name){showToast('Enter a file name','error');return;}
-  if(allFiles.some(f=>f.name===name)){showToast('File already exists','error');return;}
-  const content=TEMPLATES[tpl]||'';
-  try{
-    const ref=await db.collection('codespaceFiles').add({name,content,createdBy:currentUser.uid,createdByName:currentUser.displayName||currentUser.email,lastEditedBy:currentUser.uid,lastEditedByName:currentUser.displayName||currentUser.email,lastEditedAt:firebase.firestore.FieldValue.serverTimestamp(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-    closeModal('newFileModal'); showToast(`Created "${name}"`,'success');
-    logActivity('created',ref.id);
-    setTimeout(()=>openFile(ref.id),300);
-  }catch(e){showToast('Error: '+e.message,'error');}
+function closeUploadModal(){$('uploadModal').classList.remove('show');selectedFile=null;resetDropZone();}
+
+function setUploadMode(mode){
+  uploadMode=mode;
+  $('modeUpload').style.display=mode==='upload'?'block':'none';
+  $('modePaste').style.display=mode==='paste'?'block':'none';
+  const uBtn=$('modeUploadBtn'),pBtn=$('modePasteBtn');
+  if(mode==='upload'){
+    uBtn.style.border='1px solid var(--accent)';uBtn.style.background='rgba(88,166,255,0.1)';uBtn.style.color='var(--accent)';
+    pBtn.style.border='1px solid var(--border)';pBtn.style.background='var(--bg3)';pBtn.style.color='var(--text2)';
+  } else {
+    pBtn.style.border='1px solid var(--accent)';pBtn.style.background='rgba(88,166,255,0.1)';pBtn.style.color='var(--accent)';
+    uBtn.style.border='1px solid var(--border)';uBtn.style.background='var(--bg3)';uBtn.style.color='var(--text2)';
+  }
 }
 
-async function deleteFile(fileId,name){
+function handleFileSelect(input){
+  const file=input.files[0]; if(!file) return;
+  if(file.size>5*1024*1024){showUploadErr('File too large. Max 5 MB for code files.');return;}
+  selectedFile=file;
+  const dz=$('dropZone');
+  dz.classList.add('chosen');
+  dz.innerHTML=`<input type="file" id="fileInput" onchange="handleFileSelect(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%"/>
+    <i class="ti ti-circle-check" style="color:var(--green)"></i>
+    <h4 style="color:var(--green)">${esc(file.name)}</h4>
+    <p>${(file.size/1024).toFixed(1)} KB selected</p>`;
+  if(!$('commitMessage').value) $('commitMessage').value=`Add ${file.name}`;
+}
+
+function resetDropZone(){
+  $('dropZone').classList.remove('chosen');
+  $('dropZone').innerHTML=`<input type="file" id="fileInput" onchange="handleFileSelect(this)"/>
+    <i class="ti ti-file-upload"></i>
+    <h4>Drop file here or click to browse</h4>
+    <p>Any file type — .py, .js, .html, .cpp, .java, .txt…</p>`;
+}
+
+// Drag events
+document.addEventListener('DOMContentLoaded',()=>{
+  const dz=$('dropZone');
+  if(dz){
+    dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+    dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f){const inp=$('fileInput');inp.files=e.dataTransfer.files;handleFileSelect(inp);}});
+  }
+});
+
+async function handleSubmit(){
+  $('uploadErr').classList.remove('show');
+  const commitMsg=$('commitMessage').value.trim();
+
+  if(uploadMode==='upload'){
+    if(!selectedFile){showUploadErr('Please select a file first.');return;}
+    const name=selectedFile.name;
+    if(allFiles.some(f=>f.name===name)){showUploadErr(`A file named "${name}" already exists.`);return;}
+
+    // Read file as text
+    const content=await readFileAsText(selectedFile);
+    if(content===null){showUploadErr('Could not read file. Make sure it is a text/code file.');return;}
+
+    await commitFile(name,content,commitMsg||`Add ${name}`);
+
+  } else {
+    const name=$('pasteFileName').value.trim();
+    const content=$('pasteContent').value;
+    if(!name){showUploadErr('Enter a file name.');return;}
+    if(!content.trim()){showUploadErr('Paste some code first.');return;}
+    if(allFiles.some(f=>f.name===name)){showUploadErr(`A file named "${name}" already exists.`);return;}
+    await commitFile(name,content,commitMsg||`Add ${name}`);
+  }
+}
+
+function readFileAsText(file){
+  return new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=e=>resolve(e.target.result);
+    r.onerror=()=>resolve(null);
+    r.readAsText(file);
+  });
+}
+
+async function commitFile(name,content,commitMsg){
+  const btn=$('submitBtn');
+  btn.disabled=true;
+  btn.innerHTML='<i class="ti ti-loader spin"></i> Committing…';
+  setProgress(10,'Saving to Firestore…');
+
+  try{
+    setProgress(60,'Writing file…');
+    await db.collection('codespaceFiles').add({
+      name,content,
+      lastCommitMsg:commitMsg,
+      lastEditedBy:currentUser.uid,
+      lastEditedByName:currentUser.displayName||currentUser.email.split('@')[0],
+      lastEditedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      uploadedBy:currentUser.email,
+    });
+    setProgress(100,'Done!');
+    setTimeout(()=>{$('progWrap').style.display='none';setProgress(0,'');},800);
+    closeUploadModal();
+    showToast(`"${name}" committed successfully`,'success');
+    // Deselect paste fields
+    $('pasteFileName').value='';$('pasteContent').value='';
+  }catch(err){
+    showUploadErr('Error: '+err.message);
+    $('progWrap').style.display='none';
+  }
+  btn.disabled=false;
+  btn.innerHTML='<i class="ti ti-git-commit"></i> Commit file';
+}
+
+function setProgress(pct,label){
+  const pw=$('progWrap');
+  if(pct===0){pw.style.display='none';return;}
+  pw.style.display='block';
+  $('progFill').style.width=pct+'%';
+  $('progPct').textContent=Math.round(pct)+'%';
+  $('progLabel').textContent=label;
+}
+
+function showUploadErr(msg){const el=$('uploadErr');el.textContent=msg;el.classList.add('show');}
+
+/* ── Edit file ── */
+function openEditModal(){
+  const f=allFiles.find(x=>x.id===activeFileId); if(!f||!canEdit()) return;
+  $('editFileName').textContent=f.name;
+  $('editContent').value=f.content||'';
+  $('editCommitMsg').value='';
+  $('editModal').classList.add('show');
+}
+function closeEditModal(){$('editModal').classList.remove('show');}
+
+async function saveEdit(){
+  const f=allFiles.find(x=>x.id===activeFileId); if(!f) return;
+  const content=$('editContent').value;
+  const commitMsg=$('editCommitMsg').value.trim()||`Update ${f.name}`;
+  const btn=$('editSubmitBtn');
+  btn.disabled=true;btn.innerHTML='<i class="ti ti-loader spin"></i> Saving…';
+  try{
+    await db.collection('codespaceFiles').doc(activeFileId).update({
+      content,lastCommitMsg:commitMsg,
+      lastEditedBy:currentUser.uid,
+      lastEditedByName:currentUser.displayName||currentUser.email.split('@')[0],
+      lastEditedAt:firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    closeEditModal();
+    showToast('Changes committed','success');
+    // Refresh viewer
+    const updated={...f,content,lastCommitMsg:commitMsg};
+    allFiles=allFiles.map(x=>x.id===activeFileId?updated:x);
+    openFile(activeFileId);
+  }catch(err){showToast('Error: '+err.message,'error');}
+  btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy"></i> Save changes';
+}
+
+/* ── Delete file ── */
+function confirmDelete(fileId,name){
   if(!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  deleteFile(fileId,name);
+}
+function deleteCurrentFile(){
+  const f=allFiles.find(x=>x.id===activeFileId); if(!f) return;
+  confirmDelete(f.id,f.name);
+}
+async function deleteFile(fileId,name){
   try{
     await db.collection('codespaceFiles').doc(fileId).delete();
-    if(activeFileId===fileId) closeTab({stopPropagation:()=>{}});
-    showToast(`Deleted "${name}"`,'success');
-  }catch(e){showToast('Error: '+e.message,'error');}
+    if(activeFileId===fileId){activeFileId=null;showDirView();}
+    showToast(`"${name}" deleted`,'success');
+  }catch(err){showToast('Error: '+err.message,'error');}
 }
 
-/* ── Run / Compiler ── */
-function runCode(){
-  if(!activeFileId){showToast('Open a file first','error');return;}
-  const f=allFiles.find(x=>x.id===activeFileId); if(!f) return;
-  const code=cmEditor.getValue(), e=ext(f.name);
-  termLog('sys',`Running ${f.name}…`);
-  if(e==='html'||e==='htm') runHTML(code);
-  else if(e==='js'||e==='jsx') runJS(code);
-  else if(e==='py') runPython(code);
-  else if(e==='css') runCSS(code,f);
-  else if(e==='md') runMarkdown(code);
-  else termLog('warn',`No runner available for .${e} — showing code only`);
-}
+/* ── Mobile sidebar ── */
+function toggleMobileSidebar(){$('sidebar').classList.toggle('open');}
+document.addEventListener('click',e=>{
+  const sb=$('sidebar');
+  if(sb.classList.contains('open')&&!sb.contains(e.target)&&!e.target.closest('.mob-sidebar-btn'))sb.classList.remove('open');
+});
 
-function runJS(code){
-  termLog('sys','Executing JavaScript…');
-  const logs=[]; const origLog=console.log,origErr=console.error,origWarn=console.warn;
-  console.log=(...a)=>{logs.push({t:'code',m:a.join(' ')});origLog(...a);};
-  console.error=(...a)=>{logs.push({t:'error',m:a.join(' ')});origErr(...a);};
-  console.warn=(...a)=>{logs.push({t:'warn',m:a.join(' ')});origWarn(...a);};
-  try{
-    const fn=new Function(code); fn();
-    console.log=origLog; console.error=origErr; console.warn=origWarn;
-    logs.forEach(l=>termLog(l.t==='code'?'success':l.t,l.m));
-    if(!logs.length) termLog('success','✓ Executed successfully (no output)');
-  }catch(err){
-    console.log=origLog; console.error=origErr; console.warn=origWarn;
-    termLog('error','✗ '+err.message);
-    if(err.stack){const line=err.stack.match(/<anonymous>:(\d+)/);if(line) termLog('error','  at line '+(parseInt(line[1])-1));}
-  }
-}
-
-function runHTML(code){
-  termLog('sys','Opening HTML preview…');
-  const w=window.open('','_blank','width=900,height=600');
-  if(w){w.document.write(code);w.document.close();termLog('success','✓ HTML preview opened in new tab');}
-  else termLog('error','✗ Popup blocked — allow popups and try again');
-}
-
-function runPython(code){
-  termLog('sys','Python execution requires a server (client-side JS cannot run Python).');
-  termLog('info','Showing code analysis instead:');
-  const lines=code.split('\n');
-  termLog('code',`${lines.length} lines, ${code.length} characters`);
-  const fns=lines.filter(l=>l.match(/^def\s+\w+/));
-  if(fns.length) fns.forEach(f=>termLog('code','  function: '+f.trim()));
-  const imports=lines.filter(l=>l.match(/^import |^from /));
-  if(imports.length) imports.forEach(i=>termLog('code','  import: '+i.trim()));
-  termLog('warn','Tip: Use a Python environment (Repl.it, VS Code, terminal) to run Python locally.');
-}
-
-function runCSS(code,f){
-  termLog('sys','CSS analysis:');
-  const rules=(code.match(/\{[^}]*\}/g)||[]).length;
-  const selectors=(code.match(/[^\{]+(?=\{)/g)||[]).length;
-  termLog('success',`✓ ${rules} rule block(s), ~${selectors} selector(s)`);
-  const vars=(code.match(/--[\w-]+/g)||[]);
-  if(vars.length) termLog('code',`  CSS variables: ${[...new Set(vars)].join(', ')}`);
-}
-
-function runMarkdown(code){
-  termLog('sys','Rendering Markdown preview…');
-  const html=code.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`(.+?)`/g,'<code>$1</code>').replace(/\n/g,'<br>');
-  const w=window.open('','_blank','width=900,height=600');
-  if(w){w.document.write(`<html><head><style>body{font-family:sans-serif;max-width:700px;margin:40px auto;padding:0 20px;line-height:1.7}h1,h2,h3{margin-top:24px}code{background:#f5f5f5;padding:2px 6px;border-radius:4px}</style></head><body>${html}</body></html>`);w.document.close();termLog('success','✓ Markdown preview opened in new tab');}
-  else termLog('error','✗ Popup blocked');
-}
-
-/* ── Terminal ── */
-function termLog(type,msg){
-  const body=$('terminalBody');
-  const line=document.createElement('div'); line.className=`term-line ${type}`;
-  line.innerHTML=`<span class="tl-time">${nowStr()}</span><span class="tl-msg">${escHtml(msg)}</span>`;
-  body.appendChild(line); body.scrollTop=body.scrollHeight;
-  if(terminalVisible===false) toggleTerminal();
-}
-function clearTerminal(){$('terminalBody').innerHTML='<div class="term-line sys"><span class="tl-time"></span><span class="tl-msg">Terminal cleared.</span></div>';}
-function toggleTerminal(){
-  const p=$('terminalPanel');
-  terminalVisible=!terminalVisible;
-  p.classList.toggle('collapsed',!terminalVisible);
-}
-function setTermTab(tab){
-  activeTermTab=tab;
-  document.querySelectorAll('.terminal-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase()===tab));
-}
-
-/* ── Toolbar actions ── */
-function formatCode(){
-  if(!cmEditor||!canEdit()) return;
-  const val=cmEditor.getValue();
-  const lines=val.split('\n');
-  let indent=0;
-  const formatted=lines.map(l=>{
-    const trimmed=l.trim();
-    if(!trimmed) return '';
-    if(trimmed.match(/^[}\])]/)&&indent>0) indent--;
-    const result='  '.repeat(indent)+trimmed;
-    if(trimmed.match(/[{[(]$/)&&!trimmed.match(/[}\])]/)) indent++;
-    return result;
-  }).join('\n');
-  suppressChange=true; cmEditor.setValue(formatted); suppressChange=false;
-  scheduleAutosave();
-  showToast('Code formatted','success');
-}
-function commentLine(){if(!cmEditor||!canEdit()) return;cmEditor.execCommand('toggleComment');}
-function copyCode(){if(!cmEditor) return;navigator.clipboard.writeText(cmEditor.getValue()).then(()=>showToast('Copied to clipboard','success'));}
-function changeLang(lang){if(!cmEditor) return;cmEditor.setOption('mode',lang);$('statusLang').textContent=LANG_LABEL[lang]||lang.split('/').pop().toUpperCase();}
-function insertSnippet(type){
-  if(!cmEditor||!canEdit()){showToast('View-only access','error');return;}
-  const snips={for:'for (let i = 0; i < arr.length; i++) {\n  console.log(arr[i]);\n}',func:'const myFunction = (param) => {\n  return param;\n};',class:'class MyClass {\n  constructor() {\n  }\n\n  myMethod() {\n  }\n}'};
-  const s=snips[type]; if(!s) return;
-  const cur=cmEditor.getCursor(); cmEditor.replaceRange(s,cur); cmEditor.focus();
-}
-
-/* ── Search ── */
-function openSearchOverlay(){$('searchOverlay').classList.add('show');$('searchInput').value='';$('searchResults').innerHTML='<div class="search-empty">Start typing to search files…</div>';setTimeout(()=>$('searchInput').focus(),80);}
-function closeSearchIfOutside(e){if(e.target===$('searchOverlay')) closeSearchOverlay();}
-function closeSearchOverlay(){$('searchOverlay').classList.remove('show');}
-function doSearch(q){
-  const res=$('searchResults'); if(!q.trim()){res.innerHTML='<div class="search-empty">Start typing to search files…</div>';return;}
-  const matches=allFiles.filter(f=>f.name.toLowerCase().includes(q.toLowerCase())||(f.content||'').toLowerCase().includes(q.toLowerCase()));
-  if(!matches.length){res.innerHTML='<div class="search-empty">No files match your query</div>';return;}
-  res.innerHTML=matches.slice(0,8).map(f=>{const inContent=(f.content||'').toLowerCase().includes(q.toLowerCase())&&!f.name.toLowerCase().includes(q.toLowerCase());return`<div class="search-result" onclick="openFile('${f.id}');closeSearchOverlay()"><span class="sr-icon">${ext_icon(f.name)}</span><div class="sr-info"><div class="sr-name">${escHtml(f.name)}</div><div class="sr-match">${inContent?'Found in content':'Name match'}</div></div></div>`;}).join('');
-}
-function searchKeydown(e){if(e.key==='Escape') closeSearchOverlay();}
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='p'){e.preventDefault();openSearchOverlay();}if((e.ctrlKey||e.metaKey)&&e.key==='s'&&activeFileId){e.preventDefault();saveCurrentFile();}if(e.key==='Escape'){closeSearchOverlay();}});
-
-/* ── Activity bar tabs ── */
-function setABTab(tab){
-  curABTab=tab;
-  ['files','snippets','activity'].forEach(t=>{$('ab'+t.charAt(0).toUpperCase()+t.slice(1))?.classList.toggle('active',t===tab);});
-  $('panelExplorer').style.display=tab==='files'?'flex':'none';
-  $('panelSnippets').style.display=tab==='snippets'?'flex':'none';
-  $('panelActivity').style.display=tab==='activity'?'flex':'none';
-}
-function setABActive(id){document.querySelectorAll('.ab-btn').forEach(b=>b.classList.remove('active'));$(id)?.classList.add('active');}
-
-/* ── Layout toggles ── */
-function toggleSidebar(){
-  sidebarVisible=!sidebarVisible;
-  $('sidebar').classList.toggle('collapsed',!sidebarVisible);
-  $('editorRoot').classList.toggle('sidebar-collapsed',!sidebarVisible);
-}
-function toggleRightPanel(){
-  rightPanelVisible=!rightPanelVisible;
-  $('rightPanel').classList.toggle('collapsed',!rightPanelVisible);
-  $('editorRoot').classList.toggle('panel-collapsed',!rightPanelVisible);
-}
-function toggleMobileSidebar(){$('sidebar').classList.toggle('mobile-open');}
-
-/* ── Right panel ── */
-function setRPTab(tab){
-  activeRPTab=tab;
-  document.querySelectorAll('.rp-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase()===tab));
-  if(tab==='online') loadOnlineUsers();
-  else loadRPActivity();
-}
-async function loadOnlineUsers(){
-  const el=$('rpBody');
-  const cutoff=new Date(Date.now()-60000);
-  try{
-    const snap=await db.collection('codespacePresence').where('lastSeen','>=',firebase.firestore.Timestamp.fromDate(cutoff)).get();
-    if(snap.empty){el.innerHTML='<div class="rp-empty"><i class="ti ti-users-off"></i>No one else online</div>';return;}
-    el.innerHTML=snap.docs.map(d=>{const p=d.data();return`<div class="online-row"><div class="pav" style="background:${avatarColor(p.uid)};width:28px;height:28px;border:none;font-size:9px">${initials(p.name)}</div><div class="online-info"><div class="on-name">${escHtml(p.name)}</div><div class="on-file">${p.activeFile?'Editing: '+p.activeFile:'Browsing…'}</div></div><span class="online-dot"></span></div>`;}).join('');
-  }catch(e){el.innerHTML='<div class="rp-empty">Could not load</div>';}
-}
-function loadRPActivity(){
-  const el=$('rpBody');
-  el.innerHTML='<div class="rp-empty"><i class="ti ti-loader spin"></i>Loading…</div>';
-  db.collection('codespaceActivity').orderBy('createdAt','desc').limit(20).get().then(snap=>{
-    if(snap.empty){el.innerHTML='<div class="rp-empty"><i class="ti ti-bolt-off"></i>No activity yet</div>';return;}
-    el.innerHTML=snap.docs.map(d=>{const a=d.data(),ts=a.createdAt?new Date(a.createdAt.seconds*1000):new Date();return`<div class="act-row"><div class="act-av" style="background:${avatarColor(a.userId)}">${initials(a.userName)}</div><div class="act-body"><div class="act-text"><b>${escHtml(a.userName||'Someone')}</b> ${a.action} <span class="fname">${escHtml(a.fileName)}</span></div><div class="act-time">${timeAgo(ts)}</div></div></div>`;}).join('');
-  });
-}
-
-/* ── Snippets ── */
-function renderSnippets(){
-  $('snippetList').innerHTML=SNIPPETS.map(s=>`<div class="snip-item" onclick="insertSnippetCode(\`${s.code.replace(/`/g,'\\`')}\`)"><span class="snip-tag">${s.tag}</span><div class="snip-name">${s.name}</div><div class="snip-preview">${escHtml(s.code.split('\n')[0])}</div></div>`).join('');
-}
-function insertSnippetCode(code){
-  if(!cmEditor||!canEdit()){showToast('View-only access','error');return;}
-  cmEditor.replaceRange(code,cmEditor.getCursor()); cmEditor.focus();
-}
-
-/* ── Presence ── */
-function setPresence(user){
-  const ref=db.collection('codespacePresence').doc(user.uid);
-  ref.set({uid:user.uid,name:user.displayName||user.email.split('@')[0],role:myRole,activeFile:null,lastSeen:firebase.firestore.FieldValue.serverTimestamp()});
-  window.addEventListener('beforeunload',()=>ref.delete());
-  setInterval(()=>ref.update({lastSeen:firebase.firestore.FieldValue.serverTimestamp()}),20000);
-}
-function updatePresenceFile(f){if(!currentUser) return;db.collection('codespacePresence').doc(currentUser.uid).update({activeFile:f}).catch(()=>{});}
-function subscribePresence(){
-  const cutoff=new Date(Date.now()-60000);
-  db.collection('codespacePresence').onSnapshot(snap=>{
-    $('presenceStack').innerHTML=snap.docs.slice(0,5).map(d=>{const p=d.data();return`<div class="pav" style="background:${avatarColor(p.uid)}" title="${escHtml(p.name)}">${initials(p.name)}</div>`;}).join('');
-  });
-}
-
-/* ── Activity ── */
-function logActivity(action,fileId){
-  const f=allFiles.find(x=>x.id===fileId);
-  db.collection('codespaceActivity').add({userId:currentUser.uid,userName:currentUser.displayName||currentUser.email,action,fileName:f?f.name:'a file',createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-}
-function subscribeActivity(){
-  db.collection('codespaceActivity').orderBy('createdAt','desc').limit(30).onSnapshot(snap=>{
-    const el=$('actFeed');
-    if(snap.empty){el.innerHTML='<div class="rp-empty"><i class="ti ti-bolt-off"></i>No activity yet</div>';return;}
-    el.innerHTML=snap.docs.map(d=>{const a=d.data(),ts=a.createdAt?new Date(a.createdAt.seconds*1000):new Date();return`<div class="act-row"><div class="act-av" style="background:${avatarColor(a.userId)}">${initials(a.userName)}</div><div class="act-body"><div class="act-text"><b>${escHtml(a.userName||'?')}</b> ${a.action} <span class="fname">${escHtml(a.fileName)}</span></div><div class="act-time">${timeAgo(ts)}</div></div></div>`;}).join('');
-  });
-}
-
-/* ── Access modal ── */
-async function openAccessModal(){
-  if(myRole!=='admin'){showToast('Admin access required','error');return;}
-  $('accessModal').classList.add('show');
-  const list=$('accessList'); list.innerHTML='<div class="rp-empty"><i class="ti ti-loader spin"></i>Loading…</div>';
-  try{
-    const[profiles,access]=await Promise.all([db.collection('userProfiles').get(),db.collection('codespaceAccess').get()]);
-    const amap={}; access.forEach(d=>amap[d.id]=d.data().role);
-    const users=profiles.docs.map(d=>({uid:d.id,...d.data()})).filter(u=>!window.ADMIN_EMAILS.includes(u.email));
-    if(!users.length){list.innerHTML='<div class="rp-empty">No users found yet</div>';return;}
-    list.innerHTML=users.map(u=>{const role=amap[u.uid]||'viewer';return`<div class="access-row"><div class="acc-av" style="background:${avatarColor(u.uid)}">${initials(u.displayName)}</div><div class="acc-info"><div class="acc-name">${escHtml(u.displayName||'Unknown')}</div><div class="acc-email">${escHtml(u.email||'')}</div></div><select class="acc-select" onchange="setUserRole('${u.uid}',this.value)"><option value="viewer" ${role==='viewer'?'selected':''}>Viewer</option><option value="editor" ${role==='editor'?'selected':''}>Editor</option></select></div>`;}).join('');
-  }catch(e){list.innerHTML=`<div class="rp-empty">Error: ${escHtml(e.message)}</div>`;}
-}
-async function setUserRole(uid,role){
-  try{await db.collection('codespaceAccess').doc(uid).set({role,grantedBy:currentUser.uid,grantedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});showToast(`Role updated to ${role}`,'success');}
-  catch(e){showToast('Error: '+e.message,'error');}
-}
-
-/* ── Modals ── */
-function closeModal(id){$(id).classList.remove('show');}
-document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
+/* ── Modal close on backdrop ── */
+document.querySelectorAll('.modal-bd').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeUploadModal();closeEditModal();}});
 
 /* ── Toast ── */
 function showToast(msg,type='success'){
