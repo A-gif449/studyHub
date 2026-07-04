@@ -1,19 +1,4 @@
-/**
- * StudyHub Codespace – Download Access System
- * ============================================
- * Drop this BEFORE </body> in codespace.html (after notifications.js)
- *
- * Collections used:
- *  downloadRequests/{docId}
- *    uid, userEmail, userName,
- *    fileId, fileName,
- *    status: "pending" | "approved" | "rejected"
- *    requestedAt, resolvedAt
- *
- *  downloadAccess/{uid_fileId}   (one doc per user per file)
- *    uid, fileId, grantedAt, grantedBy
- */
-
+//codespace-download-access//
 window.SHDownloadAccess = (function () {
   "use strict";
 

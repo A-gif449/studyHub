@@ -1,3 +1,4 @@
+//notifications.js//
 (function () {
   "use strict";
 
@@ -483,6 +484,7 @@
       /* ── Waiting room (admin only) ── */
       if (ADMIN_EMAILS.includes(user.email)) {
         subscribeWaitingRoom(db);
+        subscribeDownloadRequests(db);
       }
     });
   }
@@ -540,6 +542,72 @@
         initialLoad = false;   /* ← after first snapshot, enable toasts */
         pruneReadIds(); updateBadge(); renderList();
       }, err => console.warn("[Notif] waitingRoom:", err.message));
+  }
+
+  function subscribeDownloadRequests(db) {
+    let initialLoad = true;
+
+    db.collection('downloadRequests')
+      .where('status', '==', 'pending')
+      .orderBy('requestedAt', 'desc')
+      .onSnapshot(snap => {
+        if (!initialLoad) {
+          snap.docChanges().forEach(change => {
+            if (change.type !== 'added') return;
+            const data = change.doc.data();
+            const docId = change.doc.id;
+
+            let isRecent;
+            if (!data.requestedAt) {
+              isRecent = true;
+            } else {
+              const ts  = data.requestedAt.toDate ? data.requestedAt.toDate() : new Date(data.requestedAt);
+              isRecent  = Date.now() - ts.getTime() < 30000;
+            }
+
+            if (isRecent) {
+              showDownloadToast(docId, data);
+              ringBell();
+            }
+          });
+        }
+        initialLoad = false;
+      }, err => console.warn('[Notif] downloadRequests:', err.message));
+  }
+
+  function showDownloadToast(docId, data) {
+    const existing = document.getElementById('sh-dt-' + docId);
+    if (existing) existing.remove();
+
+    const name = esc(data.userName || data.userEmail || 'Someone');
+    const file = esc(data.fileName || 'a file');
+
+    const t = document.createElement('div');
+    t.className = 'sh-waiting-toast';
+    t.id = 'sh-dt-' + docId;
+    t.innerHTML = `
+      <div class="sh-toast-head">
+        <div class="sh-toast-icon"><i class="ti ti-download"></i></div>
+        <div class="sh-toast-body">
+          <div class="sh-toast-title">${name} wants to download</div>
+          <div class="sh-toast-sub">${file} · Just now</div>
+        </div>
+        <button class="sh-toast-close" onclick="document.getElementById('sh-dt-${docId}')?.remove()">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="sh-toast-actions">
+        <button class="sh-toast-btn approve"
+          onclick="window._shApproveDownload('${docId}','${esc(data.uid)}','${esc(data.fileId)}',this);document.getElementById('sh-dt-${docId}')?.remove()">
+          <i class="ti ti-check"></i> Approve
+        </button>
+        <button class="sh-toast-btn reject"
+          onclick="window._shRejectDownload('${docId}',this);document.getElementById('sh-dt-${docId}')?.remove()">
+          <i class="ti ti-x"></i> Deny
+        </button>
+      </div>`;
+    document.body.appendChild(t);
+    setTimeout(() => { if (t.parentElement) t.remove(); }, 12000);
   }
 
   function syncUserProfile(user) {
