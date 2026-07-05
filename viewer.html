@@ -1,3 +1,4 @@
+//viewer.html//
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -461,6 +462,9 @@
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db   = firebase.firestore();
+db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+  console.warn('[Firestore] Persistence not enabled:', err.code);
+});
 
 const docId = new URLSearchParams(location.search).get('id');
 

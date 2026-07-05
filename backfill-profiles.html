@@ -61,6 +61,9 @@
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db   = firebase.firestore();
+db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+  console.warn('[Firestore] Persistence not enabled:', err.code);
+});
 
 const logEl = document.getElementById('log');
 function log(msg, cls) {

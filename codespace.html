@@ -507,6 +507,9 @@ window.CLOUDINARY_CONFIG={cloudName:"dwmvn4kj3",uploadPreset:"preupload"};
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db   = firebase.firestore();
+db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+  console.warn('[Firestore] Persistence not enabled:', err.code);
+});
 
 /* ── State ── */
 let currentUser = null, myRole = 'viewer';

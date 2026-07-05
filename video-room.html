@@ -121,6 +121,9 @@
 <script>
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth=firebase.auth();
+db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+  console.warn('[Firestore] Persistence not enabled:', err.code);
+});
 
 const ROOMS={
   general:{name:'General',emoji:'💬',desc:'Open discussion for all members'},

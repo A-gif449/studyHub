@@ -412,6 +412,9 @@ window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db   = firebase.firestore();
+db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+  console.warn('[Firestore] Persistence not enabled:', err.code);
+});
 
 /* ── state ── */
 let me = null;                  // current user object
