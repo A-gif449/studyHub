@@ -23,8 +23,14 @@ export default async function handler(req, res) {
           to: phoneNumber,
           type: 'template',
           template: {
-            name: 'hello_world',
-            language: { code: 'en_US' },
+            name: 'download_approved',
+            language: { code: 'en' },
+            components: [
+              {
+                type: 'body',
+                parameters: [{ type: 'text', text: userName || 'there' }],
+              },
+            ],
           },
         }),
       }
