@@ -9,6 +9,7 @@
               ► Admin sees a persistent bell notification
    ═══════════════════════════════════════════════════════════════ */
 
+//codespace-download-access.js//   
 const OTP_EXPIRY_MS = 5 * 60 * 1000;
 const OTP_MAX_TRIES = 3;
 const LS_KEY = 'sh_dla_requestId'; // localStorage key to persist request across closes
@@ -652,10 +653,16 @@ window.SHDownloadAccess = (() => {
       const fi=$('dlaFileIcon');   if(fi)  fi.textContent=fileEmoji(_fileName);
 
       if (data.status === 'approved') {
-        // Already approved before user returned — show download immediately
         resetTrackerToPending();
-        renderApproved();
-        showBanner('✅ Download approved!', 'Your file is ready.', 'green', 'Download now');
+      // Small delay ensures modal DOM is ready before rendering
+      setTimeout(() => {
+      renderApproved();
+      showBanner('✅ Download approved!', 'Your file is ready.', 'green', 'Download now');
+      const bannerBtn = document.getElementById('dlaBannerViewBtn');
+      if (bannerBtn) bannerBtn.onclick = () => reopenModal();
+      }, 300);
+    return;
+  }
         const bannerBtn=$('dlaBannerViewBtn');
         if(bannerBtn) bannerBtn.onclick = () => reopenModal();
         return;
@@ -667,10 +674,20 @@ window.SHDownloadAccess = (() => {
         return;
       }
 
-      // Still pending — show banner, subscribe
-      resetTrackerToPending();
-      showBanner('Download request pending', 'Waiting for admin approval…', '', 'View status');
-      subscribeToRequest(_requestId);
+      // Still pending — restore all state, show banner, subscribe
+const fn3 = document.getElementById('dlaFileName3');
+const fi  = document.getElementById('dlaFileIcon');
+if (fn3) fn3.textContent = _fileName;
+if (fi)  fi.textContent  = fileEmoji(_fileName);
+
+resetTrackerToPending();
+showBanner('Download request pending', 'Waiting for admin approval…', '', 'View status');
+
+// Wire up banner button to open the status modal
+const bannerBtn = document.getElementById('dlaBannerViewBtn');
+if (bannerBtn) bannerBtn.onclick = () => reopenModal();
+
+subscribeToRequest(_requestId);
 
     } catch(e) {
       console.warn('[DLA] checkExistingRequest error:', e.message);
