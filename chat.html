@@ -360,6 +360,10 @@
     <!-- INPUT -->
     <div class="chat-input-area">
       <div class="input-row">
+        <button class="send-btn" id="attachBtn" onclick="document.getElementById('fileInput').click()" title="Attach photo/video" style="background:var(--card2);border:1px solid var(--border2)">
+          <i class="ti ti-paperclip"></i>
+        </button>
+        <input type="file" id="fileInput" accept="image/*,video/*" style="display:none" onchange="handleFileSelect(event)"/>
         <textarea class="chat-textarea" id="msgInput" placeholder="Ask a question or share your thoughts…" rows="1" onkeydown="handleKeydown(event)" oninput="handleTyping();autoResize(this)" maxlength="1000"></textarea>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send (Enter)">
           <i class="ti ti-send"></i>
@@ -679,13 +683,20 @@ function renderMessages(msgs){
     const initials= (msg.userName||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     const avStyle = isAdm ? 'background:var(--red)' : `background:${colors}`;
 
+    // NEW: build bubble content depending on whether it's media or text
+    const bubbleContent = msg.mediaUrl
+      ? (msg.mediaType === 'video'
+          ? `<video src="${msg.mediaUrl}" controls style="max-width:260px;border-radius:10px;display:block"></video>`
+          : `<img src="${msg.mediaUrl}" style="max-width:260px;border-radius:10px;display:block;cursor:pointer" onclick="window.open('${msg.mediaUrl}','_blank')"/>`)
+      : escHtml(msg.text);
+
     html += `
       <div class="msg-row ${isOwn?'own':''}">
         <div class="msg-avatar ${showAv?'':'hidden'}" style="${avStyle}" title="${escHtml(msg.userName||'')}">${initials}</div>
         <div class="msg-body">
           ${showAv&&!isOwn?`<div class="msg-sender">${escHtml(msg.userName||'Anonymous')}${isAdm?'<span class="admin-chip">Admin</span>':''}</div>`:''}
           <div class="bubble-wrap">
-            <div class="bubble ${isOwn?'own-bubble':'theirs'}">${escHtml(msg.text)}</div>
+            <div class="bubble ${isOwn?'own-bubble':'theirs'}">${bubbleContent}</div>
             ${(isOwn||isAdm)?`<button class="del-msg-btn" onclick="deleteMessage('${msg.id}')"><i class="ti ti-x" style="font-size:9px"></i></button>`:''}
           </div>
           <div class="bubble-time">${timeStr}</div>
@@ -728,6 +739,50 @@ async function deleteMessage(id){
   if(!confirm('Delete this message?')) return;
   try{ await db.collection('chats').doc(activeRoom).collection('messages').doc(id).delete(); }
   catch(e){ showToast('Error: '+e.message,'error'); }
+}
+
+async function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const isVideo = file.type.startsWith('video/');
+  if (isVideo && file.size > 100 * 1024 * 1024) {
+    showToast('Video too large (max 100MB on free plan)', 'error');
+    return;
+  }
+  if (!isVideo && file.size > 10 * 1024 * 1024) {
+    showToast('Image too large (max 10MB on free plan)', 'error');
+    return;
+  }
+
+  showToast('Uploading...', 'success');
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'preupload'); // your existing preset, or a new 'chat_media' one
+  formData.append('resource_type', isVideo ? 'video' : 'image');
+
+  try {
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/dwmvn4kj3/${isVideo ? 'video' : 'image'}/upload`,
+      { method: 'POST', body: formData }
+    );
+    const data = await res.json();
+
+    await db.collection('chats').doc(activeRoom).collection('messages').add({
+      mediaUrl: data.secure_url,
+      mediaType: isVideo ? 'video' : 'image',
+      uid: currentUser.uid,
+      email: currentUser.email,
+      userName: currentUser.displayName || currentUser.email.split('@')[0],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      room: activeRoom,
+    });
+    showToast('Sent!', 'success');
+  } catch (e) {
+    showToast('Upload failed: ' + e.message, 'error');
+  }
+  event.target.value = ''; // reset input
 }
 
 /* ══════════════════════════════════════════════
