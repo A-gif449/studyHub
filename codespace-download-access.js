@@ -395,47 +395,48 @@ window.SHDownloadAccess = (() => {
   }
 
   /* ── Render button — checks approval status first ── */
-  async function renderBtn(fileId, fileName, fileUrl, container) {
-    if (!container) return;
-    _containers[fileId] = { container, fileName, fileUrl };
+async function renderBtn(fileId, fileName, fileUrl, container) {
+  if (!container) return;
+  _containers[fileId] = { container, fileName, fileUrl };
+  container.innerHTML = `<span style="font-size:12px;color:#484F58">Checking access…</span>`;
 
-    /* Show loading state while checking */
-    container.innerHTML = `<span style="font-size:12px;color:#484F58">Checking access…</span>`;
+  // Wait for Firebase auth to actually resolve (fixes page-reload issue)
+  const user = await new Promise(resolve => {
+    const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
+  });
 
-    const user = firebase.auth().currentUser;
-    if (!user) {
-      container.innerHTML = `
-        <button class="dla-dl-btn" onclick="alert('Please sign in to download files.')">
-          <i class="ti ti-download"></i> Download
-        </button>`;
-      return;
-    }
-
-    /* Check if permanently approved */
-    const grant = await checkExistingApproval(fileId, user.uid);
-    if (grant) {
-      renderApprovedBtn(container, fileId, fileName, fileUrl);
-      return;
-    }
-
-    /* Check if pending request exists */
-    const pending = await checkPendingRequest(fileId, user.uid);
-    if (pending) {
-      renderPendingBtn(container, pending.id, fileName, fileUrl);
-      /* Listen for admin decision */
-      listenForDecision(pending.id, fileId, fileName, fileUrl, container);
-      return;
-    }
-
-    /* No access — show request button */
+  if (!user) {
     container.innerHTML = `
-      <button class="dla-dl-btn" onclick="SHDownloadAccess.open('${fileId}','${fileName.replace(/'/g,"\\'")}','${fileUrl}')">
+      <button class="dla-dl-btn" onclick="alert('Please sign in to download files.')">
         <i class="ti ti-download"></i> Download
-      </button>
-      <div style="margin-top:8px;font-size:11px;color:#484F58">
-        <i class="ti ti-shield-check" style="font-size:11px"></i> Email verification + admin approval required
-      </div>`;
+      </button>`;
+    return;
   }
+
+  // Check permanent approval first
+  const grant = await checkExistingApproval(fileId, user.uid);
+  if (grant) {
+    renderApprovedBtn(container, fileId, fileName, fileUrl);
+    return;
+  }
+
+  // Check pending request
+  const pending = await checkPendingRequest(fileId, user.uid);
+  if (pending) {
+    renderPendingBtn(container, pending.id, fileName, fileUrl);
+    listenForDecision(pending.id, fileId, fileName, fileUrl, container);
+    return;
+  }
+
+  // No access — show request button
+  container.innerHTML = `
+    <button class="dla-dl-btn" onclick="SHDownloadAccess.open('${fileId}','${fileName.replace(/'/g,"\\'")}','${fileUrl}')">
+      <i class="ti ti-download"></i> Download
+    </button>
+    <div style="margin-top:8px;font-size:11px;color:#484F58">
+      <i class="ti ti-shield-check" style="font-size:11px"></i> Email verification + admin approval required
+    </div>`;
+}
 
   function renderApprovedBtn(container, fileId, fileName, fileUrl) {
     container.innerHTML = `
@@ -534,54 +535,58 @@ window.SHDownloadAccess = (() => {
 
   /* ── Public: open the flow ── */
   async function open(fileId, fileName, fileUrl) {
-    const user = firebase.auth().currentUser;
-    if (!user) { alert('Please sign in to download files.'); return; }
+  // Wait for auth to resolve
+  const user = await new Promise(resolve => {
+    const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
+  });
 
-    _fileId    = fileId;
-    _fileName  = fileName;
-    _fileUrl   = fileUrl;
-    _requestId = '';
+  if (!user) { alert('Please sign in to download files.'); return; }
 
-    /* Check if already approved permanently */
-    const grant = await checkExistingApproval(fileId, user.uid);
-    if (grant) {
-      triggerDownload(fileUrl, fileName);
-      return;
-    }
+  _fileId    = fileId;
+  _fileName  = fileName;
+  _fileUrl   = fileUrl;
+  _requestId = '';
 
-    /* Check if already pending */
-    const pending = await checkPendingRequest(fileId, user.uid);
-    if (pending) {
-      _requestId = pending.id;
-      $('dlaBackdrop').classList.add('show');
-      $('dlaFileName').textContent    = fileName;
-      $('dlaSuccessFile').textContent = fileName;
-      showStep(3);
-      const container = _containers[fileId] ? _containers[fileId].container : null;
-      listenForDecision(pending.id, fileId, fileName, fileUrl, container);
-      return;
-    }
+  // Already permanently approved — just download directly
+  const grant = await checkExistingApproval(fileId, user.uid);
+  if (grant) {
+    triggerDownload(fileUrl, fileName);
+    return;
+  }
 
-    /* Fresh flow */
+  // Already has a pending request — show waiting screen
+  const pending = await checkPendingRequest(fileId, user.uid);
+  if (pending) {
+    _requestId = pending.id;
     $('dlaBackdrop').classList.add('show');
     $('dlaFileName').textContent    = fileName;
-    $('dlaUserEmail').textContent   = user.email;
     $('dlaSuccessFile').textContent = fileName;
-    clearOtpInputs(); clearErr();
-    showStep(1);
-
-    try {
-      const name = user.displayName || user.email.split('@')[0];
-      await sendOtp(user.email, name, fileName);
-      startTimer();
-      startResendCooldown();
-      showStep(2);
-      setTimeout(() => { const f = document.querySelector('.otp-digit'); if (f) f.focus(); }, 100);
-    } catch (e) {
-      showStep(2);
-      showErr('Could not send code: ' + e.message + '. Try resending.');
-    }
+    showStep(3);
+    const container = _containers[fileId] ? _containers[fileId].container : null;
+    listenForDecision(pending.id, fileId, fileName, fileUrl, container);
+    return;
   }
+
+  // Fresh flow — send OTP
+  $('dlaBackdrop').classList.add('show');
+  $('dlaFileName').textContent    = fileName;
+  $('dlaUserEmail').textContent   = user.email;
+  $('dlaSuccessFile').textContent = fileName;
+  clearOtpInputs(); clearErr();
+  showStep(1);
+
+  try {
+    const name = user.displayName || user.email.split('@')[0];
+    await sendOtp(user.email, name, fileName);
+    startTimer();
+    startResendCooldown();
+    showStep(2);
+    setTimeout(() => { const f = document.querySelector('.otp-digit'); if (f) f.focus(); }, 100);
+  } catch (e) {
+    showStep(2);
+    showErr('Could not send code: ' + e.message + '. Try resending.');
+  }
+}
 
   /* ── Public: verify OTP ── */
   async function verifyOtp() {
