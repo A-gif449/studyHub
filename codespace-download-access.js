@@ -693,28 +693,17 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
     triggerDownload(url, name);
   }
 
-  /* ── Public: close modal ── */
+/* ── Public: close modal ── */
   function close() {
     $('dlaBackdrop').classList.remove('show');
     clearInterval(_timerInterval);
-    /* Cancel pending request if user closes while waiting */
-    if (_requestId) {
-      firebase.firestore().collection('downloadRequests').doc(_requestId)
-        .get().then(snap => {
-          if (snap.exists && snap.data().status === 'pending') {
-            snap.ref.update({ status: 'cancelled' }).catch(() => {});
-            /* Also update button back to request state */
-            const c = _containers[_fileId];
-            if (c) {
-              c.container.innerHTML = `
-                <button class="dla-dl-btn" onclick="SHDownloadAccess.open('${_fileId}','${c.fileName.replace(/'/g,"\\'")}','${c.fileUrl}')">
-                  <i class="ti ti-download"></i> Download
-                </button>`;
-            }
-          }
-        }).catch(() => {});
-      _requestId = '';
-    }
+    /* NOTE: we intentionally do NOT cancel the pending request here.
+       Closing the modal should only hide the UI — the request must
+       stay 'pending' in Firestore so the admin still sees it in
+       their notifications panel. The user can reopen the modal
+       later (it will detect the existing pending request and jump
+       straight back to the "waiting for approval" screen). */
+    _requestId = '';
     /* Don't kill _unsub here — keep listening if approved request exists */
   }
 
