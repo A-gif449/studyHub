@@ -363,36 +363,40 @@ window.SHDownloadAccess = (() => {
   }
 
   /* ── Check Firestore if user already has permanent approval ── */
-  async function checkExistingApproval(fileId, userId) {
-    try {
-      const snap = await firebase.firestore()
-        .collection('fileAccessGrants')
-        .where('fileId', '==', fileId)
-        .where('userId', '==', userId)
-        .where('status', '==', 'approved')
-        .limit(1)
-        .get();
-      return !snap.empty ? snap.docs[0].data() : null;
-    } catch (e) {
-      return null;
-    }
+async function checkExistingApproval(fileId, userId) {
+  try {
+    const snap = await firebase.firestore()
+      .collection('downloadRequests')
+      .where('fileId', '==', fileId)
+      .where('userId', '==', userId)
+      .get();
+    if (snap.empty) return null;
+    const approved = snap.docs.find(d =>
+      ['approved', 'completed'].includes(d.data().status)
+    );
+    return approved ? { id: approved.id, ...approved.data() } : null;
+  } catch (e) {
+    console.error('[DLA] checkExistingApproval error:', e);
+    return null;
   }
+}
 
   /* ── Check if there's already a pending request ── */
   async function checkPendingRequest(fileId, userId) {
-    try {
-      const snap = await firebase.firestore()
-        .collection('downloadRequests')
-        .where('fileId', '==', fileId)
-        .where('userId', '==', userId)
-        .where('status', '==', 'pending')
-        .limit(1)
-        .get();
-      return !snap.empty ? { id: snap.docs[0].id, ...snap.docs[0].data() } : null;
-    } catch (e) {
-      return null;
-    }
+  try {
+    const snap = await firebase.firestore()
+      .collection('downloadRequests')
+      .where('fileId', '==', fileId)
+      .where('userId', '==', userId)
+      .get();
+    if (snap.empty) return null;
+    const pending = snap.docs.find(d => d.data().status === 'pending');
+    return pending ? { id: pending.id, ...pending.data() } : null;
+  } catch (e) {
+    console.error('[DLA] checkPendingRequest error:', e);
+    return null;
   }
+}
 
   /* ── Render button — checks approval status first ── */
 async function renderBtn(fileId, fileName, fileUrl, container) {
@@ -474,15 +478,15 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
           /* Save permanent approval to Firestore */
           const user = firebase.auth().currentUser;
           if (user) {
-            await firebase.firestore().collection('fileAccessGrants').add({
-              fileId, fileName, fileUrl,
-              userId    : user.uid,
-              userEmail : user.email,
-              userName  : user.displayName || user.email.split('@')[0],
-              status    : 'approved',
-              grantedAt : firebase.firestore.FieldValue.serverTimestamp(),
-              requestId,
-            }).catch(() => {});
+            // await firebase.firestore().collection('fileAccessGrants').add({
+            //   fileId, fileName, fileUrl,
+            //   userId    : user.uid,
+            //   userEmail : user.email,
+            //   userName  : user.displayName || user.email.split('@')[0],
+            //   status    : 'approved',
+            //   grantedAt : firebase.firestore.FieldValue.serverTimestamp(),
+            //   requestId,
+            // }).catch(() => {});
 
             /* Mark request as completed */
             snap.ref.update({
