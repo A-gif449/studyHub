@@ -7,17 +7,16 @@
   const MAX_SHOW    = 20;
 
   /* ─── state ─── */
-  let allRecent             = [];
-  let friendRequestNotifs   = [];
-  let profileViewNotifs     = [];
-  let waitingRoomNotifs     = [];
-  let downloadRequestNotifs = []; // admin sees pending download requests
-  let myDownloadNotifs      = []; // user sees their own request outcomes
-  let panelOpen             = false;
-  let prevUnreadCount       = 0;
-  let currentUserEmail      = null;
-  let currentUserUid        = null;
-  const ADMIN_EMAILS        = ["abhishekbasu188@gmail.com"];
+  let allRecent           = [];
+  let friendRequestNotifs = [];
+  let profileViewNotifs   = [];
+  let waitingRoomNotifs   = [];
+  let panelOpen           = false;
+  let prevUnreadCount     = 0;
+  let currentUserEmail    = null;
+  let currentUserUid      = null;
+  let downloadRequestNotifs = [];
+  const ADMIN_EMAILS      = ["abhishekbasu188@gmail.com"];
 
   /* ─── read-state helpers ─── */
   function getReadIds() {
@@ -32,8 +31,7 @@
   }
   function markAllRead() {
     const ids = getReadIds();
-    [...allRecent, ...friendRequestNotifs, ...profileViewNotifs,
-     ...waitingRoomNotifs, ...downloadRequestNotifs, ...myDownloadNotifs]
+    [...allRecent, ...friendRequestNotifs, ...profileViewNotifs, ...waitingRoomNotifs]
       .forEach(x => ids.add(x.id));
     saveReadIds(ids);
     updateBadge();
@@ -49,13 +47,13 @@
       ...profileViewNotifs.filter(v => isUnread(v.id)),
       ...waitingRoomNotifs.filter(w => isUnread(w.id)),
       ...downloadRequestNotifs.filter(d => isUnread(d.id)),
-      ...myDownloadNotifs.filter(d => isUnread(d.id)),
     ];
   }
   function pruneReadIds() {
     const allIds = new Set([
-      ...allRecent, ...friendRequestNotifs, ...profileViewNotifs,
-      ...waitingRoomNotifs, ...downloadRequestNotifs, ...myDownloadNotifs,
+      ...allRecent, ...friendRequestNotifs,
+      ...profileViewNotifs, ...waitingRoomNotifs,
+        ...downloadRequestNotifs,
     ].map(x => x.id));
     const pruned = new Set([...getReadIds()].filter(id => allIds.has(id)));
     saveReadIds(pruned);
@@ -165,6 +163,7 @@
         transform: translateY(0) scale(1);
         pointer-events: auto;
       }
+
       .sh-panel-head {
         padding: 13px 14px 11px;
         display: flex; align-items: center; justify-content: space-between;
@@ -194,6 +193,7 @@
         transition: color .15s, background .15s;
       }
       .sh-mark-all-btn:hover { color: #8FA3D6; background: rgba(91,127,255,0.08); }
+
       .sh-list {
         overflow-y: auto; flex: 1; padding: 6px;
         scrollbar-width: thin;
@@ -201,6 +201,7 @@
       }
       .sh-list::-webkit-scrollbar { width: 3px; }
       .sh-list::-webkit-scrollbar-thumb { background: rgba(91,127,255,0.3); border-radius: 99px; }
+
       .sh-divider {
         padding: 8px 10px 4px;
         font-size: 10px; font-weight: 700;
@@ -208,6 +209,7 @@
         color: #3E3C56;
         font-family: 'Inter', system-ui, sans-serif;
       }
+
       .sh-item {
         display: flex; align-items: flex-start; gap: 10px;
         padding: 10px; border-radius: 8px;
@@ -219,20 +221,9 @@
       .sh-item.sh-unread { background: rgba(91,127,255,0.05); }
       .sh-item.sh-unread:hover { background: rgba(91,127,255,0.09); }
 
-      /* Waiting room tint */
       .sh-item.sh-waiting { background: rgba(201,163,86,0.05); }
       .sh-item.sh-waiting:hover { background: rgba(201,163,86,0.09); }
       .sh-item.sh-waiting.sh-unread { background: rgba(201,163,86,0.08); }
-
-      /* Download approved tint */
-      .sh-item.sh-dl-ok { background: rgba(78,158,120,0.05); }
-      .sh-item.sh-dl-ok:hover { background: rgba(78,158,120,0.09); }
-      .sh-item.sh-dl-ok.sh-unread { background: rgba(78,158,120,0.08); }
-
-      /* Download rejected tint */
-      .sh-item.sh-dl-deny { background: rgba(194,86,79,0.05); }
-      .sh-item.sh-dl-deny:hover { background: rgba(194,86,79,0.08); }
-      .sh-item.sh-dl-deny.sh-unread { background: rgba(194,86,79,0.07); }
 
       .sh-icon-box {
         width: 34px; height: 34px; border-radius: 7px;
@@ -244,8 +235,6 @@
       .sh-icon-box.type-friend  { background: rgba(78,158,120,0.1); }
       .sh-icon-box.type-view    { background: rgba(63,169,204,0.1); }
       .sh-icon-box.type-waiting { background: rgba(201,163,86,0.12); }
-      .sh-icon-box.type-dl-ok   { background: rgba(78,158,120,0.14); }
-      .sh-icon-box.type-dl-deny { background: rgba(194,86,79,0.1); }
 
       .sh-item-body { flex: 1; min-width: 0; }
       .sh-item-title {
@@ -265,22 +254,9 @@
         background: rgba(255,255,255,0.05);
         color: #62656F; font-size: 10px; font-weight: 600;
       }
-      .sh-tag.waiting  { background: rgba(201,163,86,0.12); color: #C9A356; }
-      .sh-tag.friend   { background: rgba(78,158,120,0.12); color: #4E9E78; }
-      .sh-tag.view     { background: rgba(63,169,204,0.10); color: #3FA9CC; }
-      .sh-tag.dl-ok    { background: rgba(78,158,120,0.14); color: #4E9E78; }
-      .sh-tag.dl-deny  { background: rgba(194,86,79,0.10); color: #C2564F; }
-
-      /* Download button inside notification */
-      .sh-dl-btn {
-        display: inline-flex; align-items: center; gap: 5px;
-        margin-top: 8px; padding: 6px 12px; border-radius: 6px;
-        background: rgba(78,158,120,0.15); border: 1px solid rgba(78,158,120,0.3);
-        color: #4E9E78; font-size: 11.5px; font-weight: 700;
-        cursor: pointer; font-family: inherit; text-decoration: none;
-        transition: background .15s;
-      }
-      .sh-dl-btn:hover { background: rgba(78,158,120,0.25); }
+      .sh-tag.waiting { background: rgba(201,163,86,0.12); color: #C9A356; }
+      .sh-tag.friend  { background: rgba(78,158,120,0.12); color: #4E9E78; }
+      .sh-tag.view    { background: rgba(63,169,204,0.10); color: #3FA9CC; }
 
       .sh-action-row {
         display: flex; gap: 6px; margin-top: 7px;
@@ -294,12 +270,14 @@
         display: inline-flex; align-items: center; gap: 5px;
       }
       .sh-action-btn.approve {
-        background: rgba(78,158,120,0.12); color: #4E9E78;
+        background: rgba(78,158,120,0.12);
+        color: #4E9E78;
         border-color: rgba(78,158,120,0.25);
       }
       .sh-action-btn.approve:hover { background: rgba(78,158,120,0.22); }
       .sh-action-btn.reject {
-        background: rgba(194,86,79,0.08); color: #C2564F;
+        background: rgba(194,86,79,0.08);
+        color: #C2564F;
         border-color: rgba(194,86,79,0.2);
       }
       .sh-action-btn.reject:hover { background: rgba(194,86,79,0.16); }
@@ -310,9 +288,7 @@
         opacity: 0; transition: opacity .15s;
       }
       .sh-item.sh-unread .sh-unread-dot { opacity: 1; }
-      .sh-item.sh-waiting.sh-unread .sh-unread-dot  { background: #C9A356; }
-      .sh-item.sh-dl-ok.sh-unread .sh-unread-dot    { background: #4E9E78; }
-      .sh-item.sh-dl-deny.sh-unread .sh-unread-dot  { background: #C2564F; }
+      .sh-item.sh-waiting.sh-unread .sh-unread-dot { background: #C9A356; }
 
       .sh-empty {
         padding: 40px 20px; text-align: center;
@@ -336,7 +312,7 @@
       }
       .sh-foot-link:hover { background: rgba(255,255,255,0.04); color: #8FA3D6; }
 
-      /* ── Admin toasts ── */
+      /* ── Waiting room toast (admin only) ── */
       .sh-waiting-toast {
         position: fixed; bottom: 24px; right: 24px; z-index: 9998;
         width: 320px;
@@ -372,7 +348,8 @@
       .sh-toast-close {
         background: none; border: none; color: #62656F;
         font-size: 15px; cursor: pointer; flex-shrink: 0;
-        padding: 2px; line-height: 1; transition: color .15s;
+        padding: 2px; line-height: 1;
+        transition: color .15s;
       }
       .sh-toast-close:hover { color: #ECEDF1; }
       .sh-toast-actions { display: flex; gap: 8px; }
@@ -442,9 +419,7 @@
         </div>
         <button class="sh-mark-all-btn" onclick="window._shMarkAll()">Mark all read</button>
       </div>
-      <div class="sh-list" id="sh-list">
-        <div style="padding:30px 20px;text-align:center;color:#3E3C56;font-size:12.5px">Loading…</div>
-      </div>
+      <div class="sh-list" id="sh-list"><div style="padding:30px 20px;text-align:center;color:#3E3C56;font-size:12.5px">Loading…</div></div>
       <div class="sh-panel-foot">
         <a href="index.html#materials" class="sh-foot-link">Browse all materials →</a>
       </div>`;
@@ -509,10 +484,7 @@
           pruneReadIds(); updateBadge(); renderList();
         }, err => console.warn("[Notif] profileViews:", err.message));
 
-      /* ── My download request outcomes (every signed-in user) ── */
-      subscribeMyDownloadOutcomes(db, user.uid);
-
-      /* ── Admin-only subscriptions ── */
+      /* ── Waiting room (admin only) ── */
       if (ADMIN_EMAILS.includes(user.email)) {
         subscribeWaitingRoom(db);
         subscribeDownloadRequests(db);
@@ -521,162 +493,93 @@
   }
 
   /* ══════════════════════════════════════════════════════════
-     ★  MY DOWNLOAD OUTCOMES — shows user their approval/rejection
-  ══════════════════════════════════════════════════════════ */
-  function subscribeMyDownloadOutcomes(db, uid) {
-    let initialLoad = true;
-
-    db.collection("downloadRequests")
-      .where("userId", "==", uid)
-      .orderBy("requestedAt", "desc")
-      .limit(20)
-      .onSnapshot(snap => {
-
-        if (!initialLoad) {
-          /* Watch for status changes on existing docs (modified) */
-          snap.docChanges().forEach(change => {
-            if (change.type !== "modified") return;
-            const data   = change.doc.data();
-            const id     = change.doc.id;
-            const status = data.status;
-
-            if (status !== "approved" && status !== "rejected" && status !== "completed") return;
-
-            /* Build a stable notification ID so we don't duplicate */
-            const notifId = id + "_outcome";
-
-            /* Skip if already in our list */
-            if (myDownloadNotifs.find(n => n.id === notifId)) return;
-
-            myDownloadNotifs.unshift({
-              id:       notifId,
-              origId:   id,
-              status:   status === "completed" ? "approved" : status,
-              fileName: data.fileName || "your file",
-              fileUrl:  data.fileUrl  || "",
-              resolvedAt: data.resolvedAt || data.approvedAt || data.rejectedAt || null,
-              _type: "myDownload",
-            });
-
-            /* Ring the bell and show a small toast to the user */
-            ringBell();
-            showUserDownloadToast(data.fileName || "your file", status);
-          });
-        }
-
-        /* Rebuild the full list from Firestore state (covers page reloads) */
-        myDownloadNotifs = snap.docs
-          .filter(d => {
-            const s = d.data().status;
-            return s === "approved" || s === "rejected" || s === "completed";
-          })
-          .map(d => ({
-            id:       d.id + "_outcome",
-            origId:   d.id,
-            status:   d.data().status === "completed" ? "approved" : d.data().status,
-            fileName: d.data().fileName || "your file",
-            fileUrl:  d.data().fileUrl  || "",
-            resolvedAt: d.data().resolvedAt || d.data().approvedAt || d.data().rejectedAt || null,
-            _type: "myDownload",
-          }));
-
-        initialLoad = false;
-        pruneReadIds(); updateBadge(); renderList();
-      }, err => console.warn("[Notif] myDownloadOutcomes:", err.message));
-  }
-
-  /* Small non-intrusive user toast for download outcome */
-  function showUserDownloadToast(fileName, status) {
-    const isOk   = status === "approved" || status === "completed";
-    const t = document.createElement("div");
-    t.className = "sh-waiting-toast";
-    t.style.borderColor = isOk ? "rgba(78,158,120,0.35)" : "rgba(194,86,79,0.35)";
-    t.innerHTML = `
-      <div class="sh-toast-head">
-        <div class="sh-toast-icon" style="background:${isOk
-          ? "rgba(78,158,120,0.14);color:#4E9E78"
-          : "rgba(194,86,79,0.1);color:#C2564F"}">
-          <i class="ti ti-${isOk ? "circle-check" : "shield-x"}"></i>
-        </div>
-        <div class="sh-toast-body">
-          <div class="sh-toast-title">${isOk ? "Download approved!" : "Download denied"}</div>
-          <div class="sh-toast-sub">${esc(fileName)} · ${isOk
-            ? "Check notifications to download"
-            : "Contact admin for more info"}</div>
-        </div>
-        <button class="sh-toast-close" onclick="this.closest('.sh-waiting-toast').remove()">
-          <i class="ti ti-x"></i>
-        </button>
-      </div>`;
-    document.body.appendChild(t);
-    setTimeout(() => { if (t.parentElement) t.remove(); }, 10000);
-  }
-
-  /* ══════════════════════════════════════════════════════════
      ★  FIXED: Waiting Room Subscription
+     
+     Two bugs were here:
+     1. `if (data.requestedAt)` failed because serverTimestamp()
+        returns null in the first (pending-write) snapshot.
+     2. No initialLoad guard — ALL existing docs fired as "added"
+        on first subscription, causing false toasts.
   ══════════════════════════════════════════════════════════ */
   function subscribeWaitingRoom(db) {
-    let initialLoad = true;
+    let initialLoad = true;   /* ← FIX 1: skip toasts for the first batch */
 
     db.collection("waitingRoom")
       .where("status", "==", "waiting")
       .orderBy("requestedAt", "desc")
       .onSnapshot(snap => {
         const prev = new Set(waitingRoomNotifs.map(w => w.id));
+
         waitingRoomNotifs = snap.docs.map(d => Object.assign({ id: d.id, _type: "waitingRoom" }, d.data()));
 
         if (!initialLoad) {
           snap.docChanges().forEach(change => {
             if (change.type !== "added") return;
             if (prev.has(change.doc.id)) return;
+
             const data = change.doc.data();
-            let isRecent = !data.requestedAt ||
-              (Date.now() - (data.requestedAt.toDate?.() || new Date(data.requestedAt)).getTime() < 30000);
-            if (isRecent) { showWaitingToast(change.doc.id, data); ringBell(); }
+
+            /*
+             * FIX 2: serverTimestamp() is null on the first (pending-write)
+             * snapshot — the server hasn't resolved it yet.
+             * A null requestedAt means the doc was JUST written, so treat
+             * it as "now" (age = 0, definitely recent).
+             */
+            let isRecent;
+            if (!data.requestedAt) {
+              /* Pending write — document was literally just added */
+              isRecent = true;
+            } else {
+              const ts  = data.requestedAt.toDate ? data.requestedAt.toDate() : new Date(data.requestedAt);
+              const age = Date.now() - ts.getTime();
+              isRecent  = age < 30000; /* 30 s window (generous for slow connections) */
+            }
+
+            if (isRecent) {
+              showWaitingToast(change.doc.id, data);
+              ringBell();
+            }
           });
         }
 
-        initialLoad = false;
+        initialLoad = false;   /* ← after first snapshot, enable toasts */
         pruneReadIds(); updateBadge(); renderList();
       }, err => console.warn("[Notif] waitingRoom:", err.message));
   }
 
-  /* ── Admin: pending download requests ── */
-  function subscribeDownloadRequests(db) {
+ function subscribeDownloadRequests(db) {
     let initialLoad = true;
 
-    db.collection("downloadRequests")
-      .where("status", "==", "pending")
-      .orderBy("requestedAt", "desc")
+    db.collection('downloadRequests')
+      .where('status', '==', 'pending')
+      .orderBy('requestedAt', 'desc')
       .onSnapshot(snap => {
-        downloadRequestNotifs = snap.docs.map(d => ({
-          id: d.id, _type: "downloadRequest", ...d.data()
-        }));
+        downloadRequestNotifs = snap.docs.map(d => ({id: d.id, _type: 'downloadRequest', ...d.data()}));
 
         if (!initialLoad) {
           snap.docChanges().forEach(change => {
-            if (change.type !== "added") return;
+            if (change.type !== 'added') return;
             const data = change.doc.data();
-            let isRecent = !data.requestedAt ||
-              (Date.now() - (data.requestedAt.toDate?.() || new Date(data.requestedAt)).getTime() < 30000);
-            if (isRecent) { showDownloadToast(change.doc.id, data); ringBell(); }
+            const docId = change.doc.id;
+            let isRecent = !data.requestedAt || (Date.now() - (data.requestedAt.toDate?.() || new Date(data.requestedAt)).getTime() < 30000);
+            if (isRecent) { showDownloadToast(docId, data); ringBell(); }
           });
         }
-
         initialLoad = false;
         pruneReadIds(); updateBadge(); renderList();
-      }, err => console.warn("[Notif] downloadRequests:", err.message));
+      }, err => console.warn('[Notif] downloadRequests:', err.message));
   }
 
-  /* Admin toast for incoming download request */
   function showDownloadToast(docId, data) {
-    const existing = document.getElementById("sh-dt-" + docId);
+    const existing = document.getElementById('sh-dt-' + docId);
     if (existing) existing.remove();
-    const name = esc(data.userName || data.userEmail || "Someone");
-    const file = esc(data.fileName || "a file");
-    const t = document.createElement("div");
-    t.className = "sh-waiting-toast";
-    t.id = "sh-dt-" + docId;
+
+    const name = esc(data.userName || data.userEmail || 'Someone');
+    const file = esc(data.fileName || 'a file');
+
+    const t = document.createElement('div');
+    t.className = 'sh-waiting-toast';
+    t.id = 'sh-dt-' + docId;
     t.innerHTML = `
       <div class="sh-toast-head">
         <div class="sh-toast-icon"><i class="ti ti-download"></i></div>
@@ -690,7 +593,7 @@
       </div>
       <div class="sh-toast-actions">
         <button class="sh-toast-btn approve"
-          onclick="window._shApproveDownload('${docId}','${esc(data.userId||"")}','${esc(data.fileId||"")}',this);document.getElementById('sh-dt-${docId}')?.remove()">
+          onclick="window._shApproveDownload('${docId}','${esc(data.uid)}','${esc(data.fileId)}',this);document.getElementById('sh-dt-${docId}')?.remove()">
           <i class="ti ti-check"></i> Approve
         </button>
         <button class="sh-toast-btn reject"
@@ -729,11 +632,14 @@
     const btn   = document.getElementById("sh-bell-btn");
     const pill  = document.getElementById("sh-count-pill");
     if (!badge || !btn) return;
+
     const count = getUnreadItems().length;
+
     if (pill) {
       pill.textContent = count > 0 ? count + " new" : "All read";
       pill.className   = "sh-count-pill " + (count > 0 ? "has-new" : "all-read");
     }
+
     if (count > 0) {
       badge.textContent = count > 99 ? "99+" : String(count);
       badge.classList.add("sh-badge-visible");
@@ -756,7 +662,6 @@
   };
 
   function timeAgo(date) {
-    if (!date) return "";
     const d = Math.floor((Date.now() - date.getTime()) / 1000);
     if (d < 60) return "just now";
     if (d < 3600) return Math.floor(d/60) + "m ago";
@@ -776,14 +681,13 @@
     if (!list) return;
 
     const isAdmin = ADMIN_EMAILS.includes(currentUserEmail);
-    const hasWaiting  = isAdmin && waitingRoomNotifs.length > 0;
-    const hasDlReqs   = isAdmin && downloadRequestNotifs.length > 0;
-    const hasMyDl     = myDownloadNotifs.length > 0;
-    const hasFriends  = friendRequestNotifs.length > 0;
-    const hasViews    = profileViewNotifs.length > 0;
-    const hasPdfs     = allRecent.length > 0;
 
-    if (!hasWaiting && !hasDlReqs && !hasMyDl && !hasFriends && !hasViews && !hasPdfs) {
+    const hasWaiting = isAdmin && waitingRoomNotifs.length > 0;
+    const hasFriends = friendRequestNotifs.length > 0;
+    const hasViews   = profileViewNotifs.length > 0;
+    const hasPdfs    = allRecent.length > 0;
+
+    if (!hasWaiting && !hasFriends && !hasViews && !hasPdfs) {
       list.innerHTML = `
         <div class="sh-empty">
           <span class="sh-empty-icon"><i class="ti ti-inbox" style="font-size:26px"></i></span>
@@ -794,51 +698,7 @@
 
     let html = "";
 
-    /* ── My Download Outcomes (every user) ── */
-    if (hasMyDl) {
-      html += `<div class="sh-divider">My Downloads</div>`;
-      html += myDownloadNotifs.map(d => {
-        const isOk   = d.status === "approved";
-        const unread = isUnread(d.id);
-        const ts     = d.resolvedAt
-          ? (d.resolvedAt.toDate ? d.resolvedAt.toDate() : new Date(d.resolvedAt))
-          : null;
-        const ago = ts ? timeAgo(ts) : "";
-
-        return `
-          <div class="sh-item ${isOk ? "sh-dl-ok" : "sh-dl-deny"} ${unread ? "sh-unread" : ""}"
-               onclick="window._shReadItem('${esc(d.id)}')">
-            <div class="sh-icon-box ${isOk ? "type-dl-ok" : "type-dl-deny"}">
-              <i class="ti ti-${isOk ? "circle-check" : "shield-x"}"
-                 style="font-size:16px;color:${isOk ? "#4E9E78" : "#C2564F"}"></i>
-            </div>
-            <div class="sh-item-body">
-              <div class="sh-item-title">
-                ${isOk ? "Download approved" : "Download denied"} — ${esc(d.fileName)}
-              </div>
-              <div class="sh-item-meta">
-                <span class="sh-tag ${isOk ? "dl-ok" : "dl-deny"}">
-                  ${isOk ? "✓ Approved" : "✗ Rejected"}
-                </span>
-                ${ago ? `<span>· ${ago}</span>` : ""}
-              </div>
-              ${isOk && d.fileUrl ? `
-                <a class="sh-dl-btn" href="${esc(d.fileUrl)}" target="_blank"
-                   download="${esc(d.fileName)}"
-                   onclick="event.stopPropagation();window._shReadItem('${esc(d.id)}')">
-                  <i class="ti ti-download" style="font-size:13px"></i> Download now
-                </a>` : ""}
-              ${!isOk ? `
-                <div style="margin-top:6px;font-size:11.5px;color:#62656F;line-height:1.5">
-                  Contact the admin if you believe this was a mistake.
-                </div>` : ""}
-            </div>
-            <div class="sh-unread-dot"></div>
-          </div>`;
-      }).join("");
-    }
-
-    /* ── Admin: Waiting Room ── */
+    /* ── Waiting Room (admin) ── */
     if (hasWaiting) {
       html += `<div class="sh-divider">Waiting Room</div>`;
       html += waitingRoomNotifs.map(w => {
@@ -852,9 +712,8 @@
               <i class="ti ti-door-enter" style="font-size:16px;color:#C9A356"></i>
             </div>
             <div class="sh-item-body">
-              <div class="sh-item-title">
-                ${esc(w.name || w.userName || w.userEmail || "Someone")} wants to join
-              </div>
+              <div class="sh-item-title">${esc(w.name || w.userName || w.userEmail || "Someone")} wants to join</div>
+              <span>${esc(w.roomName || w.room || "Study Room")}</span>
               <div class="sh-item-meta">
                 <span class="sh-tag waiting">Waiting Room</span>
                 <span>${esc(w.room || "Study Room")}</span>
@@ -862,11 +721,11 @@
               </div>
               <div class="sh-action-row">
                 <button class="sh-action-btn approve"
-                  onclick="event.stopPropagation();window._shApproveWaiting('${esc(w.id)}',this)">
+                  onclick="event.stopPropagation(); window._shApproveWaiting('${esc(w.id)}', this)">
                   <i class="ti ti-check" style="font-size:12px"></i> Approve
                 </button>
                 <button class="sh-action-btn reject"
-                  onclick="event.stopPropagation();window._shRejectWaiting('${esc(w.id)}',this)">
+                  onclick="event.stopPropagation(); window._shRejectWaiting('${esc(w.id)}', this)">
                   <i class="ti ti-x" style="font-size:12px"></i> Reject
                 </button>
               </div>
@@ -876,43 +735,58 @@
       }).join("");
     }
 
-    /* ── Admin: Download Requests ── */
-    if (hasDlReqs) {
+    /* ── Download Requests (admin) ── */
+    if (isAdmin && downloadRequestNotifs.length > 0) {
       html += `<div class="sh-divider">Download Requests</div>`;
       html += downloadRequestNotifs.map(d => {
         const ts  = d.requestedAt ? (d.requestedAt.toDate?.() || new Date(d.requestedAt)) : new Date();
         const ago = timeAgo(ts);
         const unread = isUnread(d.id);
         return `
-          <div class="sh-item sh-waiting ${unread ? "sh-unread" : ""}"
+          <div class="sh-item sh-waiting ${unread ? 'sh-unread' : ''}"
                onclick="window._shReadItem('${esc(d.id)}')">
             <div class="sh-icon-box type-waiting">
               <i class="ti ti-download" style="font-size:16px;color:#C9A356"></i>
             </div>
             <div class="sh-item-body">
-              <div class="sh-item-title">
-                ${esc(d.userName || d.userEmail || "Someone")} wants to download
-              </div>
+              <div class="sh-item-title">${esc(d.userName || d.userEmail || 'Someone')} wants to download</div>
               <div class="sh-item-meta">
                 <span class="sh-tag waiting">Download Request</span>
-                <span>${esc(d.fileName || "a file")}</span>
+                <span>${esc(d.fileName || 'a file')}</span>
                 <span>· ${ago}</span>
               </div>
               <div class="sh-action-row">
                 <button class="sh-action-btn approve"
-                  onclick="event.stopPropagation();window._shApproveDownload('${esc(d.id)}','${esc(d.userId||"")}','${esc(d.fileId||"")}',this)">
+                  onclick="event.stopPropagation(); window._shApproveDownload('${esc(d.id)}','${esc(d.uid)}','${esc(d.fileId)}', this)">
                   <i class="ti ti-check" style="font-size:12px"></i> Approve
                 </button>
                 <button class="sh-action-btn reject"
-                  onclick="event.stopPropagation();window._shRejectDownload('${esc(d.id)}',this)">
+                  onclick="event.stopPropagation(); window._shRejectDownload('${esc(d.id)}', this)">
                   <i class="ti ti-x" style="font-size:12px"></i> Deny
                 </button>
               </div>
             </div>
             <div class="sh-unread-dot"></div>
           </div>`;
-      }).join("");
+      }).join('');
     }
+
+    window._shRejectDownload = async function(docId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Rejecting…'; }
+  try {
+    await firebase.firestore().collection('downloadRequests').doc(docId).update({
+      status: 'rejected',
+      resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      resolvedBy: currentUserEmail,
+    });
+    markItemRead(docId);
+    updateBadge();
+    renderList();
+  } catch(e) {
+    console.error('[Notif] reject download error:', e);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-x"></i> Deny'; }
+  }
+};
 
     /* ── Friend Requests ── */
     if (hasFriends) {
@@ -921,7 +795,7 @@
         const unread = isUnread(req.id);
         return `
           <div class="sh-item ${unread ? "sh-unread" : ""}"
-               onclick="window._shOpenFriends();window._shReadItem('${esc(req.id)}')">
+               onclick="window._shOpenFriends(); window._shReadItem('${esc(req.id)}')">
             <div class="sh-icon-box type-friend">
               <i class="ti ti-user-plus" style="font-size:15px;color:#4E9E78"></i>
             </div>
@@ -945,7 +819,7 @@
         const unread = isUnread(pv.id);
         return `
           <div class="sh-item ${unread ? "sh-unread" : ""}"
-               onclick="window._shOpenProfileViewer('${esc(pv.viewerUid)}');window._shReadItem('${esc(pv.id)}')">
+               onclick="window._shOpenProfileViewer('${esc(pv.viewerUid)}'); window._shReadItem('${esc(pv.id)}')">
             <div class="sh-icon-box type-view">
               <i class="ti ti-eye" style="font-size:15px;color:#3FA9CC"></i>
             </div>
@@ -965,11 +839,13 @@
     if (hasPdfs) {
       html += `<div class="sh-divider">Study Materials</div>`;
       html += allRecent.map(pdf => {
-        const emoji  = subjectEmoji[pdf.subject] || subjectEmoji.Default;
+        const emoji = subjectEmoji[pdf.subject] || subjectEmoji.Default;
         const unread = isUnread(pdf.id);
-        const ts = pdf.uploadedAt
-          ? (pdf.uploadedAt.toDate ? pdf.uploadedAt.toDate() : new Date(pdf.uploadedAt))
-          : null;
+        let ago = "";
+        if (pdf.uploadedAt) {
+          const d = pdf.uploadedAt.toDate ? pdf.uploadedAt.toDate() : new Date(pdf.uploadedAt);
+          ago = timeAgo(d);
+        }
         return `
           <div class="sh-item ${unread ? "sh-unread" : ""}"
                onclick="window._shOpenPdf('${esc(pdf.id)}')">
@@ -979,7 +855,7 @@
               <div class="sh-item-meta">
                 <span class="sh-tag">${esc(pdf.subject || "General")}</span>
                 ${pdf.level ? `<span>${esc(pdf.level)}</span>` : ""}
-                ${ts ? `<span>· ${timeAgo(ts)}</span>` : ""}
+                ${ago ? `<span>· ${ago}</span>` : ""}
               </div>
             </div>
             <div class="sh-unread-dot"></div>
@@ -991,13 +867,15 @@
   }
 
   /* ══════════════════════════════════════════════════════════
-     6.  ADMIN TOAST (waiting room)
+     6.  WAITING ROOM TOAST (admin only)
   ══════════════════════════════════════════════════════════ */
   function showWaitingToast(docId, data) {
     const existing = document.getElementById("sh-wt-" + docId);
     if (existing) existing.remove();
+
     const name = esc(data.name || data.userName || data.userEmail || "Someone");
     const room = esc(data.roomName || data.room || "Study Room");
+
     const t = document.createElement("div");
     t.className = "sh-waiting-toast";
     t.id = "sh-wt-" + docId;
@@ -1014,78 +892,72 @@
       </div>
       <div class="sh-toast-actions">
         <button class="sh-toast-btn approve"
-          onclick="window._shApproveWaiting('${docId}',this);document.getElementById('sh-wt-${docId}')?.remove()">
+          onclick="window._shApproveWaiting('${docId}', this); document.getElementById('sh-wt-${docId}')?.remove()">
           <i class="ti ti-check"></i> Approve
         </button>
         <button class="sh-toast-btn reject"
-          onclick="window._shRejectWaiting('${docId}',this);document.getElementById('sh-wt-${docId}')?.remove()">
+          onclick="window._shRejectWaiting('${docId}', this); document.getElementById('sh-wt-${docId}')?.remove()">
           <i class="ti ti-x"></i> Reject
         </button>
       </div>`;
     document.body.appendChild(t);
+
     setTimeout(() => { if (t.parentElement) t.remove(); }, 12000);
   }
 
-  /* ══════════════════════════════════════════════════════════
-     7.  ACTION HANDLERS
-  ══════════════════════════════════════════════════════════ */
-  window._shApproveDownload = async function(reqId, uid, fileId, btn) {
-    if (btn) { btn.disabled = true; btn.textContent = "Approving…"; }
-    try {
-      const db = firebase.firestore();
-      const batch = db.batch();
-      batch.update(db.collection("downloadRequests").doc(reqId), {
-        status: "approved",
-        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        resolvedBy: currentUserEmail,
-      });
-      if (uid && fileId) {
-        batch.set(db.collection("downloadAccess").doc(uid + "_" + fileId), {
-          uid, fileId,
-          grantedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          grantedBy: currentUserEmail,
-        });
-      }
-      await batch.commit();
-      markItemRead(reqId);
-      updateBadge(); renderList();
-      _showPageToast("Download access granted ✓", "success");
-    } catch(e) {
-      console.error("[Notif] approve download:", e);
-      if (btn) { btn.disabled = false; btn.innerHTML = "<i class='ti ti-check'></i> Approve"; }
-    }
-  };
+  /* ── Approve / Reject handlers ── */
+ window._shApproveDownload = async function(reqId, uid, fileId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Approving…'; }
+  try {
+    const db = firebase.firestore();
+    const batch = db.batch();
 
-  window._shRejectDownload = async function(docId, btn) {
-    if (btn) { btn.disabled = true; btn.textContent = "Rejecting…"; }
-    try {
-      await firebase.firestore().collection("downloadRequests").doc(docId).update({
-        status: "rejected",
-        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        resolvedBy: currentUserEmail,
-      });
-      markItemRead(docId);
-      updateBadge(); renderList();
-    } catch(e) {
-      console.error("[Notif] reject download:", e);
-      if (btn) { btn.disabled = false; btn.innerHTML = "<i class='ti ti-x'></i> Deny"; }
-    }
-  };
+    // Update request status
+    batch.update(db.collection('downloadRequests').doc(reqId), {
+      status: 'approved',
+      resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      resolvedBy: currentUserEmail,
+    });
 
-  window._shApproveWaiting = async function(docId, btn) {
-    if (btn) { btn.disabled = true; btn.textContent = "Approving…"; }
-    try {
-      await firebase.firestore().collection("waitingRoom").doc(docId).update({
-        status: "approved",
-        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        approvedBy: currentUserEmail,
-      });
-      markItemRead(docId); updateBadge(); renderList();
-    } catch(e) {
-      console.error("[Notif] approve waiting:", e);
-      if (btn) { btn.disabled = false; btn.innerHTML = "<i class='ti ti-check'></i> Approve"; }
+    // Create access doc with correct ID format: uid_fileId
+    const accessDocId = uid + '_' + fileId;
+    batch.set(db.collection('downloadAccess').doc(accessDocId), {
+      uid: uid,
+      fileId: fileId,
+      grantedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      grantedBy: currentUserEmail,
+    });
+
+    await batch.commit();
+    markItemRead(reqId);
+    updateBadge();
+    renderList();
+    showApprovalToast('Download access granted ✓');
+  } catch(e) {
+    console.error('[Notif] approve download error:', e);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Approve'; }
+  }
+};
+
+window._shApproveWaiting = async function(docId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Approving…'; }
+  try {
+    await firebase.firestore().collection('waitingRoom').doc(docId).update({
+      status: 'approved',
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      approvedBy: currentUserEmail,
+    });
+    markItemRead(docId);
+    updateBadge();
+    renderList();
+  } catch(e) {
+    console.error('[Notif] approve waiting error:', e);
+    if (btn) { 
+      btn.disabled = false; 
+      btn.innerHTML = '<i class="ti ti-check"></i> Approve'; 
     }
-  };
+  }
+};
 
   window._shRejectWaiting = async function(docId, btn) {
     if (btn) { btn.disabled = true; btn.textContent = "Rejecting…"; }
@@ -1093,34 +965,23 @@
       await firebase.firestore().collection("waitingRoom").doc(docId).update({
         status: "rejected",
         rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        rejectedBy: currentUserEmail,
+        rejectedBy: currentUserEmail
       });
-      markItemRead(docId); updateBadge(); renderList();
-    } catch(e) {
-      console.error("[Notif] reject waiting:", e);
-      if (btn) { btn.disabled = false; btn.innerHTML = "<i class='ti ti-x'></i> Reject"; }
-    }
+      markItemRead(docId);
+      updateBadge();
+      renderList();
+    } catch(e) { console.error("[Notif] reject error:", e); if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-x"></i> Reject';} }
   };
 
-  window._shReadItem          = function(id) { markItemRead(id); updateBadge(); renderList(); };
-  window._shOpenFriends       = function()  { closePanel(); window.location.href = "friends.html?tab=requests"; };
+  /* ── Other handlers ── */
+  window._shReadItem = function(id) { markItemRead(id); updateBadge(); renderList(); };
+  window._shOpenFriends = function() { closePanel(); window.location.href = "friends.html?tab=requests"; };
   window._shOpenProfileViewer = function(uid) { closePanel(); window.location.href = "profile.html?uid=" + encodeURIComponent(uid); };
-  window._shOpenPdf           = function(id)  { markItemRead(id); closePanel(); window.location.href = "viewer.html?id=" + encodeURIComponent(id); };
-
-  /* Reuse page toast if it exists, else silent */
-  function _showPageToast(msg, type) {
-    const t = document.getElementById("toast");
-    if (!t) return;
-    const m = document.getElementById("toastMsg");
-    const i = document.getElementById("toastIcon");
-    if (m) m.textContent = msg;
-    if (i) i.className = type === "success" ? "ti ti-check" : "ti ti-alert-circle";
-    t.className = `toast ${type} show`;
-    setTimeout(() => t.classList.remove("show"), 3000);
-  }
+  window._shOpenPdf = function(id) { markItemRead(id); closePanel(); window.location.href = "viewer.html?id=" + encodeURIComponent(id); };
+  window._shOpenWaiting = function(id) { markItemRead(id); closePanel(); window.location.href = "admin.html#waiting"; };
 
   /* ══════════════════════════════════════════════════════════
-     8.  PANEL OPEN / CLOSE
+     7.  PANEL OPEN / CLOSE
   ══════════════════════════════════════════════════════════ */
   function togglePanel(e) { e.stopPropagation(); panelOpen ? closePanel() : openPanel(); }
 
@@ -1142,6 +1003,19 @@
       if (!panelOpen) panel.style.display = "";
       panel.removeEventListener("transitionend", hide);
     });
+  }
+
+function showApprovalToast(msg) {
+    // Try to reuse existing toast element on the page
+    const t = document.getElementById('toast');
+    if (t) {
+      const msgEl = document.getElementById('toastMsg');
+      const iconEl = document.getElementById('toastIcon');
+      if (msgEl) msgEl.textContent = msg;
+      if (iconEl) iconEl.className = 'ti ti-check';
+      t.className = 'toast success show';
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
   }
 
 })();
