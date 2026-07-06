@@ -676,6 +676,12 @@
       .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
 
+  function generateSecurityCode() {
+  const t = Date.now().toString(36).toUpperCase();
+  const r = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `SH-${t}-${r}`;
+  }
+
   function renderList() {
     const list = document.getElementById("sh-list");
     if (!list) return;
@@ -906,33 +912,34 @@
   }
 
   /* ── Approve / Reject handlers ── */
- window._shApproveDownload = async function(reqId, uid, fileId, btn) {
+window._shApproveDownload = async function(reqId, uid, fileId, btn) {
   if (btn) { btn.disabled = true; btn.textContent = 'Approving…'; }
   try {
     const db = firebase.firestore();
     const batch = db.batch();
+    const securityCode = generateSecurityCode();
 
-    // Update request status
     batch.update(db.collection('downloadRequests').doc(reqId), {
       status: 'approved',
       resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
       resolvedBy: currentUserEmail,
+      securityCode: securityCode,          // ← new
     });
 
-    // Create access doc with correct ID format: uid_fileId
     const accessDocId = uid + '_' + fileId;
     batch.set(db.collection('downloadAccess').doc(accessDocId), {
       uid: uid,
       fileId: fileId,
       grantedAt: firebase.firestore.FieldValue.serverTimestamp(),
       grantedBy: currentUserEmail,
-    });
+      securityCode: securityCode,          // ← new
+    }, { merge: true });
 
     await batch.commit();
     markItemRead(reqId);
     updateBadge();
     renderList();
-    showApprovalToast('Download access granted ✓');
+    showApprovalToast('Access granted ✓ Code: ' + securityCode);
   } catch(e) {
     console.error('[Notif] approve download error:', e);
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Approve'; }

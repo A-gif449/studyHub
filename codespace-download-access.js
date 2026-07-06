@@ -256,6 +256,21 @@ const OTP_MAX_TRIES = 3;
           The admin approved your request for <b id="dlaSuccessFile"></b>.<br/>
           Your download will start automatically. You can also download it anytime from the file page.
         </p>
+
+        <!-- Security code box -->
+        <div id="dlaSecurityBox" style="margin:0 0 18px;padding:14px;border-radius:8px;background:#0D1117;border:1px solid #30363D;text-align:left">
+          <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#484F58;font-weight:700;margin-bottom:6px">Download Security Code</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <span id="dlaSecurityCode" style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#58A6FF;letter-spacing:.5px">—</span>
+            <button style="background:transparent;border:1px solid #30363D;color:#8B949E;border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit" onclick="navigator.clipboard.writeText(document.getElementById('dlaSecurityCode').textContent)">
+              <i class="ti ti-copy"></i> Copy
+            </button>
+          </div>
+          <div style="font-size:11px;color:#484F58;margin-top:8px;line-height:1.5">
+            Keep this code for your records — it verifies this file was issued to <b id="dlaSecurityUser" style="color:#8B949E"></b> on <span id="dlaSecurityDate" style="color:#8B949E"></span>.
+          </div>
+        </div>
+
         <button class="dla-btn green-btn" id="dlaManualDlBtn" onclick="SHDownloadAccess._triggerDownload()">
           <i class="ti ti-download"></i> Download now
         </button>
@@ -313,6 +328,7 @@ const OTP_MAX_TRIES = 3;
 window.SHDownloadAccess = (() => {
   let _fileId = '', _fileName = '', _fileUrl = '';
   let _requestId = '';
+  let _securityCode = '';
   let _otpCode = '', _otpExpiry = 0, _otpTries = 0;
   let _timerInterval = null, _unsub = null;
   let _resendCooldown = false;
@@ -342,6 +358,12 @@ window.SHDownloadAccess = (() => {
   }
   function generateOtp() { return String(Math.floor(100000 + Math.random() * 900000)); }
 
+  function generateSecurityCode() {
+    const t = Date.now().toString(36).toUpperCase();
+    const r = Math.random().toString(36).slice(2, 8).toUpperCase();
+    return `SH-${t}-${r}`;
+  }
+
   function startTimer() {
     clearInterval(_timerInterval);
     const end = _otpExpiry;
@@ -363,93 +385,117 @@ window.SHDownloadAccess = (() => {
   }
 
   /* ── Check Firestore if user already has permanent approval ── */
-async function checkExistingApproval(fileId, userId) {
-  try {
-    const snap = await firebase.firestore()
-      .collection('downloadRequests')
-      .where('fileId', '==', fileId)
-      .where('userId', '==', userId)
-      .get();
-    if (snap.empty) return null;
-    const approved = snap.docs.find(d =>
-      ['approved', 'completed'].includes(d.data().status)
-    );
-    return approved ? { id: approved.id, ...approved.data() } : null;
-  } catch (e) {
-    console.error('[DLA] checkExistingApproval error:', e);
-    return null;
+  async function checkExistingApproval(fileId, userId) {
+    try {
+      const snap = await firebase.firestore()
+        .collection('downloadRequests')
+        .where('fileId', '==', fileId)
+        .where('userId', '==', userId)
+        .get();
+      if (snap.empty) return null;
+      const approvedDoc = snap.docs.find(d =>
+        ['approved', 'completed'].includes(d.data().status)
+      );
+      if (!approvedDoc) return null;
+
+      let data = approvedDoc.data();
+
+      // Backfill: approvals granted before this feature existed
+      if (!data.securityCode) {
+        const code = generateSecurityCode();
+        await approvedDoc.ref.update({
+          securityCode: code,
+          securityCodeIssuedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }).catch(e => console.warn('[DLA] backfill securityCode failed:', e));
+        data = { ...data, securityCode: code };
+      }
+
+      return { id: approvedDoc.id, ...data };
+    } catch (e) {
+      console.error('[DLA] checkExistingApproval error:', e);
+      return null;
+    }
   }
-}
 
   /* ── Check if there's already a pending request ── */
   async function checkPendingRequest(fileId, userId) {
-  try {
-    const snap = await firebase.firestore()
-      .collection('downloadRequests')
-      .where('fileId', '==', fileId)
-      .where('userId', '==', userId)
-      .get();
-    if (snap.empty) return null;
-    const pending = snap.docs.find(d => d.data().status === 'pending');
-    return pending ? { id: pending.id, ...pending.data() } : null;
-  } catch (e) {
-    console.error('[DLA] checkPendingRequest error:', e);
-    return null;
+    try {
+      const snap = await firebase.firestore()
+        .collection('downloadRequests')
+        .where('fileId', '==', fileId)
+        .where('userId', '==', userId)
+        .get();
+      if (snap.empty) return null;
+      const pending = snap.docs.find(d => d.data().status === 'pending');
+      return pending ? { id: pending.id, ...pending.data() } : null;
+    } catch (e) {
+      console.error('[DLA] checkPendingRequest error:', e);
+      return null;
+    }
   }
-}
 
   /* ── Render button — checks approval status first ── */
-async function renderBtn(fileId, fileName, fileUrl, container) {
-  if (!container) return;
-  _containers[fileId] = { container, fileName, fileUrl };
-  container.innerHTML = `<span style="font-size:12px;color:#484F58">Checking access…</span>`;
+  async function renderBtn(fileId, fileName, fileUrl, container) {
+    if (!container) return;
+    _containers[fileId] = { container, fileName, fileUrl };
+    container.innerHTML = `<span style="font-size:12px;color:#484F58">Checking access…</span>`;
 
-  // Wait for Firebase auth to actually resolve (fixes page-reload issue)
-  const user = await new Promise(resolve => {
-    const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
-  });
+    // Wait for Firebase auth to actually resolve (fixes page-reload issue)
+    const user = await new Promise(resolve => {
+      const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
+    });
 
-  if (!user) {
+    if (!user) {
+      container.innerHTML = `
+        <button class="dla-dl-btn" onclick="alert('Please sign in to download files.')">
+          <i class="ti ti-download"></i> Download
+        </button>`;
+      return;
+    }
+
+    // Check permanent approval first
+    const grant = await checkExistingApproval(fileId, user.uid);
+    if (grant) {
+      renderApprovedBtn(container, fileId, fileName, fileUrl, grant.id, grant.securityCode);
+      return;
+    }
+
+    // Check pending request
+    const pending = await checkPendingRequest(fileId, user.uid);
+    if (pending) {
+      renderPendingBtn(container, pending.id, fileName, fileUrl);
+      listenForDecision(pending.id, fileId, fileName, fileUrl, container);
+      return;
+    }
+
+    // No access — show request button
     container.innerHTML = `
-      <button class="dla-dl-btn" onclick="alert('Please sign in to download files.')">
+      <button class="dla-dl-btn" onclick="SHDownloadAccess.open('${fileId}','${fileName.replace(/'/g,"\\'")}','${fileUrl}')">
         <i class="ti ti-download"></i> Download
-      </button>`;
-    return;
+      </button>
+      <div style="margin-top:8px;font-size:11px;color:#484F58">
+        <i class="ti ti-shield-check" style="font-size:11px"></i> Email verification + admin approval required
+      </div>`;
   }
 
-  // Check permanent approval first
-  const grant = await checkExistingApproval(fileId, user.uid);
-  if (grant) {
-    renderApprovedBtn(container, fileId, fileName, fileUrl, grant.id);
-    return;
-  }
-
-  // Check pending request
-  const pending = await checkPendingRequest(fileId, user.uid);
-  if (pending) {
-    renderPendingBtn(container, pending.id, fileName, fileUrl);
-    listenForDecision(pending.id, fileId, fileName, fileUrl, container);
-    return;
-  }
-
-  // No access — show request button
-  container.innerHTML = `
-    <button class="dla-dl-btn" onclick="SHDownloadAccess.open('${fileId}','${fileName.replace(/'/g,"\\'")}','${fileUrl}')">
-      <i class="ti ti-download"></i> Download
-    </button>
-    <div style="margin-top:8px;font-size:11px;color:#484F58">
-      <i class="ti ti-shield-check" style="font-size:11px"></i> Email verification + admin approval required
-    </div>`;
-}
-
-  function renderApprovedBtn(container, fileId, fileName, fileUrl, requestId) {
+  function renderApprovedBtn(container, fileId, fileName, fileUrl, requestId, securityCode) {
     container.innerHTML = `
-      <button class="dla-approved-btn" onclick="SHDownloadAccess._directDownload('${fileUrl}','${fileName.replace(/'/g,"\\'")}','${fileId}','${requestId||''}')">
+      <button class="dla-approved-btn" onclick="SHDownloadAccess._directDownload('${fileUrl}','${fileName.replace(/'/g,"\\'")}','${fileId}','${requestId||''}','${securityCode||''}')">
         <i class="ti ti-download"></i> Download file
       </button>
       <div style="margin-top:8px;font-size:11px;color:#3FB950">
         <i class="ti ti-circle-check" style="font-size:11px"></i> Access approved — download anytime
-      </div>`;
+      </div>
+      ${securityCode ? `
+      <div style="margin-top:10px;padding:8px 10px;border-radius:6px;background:#0D1117;border:1px solid #30363D;display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="font-size:10.5px;color:#8B949E">
+          <div style="text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:2px">Security Code</div>
+          <span style="font-family:'JetBrains Mono',monospace;color:#58A6FF;font-size:12px">${securityCode}</span>
+        </div>
+        <button onclick="navigator.clipboard.writeText('${securityCode}')" style="background:transparent;border:1px solid #30363D;color:#8B949E;border-radius:5px;width:26px;height:26px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+          <i class="ti ti-copy"></i>
+        </button>
+      </div>` : ''}`;
   }
 
   function renderPendingBtn(container, requestId, fileName, fileUrl) {
@@ -475,34 +521,30 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
         if (data.status === 'approved') {
           if (_unsub) { _unsub(); _unsub = null; }
 
-          /* Save permanent approval to Firestore */
+          let securityCode = data.securityCode;
+          if (!securityCode) {
+            securityCode = generateSecurityCode();
+            snap.ref.update({ securityCode }).catch(() => {});
+          }
+          _securityCode = securityCode;
+
           const user = firebase.auth().currentUser;
           if (user) {
-            // await firebase.firestore().collection('fileAccessGrants').add({
-            //   fileId, fileName, fileUrl,
-            //   userId    : user.uid,
-            //   userEmail : user.email,
-            //   userName  : user.displayName || user.email.split('@')[0],
-            //   status    : 'approved',
-            //   grantedAt : firebase.firestore.FieldValue.serverTimestamp(),
-            //   requestId,
-            // }).catch(() => {});
-
-            /* Mark request as completed */
             snap.ref.update({
               status: 'completed',
               completedAt: firebase.firestore.FieldValue.serverTimestamp(),
             }).catch(() => {});
           }
 
-          /* Update UI in modal */
           if ($('dlaBackdrop').classList.contains('show')) {
+            $('dlaSecurityCode').textContent = securityCode;
+            $('dlaSecurityUser').textContent = user ? (user.displayName || user.email) : '';
+            $('dlaSecurityDate').textContent = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
             showStep(4);
             triggerDownload(fileUrl, fileName, fileId, requestId);
           }
 
-          /* Update button on the file card */
-          if (container) renderApprovedBtn(container, fileId, fileName, fileUrl, requestId);
+          if (container) renderApprovedBtn(container, fileId, fileName, fileUrl, requestId, securityCode);
 
         } else if (data.status === 'rejected') {
           if (_unsub) { _unsub(); _unsub = null; }
@@ -539,58 +581,59 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
 
   /* ── Public: open the flow ── */
   async function open(fileId, fileName, fileUrl) {
-  // Wait for auth to resolve
-  const user = await new Promise(resolve => {
-    const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
-  });
+    // Wait for auth to resolve
+    const user = await new Promise(resolve => {
+      const unsub = firebase.auth().onAuthStateChanged(u => { unsub(); resolve(u); });
+    });
 
-  if (!user) { alert('Please sign in to download files.'); return; }
+    if (!user) { alert('Please sign in to download files.'); return; }
 
-  _fileId    = fileId;
-  _fileName  = fileName;
-  _fileUrl   = fileUrl;
-  _requestId = '';
+    _fileId    = fileId;
+    _fileName  = fileName;
+    _fileUrl   = fileUrl;
+    _requestId = '';
 
-  // Already permanently approved — just download directly
-  const grant = await checkExistingApproval(fileId, user.uid);
-  if (grant) {
-    triggerDownload(fileUrl, fileName, fileId, grant.id);
-    return;
-  }
+    // Already permanently approved — just download directly
+    const grant = await checkExistingApproval(fileId, user.uid);
+    if (grant) {
+      _securityCode = grant.securityCode || '';
+      triggerDownload(fileUrl, fileName, fileId, grant.id);
+      return;
+    }
 
-  // Already has a pending request — show waiting screen
-  const pending = await checkPendingRequest(fileId, user.uid);
-  if (pending) {
-    _requestId = pending.id;
+    // Already has a pending request — show waiting screen
+    const pending = await checkPendingRequest(fileId, user.uid);
+    if (pending) {
+      _requestId = pending.id;
+      $('dlaBackdrop').classList.add('show');
+      $('dlaFileName').textContent    = fileName;
+      $('dlaSuccessFile').textContent = fileName;
+      showStep(3);
+      const container = _containers[fileId] ? _containers[fileId].container : null;
+      listenForDecision(pending.id, fileId, fileName, fileUrl, container);
+      return;
+    }
+
+    // Fresh flow — send OTP
     $('dlaBackdrop').classList.add('show');
     $('dlaFileName').textContent    = fileName;
+    $('dlaUserEmail').textContent   = user.email;
     $('dlaSuccessFile').textContent = fileName;
-    showStep(3);
-    const container = _containers[fileId] ? _containers[fileId].container : null;
-    listenForDecision(pending.id, fileId, fileName, fileUrl, container);
-    return;
-  }
+    clearOtpInputs(); clearErr();
+    showStep(1);
 
-  // Fresh flow — send OTP
-  $('dlaBackdrop').classList.add('show');
-  $('dlaFileName').textContent    = fileName;
-  $('dlaUserEmail').textContent   = user.email;
-  $('dlaSuccessFile').textContent = fileName;
-  clearOtpInputs(); clearErr();
-  showStep(1);
-
-  try {
-    const name = user.displayName || user.email.split('@')[0];
-    await sendOtp(user.email, name, fileName);
-    startTimer();
-    startResendCooldown();
-    showStep(2);
-    setTimeout(() => { const f = document.querySelector('.otp-digit'); if (f) f.focus(); }, 100);
-  } catch (e) {
-    showStep(2);
-    showErr('Could not send code: ' + e.message + '. Try resending.');
+    try {
+      const name = user.displayName || user.email.split('@')[0];
+      await sendOtp(user.email, name, fileName);
+      startTimer();
+      startResendCooldown();
+      showStep(2);
+      setTimeout(() => { const f = document.querySelector('.otp-digit'); if (f) f.focus(); }, 100);
+    } catch (e) {
+      showStep(2);
+      showErr('Could not send code: ' + e.message + '. Try resending.');
+    }
   }
-}
 
   /* ── Public: verify OTP ── */
   async function verifyOtp() {
@@ -676,7 +719,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
   }
 
   /* ── Log a download event so the admin can see who downloaded what, and when ── */
-  async function logDownload(fileId, fileName, requestId) {
+  async function logDownload(fileId, fileName, requestId, securityCode) {
     try {
       const user = firebase.auth().currentUser;
       if (!user) return;
@@ -689,6 +732,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
         userId      : user.uid,
         userName    : user.displayName || user.email.split('@')[0],
         userEmail   : user.email,
+        securityCode: securityCode || null,
         downloadedAt: now,
       });
 
@@ -710,7 +754,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
     a.href = url; a.download = name; a.target = '_blank';
     document.body.appendChild(a); a.click();
     setTimeout(() => document.body.removeChild(a), 200);
-    logDownload(fileId, name, requestId);
+    logDownload(fileId, name, requestId, _securityCode);
   }
 
   /* Called from manual download button inside modal */
@@ -719,11 +763,12 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
   }
 
   /* Called from approved button on file card */
-  function _directDownload(url, name, fileId, requestId) {
+  function _directDownload(url, name, fileId, requestId, securityCode) {
+    _securityCode = securityCode || _securityCode || '';
     triggerDownload(url, name, fileId, requestId);
   }
 
-/* ── Public: close modal ── */
+  /* ── Public: close modal ── */
   function close() {
     $('dlaBackdrop').classList.remove('show');
     clearInterval(_timerInterval);
