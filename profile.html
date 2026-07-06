@@ -293,6 +293,41 @@
     .modal-header,.modal-body,.modal-footer{padding-left:20px;padding-right:20px}
     .settings-tab span{display:none}
   }
+
+  /* ── Presence indicator ── */
+.sh-presence-dot{
+  width:11px;height:11px;border-radius:50%;
+  border:2px solid var(--card);
+  flex-shrink:0;
+  transition:background .3s;
+}
+.sh-presence-dot.sh-presence-online{
+  background:var(--green);
+  box-shadow:0 0 0 0 rgba(78,158,120,0.6);
+  animation:sh-pulse 2s infinite;
+}
+.sh-presence-dot.sh-presence-offline{
+  background:var(--text3);
+}
+@keyframes sh-pulse{
+  0%{box-shadow:0 0 0 0 rgba(78,158,120,0.45)}
+  70%{box-shadow:0 0 0 6px rgba(78,158,120,0)}
+  100%{box-shadow:0 0 0 0 rgba(78,158,120,0)}
+}
+
+/* Positioned on an avatar corner (e.g. profile avatar, follower avatars, chat list) */
+.sh-presence-dot.on-avatar{
+  position:absolute;bottom:2px;right:2px;z-index:2;
+}
+
+/* Text label style, e.g. under a name in chat/profile */
+.sh-presence-label{
+  font-size:11.5px;
+  color:var(--text3);
+  display:flex;align-items:center;gap:5px;
+}
+.sh-presence-label.is-online{ color:var(--green); font-weight:500; }
+
 </style>
 <link rel="stylesheet" href="mobile.css"/>
 </head>
@@ -354,6 +389,7 @@
       <div class="profile-avatar" id="profileAvatar">?</div>
       <div class="avatar-badge" id="profileBadge" title="Active member"><i class="ti ti-check"></i></div>
       <div class="avatar-edit-hint" id="avatarEditHint" style="display:none"><i class="ti ti-camera"></i></div>
+      <div class="sh-presence-dot on-avatar" id="profilePresenceDot"></div>
     </div>
 
     <div class="profile-identity">
@@ -366,6 +402,7 @@
         <i class="ti ti-mail"></i>
         <span id="profileEmail">—</span>
       </div>
+       <div class="sh-presence-label" id="profilePresenceLabel"></div>
       <p class="profile-bio" id="profileBio">Passionate learner on StudyHub. Exploring knowledge across subjects and building expertise one PDF at a time.</p>
       <div class="profile-tags" id="profileTagsRow">
         <span class="profile-tag"><i class="ti ti-calendar"></i><span id="joinedLabel">Joined recently</span></span>
@@ -765,6 +802,7 @@ db.enablePersistence({ synchronizeTabs: true }).catch(err => {
   console.warn('[Firestore] Persistence not enabled:', err.code);
 });
 
+
 const params    = new URLSearchParams(location.search);
 const targetUid = params.get('uid');
 let currentUser  = null;
@@ -991,6 +1029,9 @@ function renderProfile(p, viewer){
   renderActivityFeed('views');
   loadStatusCard(p,viewer,isOwn);
 
+  if(window.SHPresence){
+    SHPresence.watch(p.uid, document.getElementById('profilePresenceDot'), document.getElementById('profilePresenceLabel'));
+  }
   // Load saved appearance prefs
   loadAppearancePrefs();
 }
@@ -1325,6 +1366,7 @@ document.getElementById('settingsModal').addEventListener('click',e=>{ if(e.targ
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeEditProfile();closeSettings();} });
 </script>
 <script src="friends.js"></script>
+<script src="presence.js"></script>
 <script src="notifications.js"></script>
 <script src="doubt-chat.js" defer></script>
 </body>
