@@ -686,6 +686,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
       await firebase.firestore().collection('downloads').add({
         pdfTitle    : fileName,
         fileId      : fileId || null,
+        userId      : user.uid,
         userName    : user.displayName || user.email.split('@')[0],
         userEmail   : user.email,
         downloadedAt: now,
@@ -696,7 +697,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
       if (requestId) {
         await firebase.firestore().collection('downloadRequests').doc(requestId).update({
           downloadedAt: now,
-        }).catch(() => {});
+        }).catch(e => console.error('[DLA] downloadedAt update failed:', e));
       }
     } catch (e) {
       console.warn('[DLA] logDownload failed:', e);
