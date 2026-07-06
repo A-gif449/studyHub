@@ -420,7 +420,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
   // Check permanent approval first
   const grant = await checkExistingApproval(fileId, user.uid);
   if (grant) {
-    renderApprovedBtn(container, fileId, fileName, fileUrl);
+    renderApprovedBtn(container, fileId, fileName, fileUrl, grant.id);
     return;
   }
 
@@ -442,9 +442,9 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
     </div>`;
 }
 
-  function renderApprovedBtn(container, fileId, fileName, fileUrl) {
+  function renderApprovedBtn(container, fileId, fileName, fileUrl, requestId) {
     container.innerHTML = `
-      <button class="dla-approved-btn" onclick="SHDownloadAccess._directDownload('${fileUrl}','${fileName.replace(/'/g,"\\'")}','${fileId}')">
+      <button class="dla-approved-btn" onclick="SHDownloadAccess._directDownload('${fileUrl}','${fileName.replace(/'/g,"\\'")}','${fileId}','${requestId||''}')">
         <i class="ti ti-download"></i> Download file
       </button>
       <div style="margin-top:8px;font-size:11px;color:#3FB950">
@@ -502,7 +502,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
           }
 
           /* Update button on the file card */
-          if (container) renderApprovedBtn(container, fileId, fileName, fileUrl);
+          if (container) renderApprovedBtn(container, fileId, fileName, fileUrl, requestId);
 
         } else if (data.status === 'rejected') {
           if (_unsub) { _unsub(); _unsub = null; }
@@ -718,8 +718,8 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
   }
 
   /* Called from approved button on file card */
-  function _directDownload(url, name, fileId) {
-    triggerDownload(url, name, fileId);
+  function _directDownload(url, name, fileId, requestId) {
+    triggerDownload(url, name, fileId, requestId);
   }
 
 /* ── Public: close modal ── */
