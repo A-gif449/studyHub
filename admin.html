@@ -1,3 +1,4 @@
+//admin.html//
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -760,7 +761,7 @@ function showAdmin(user){
   const initials = (user.displayName || user.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
   document.getElementById('adminInitials').textContent = initials;
   document.getElementById('adminName').textContent = user.displayName || user.email;
-  loadPdfs(); loadViews(); loadDownloads(); loadIqSets(); loadPendingPayments(); loadWaitingRoom();
+  loadPdfs(); loadViews(); loadDownloads(); loadIqSets(); loadPendingPayments(); loadWaitingRoom(); loadDownloadRequests();
   if(window.location.hash === '#waiting') admSwitch('waiting');
 }
 
@@ -1166,6 +1167,19 @@ function renderDlReqs() {
         onclick="rejectDlReq('${r.id}')"
       ><i class="ti ti-x"></i></button>` : '';
  
+    // Download timestamp / status line — shows exactly when the user pulled the file,
+    // or a "not downloaded yet" hint if approval was granted but no download logged yet.
+    const downloadInfo = r.downloadedAt
+      ? `<span style="margin-left:8px;font-size:11px;color:var(--text3);display:inline-flex;align-items:center;gap:4px">
+           <i class="ti ti-clock-check" style="font-size:11px;color:var(--green)"></i>
+           Downloaded ${new Date(r.downloadedAt.seconds * 1000).toLocaleString()}
+         </span>`
+      : (r.status === 'approved' || r.status === 'completed')
+        ? `<span style="margin-left:8px;font-size:11px;color:var(--gold);display:inline-flex;align-items:center;gap:4px">
+             <i class="ti ti-hourglass-low" style="font-size:11px"></i> Not downloaded yet
+           </span>`
+        : '';
+ 
     return `
       <div class="pdf-item" style="align-items:flex-start;flex-wrap:wrap;border-left:3px solid ${s.color}">
         <div class="pdf-emoji">${s.icon}</div>
@@ -1174,12 +1188,13 @@ function renderDlReqs() {
           <div class="pdf-meta">
             <span class="tag">${escHtml(r.userName || 'Unknown')}</span>
             <span>${escHtml(r.userEmail || '')}</span>
-            <span>· ${time}</span>
+            <span>· Requested ${time}</span>
           </div>
           <div style="margin-top:6px">
             <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:5px;font-size:10.5px;font-weight:700;background:${s.bg};color:${s.color}">
               ${r.status}
             </span>
+            ${downloadInfo}
           </div>
         </div>
         ${approveBtn ? `<div class="pdf-actions" style="flex-shrink:0">${approveBtn}</div>` : ''}
@@ -1234,7 +1249,7 @@ function showToast(msg,type='success'){
   setTimeout(()=>t.classList.remove('show'),3500);
 }
 function admSwitch(sec){
-  ['upload','views','downloads','premium','payments','waiting'].forEach(s=>{
+  ['upload','views','downloads','premium','payments','waiting','downloads2'].forEach(s=>{
     const el=document.getElementById('adm-'+s); if(el)el.style.display=s===sec?'block':'none';
     const pill=document.querySelector(`.adm-pill[data-sec="${s}"]`); if(pill)pill.classList.toggle('active',s===sec);
   });

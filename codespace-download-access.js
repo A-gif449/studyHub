@@ -444,7 +444,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
 
   function renderApprovedBtn(container, fileId, fileName, fileUrl) {
     container.innerHTML = `
-      <button class="dla-approved-btn" onclick="SHDownloadAccess._directDownload('${fileUrl}','${fileName.replace(/'/g,"\\'")}')">
+      <button class="dla-approved-btn" onclick="SHDownloadAccess._directDownload('${fileUrl}','${fileName.replace(/'/g,"\\'")}','${fileId}')">
         <i class="ti ti-download"></i> Download file
       </button>
       <div style="margin-top:8px;font-size:11px;color:#3FB950">
@@ -498,7 +498,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
           /* Update UI in modal */
           if ($('dlaBackdrop').classList.contains('show')) {
             showStep(4);
-            triggerDownload(fileUrl, fileName);
+            triggerDownload(fileUrl, fileName, fileId, requestId);
           }
 
           /* Update button on the file card */
@@ -554,7 +554,7 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
   // Already permanently approved — just download directly
   const grant = await checkExistingApproval(fileId, user.uid);
   if (grant) {
-    triggerDownload(fileUrl, fileName);
+    triggerDownload(fileUrl, fileName, fileId, grant.id);
     return;
   }
 
@@ -675,22 +675,51 @@ async function renderBtn(fileId, fileName, fileUrl, container) {
     }, 1000);
   }
 
+  /* ── Log a download event so the admin can see who downloaded what, and when ── */
+  async function logDownload(fileId, fileName, requestId) {
+    try {
+      const user = firebase.auth().currentUser;
+      if (!user) return;
+      const now = firebase.firestore.FieldValue.serverTimestamp();
+
+      /* Entry for the existing "Downloads" admin tab (analytics feed) */
+      await firebase.firestore().collection('downloads').add({
+        pdfTitle    : fileName,
+        fileId      : fileId || null,
+        userName    : user.displayName || user.email.split('@')[0],
+        userEmail   : user.email,
+        downloadedAt: now,
+      });
+
+      /* Stamp the specific download request too, if we have one, so the
+         admin's Download Requests panel can show an exact download time */
+      if (requestId) {
+        await firebase.firestore().collection('downloadRequests').doc(requestId).update({
+          downloadedAt: now,
+        }).catch(() => {});
+      }
+    } catch (e) {
+      console.warn('[DLA] logDownload failed:', e);
+    }
+  }
+
   /* ── Download triggers ── */
-  function triggerDownload(url, name) {
+  function triggerDownload(url, name, fileId, requestId) {
     const a = document.createElement('a');
     a.href = url; a.download = name; a.target = '_blank';
     document.body.appendChild(a); a.click();
     setTimeout(() => document.body.removeChild(a), 200);
+    logDownload(fileId, name, requestId);
   }
 
   /* Called from manual download button inside modal */
   function _triggerDownload() {
-    triggerDownload(_fileUrl, _fileName);
+    triggerDownload(_fileUrl, _fileName, _fileId, _requestId);
   }
 
   /* Called from approved button on file card */
-  function _directDownload(url, name) {
-    triggerDownload(url, name);
+  function _directDownload(url, name, fileId) {
+    triggerDownload(url, name, fileId);
   }
 
 /* ── Public: close modal ── */
