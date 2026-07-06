@@ -70,19 +70,19 @@
     },
 
     // Live-updating label, e.g. "Active now" / "Active 5m ago"
-    formatLabel(presence){
-      if(!presence.lastActive) return 'Offline';
-      if(presence.online) return 'Active now';
-      const diffMs = Date.now() - presence.lastActive.getTime();
-      const mins = Math.floor(diffMs/60000);
-      if(mins < 1)   return 'Active just now';
-      if(mins < 60)  return `Active ${mins}m ago`;
-      const hrs = Math.floor(mins/60);
-      if(hrs < 24)   return `Active ${hrs}h ago`;
-      const days = Math.floor(hrs/24);
-      if(days < 7)   return `Active ${days}d ago`;
-      return `Last seen ${presence.lastActive.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
-    },
+   formatLabel(presence){
+  if(!presence.lastActive) return 'Offline';
+  if(presence.online) return 'Active now';
+  const diffMs = Date.now() - presence.lastActive.getTime();
+  const mins = Math.floor(diffMs/60000);
+  if(mins < 1)   return 'Last seen just now';
+  if(mins < 60)  return `Last seen ${mins}m ago`;
+  const hrs = Math.floor(mins/60);
+  if(hrs < 24)   return `Last seen ${hrs}h ago`;
+  const days = Math.floor(hrs/24);
+  if(days < 7)   return `Last seen ${days}d ago`;
+  return `Last seen ${presence.lastActive.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+}
 
     // Attach a live-updating presence badge to a DOM element for a given uid
     // dotEl: small dot element, labelEl: optional text element
