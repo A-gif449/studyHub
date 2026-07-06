@@ -912,7 +912,7 @@ function renderProfile(p, viewer){
     document.getElementById('lockedScreenName').textContent=p.displayName;
     toggleStoryRing(false);
     const actionsEl=document.getElementById('profileActions');
-    actionsEl.innerHTML=`<div id="shFriendsBtnWrap"></div><button class="btn-secondary" onclick="window.location.href=`messages.html?uid=${profileData.uid}&name=${encodeURIComponent(profileData.displayName)}&email=${encodeURIComponent(profileData.email)}`"><i class="ti ti-message-circle"></i> Message</button><span class="private-badge"><i class="ti ti-lock"></i> Private profile</span>`;
+    actionsEl.innerHTML=`<div id="shFriendsBtnWrap"></div><button class="btn-secondary" onclick="window.location.href='messages.html?uid=${profileData.uid}&name=${encodeURIComponent(profileData.displayName)}&email=${encodeURIComponent(profileData.email)}'"><i class="ti ti-message-circle"></i> Message</button><span class="private-badge"><i class="ti ti-lock"></i> Private profile</span>`;
     if(typeof SHFriends!=='undefined'&&viewer){ SHFriends.init(viewer); SHFriends.renderButton(p.uid,p.displayName,p.email,document.getElementById('shFriendsBtnWrap')); }
     return;
   }
