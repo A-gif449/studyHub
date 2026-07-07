@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Registration Requests – StudyHub Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0E0F12;--bg2:#13141A;--card:#15161C;--card2:#1B1D25;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+    --accent:#5B7FFF;--accent2:#8FA3D6;--gold:#C9A356;--green:#4E9E78;--red:#C2564F;
+    --text:#ECEDF1;--text2:#9498A6;--text3:#62656F;
+  }
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:40px 5% 80px}
+  .page-header{max-width:960px;margin:0 auto 32px}
+  .page-header a{color:var(--text2);text-decoration:none;font-size:13px;display:inline-flex;align-items:center;gap:6px;margin-bottom:18px}
+  .page-header h1{font-family:'Source Serif 4',serif;font-size:clamp(24px,3.6vw,32px)}
+  .page-header p{color:var(--text2);margin-top:8px;font-size:14px}
+  .gate{max-width:420px;margin:120px auto;text-align:center;color:var(--text2)}
+  .gate i{font-size:36px;margin-bottom:14px;display:block;color:var(--text3)}
+  .filter-row{display:flex;gap:8px;max-width:960px;margin:24px auto;flex-wrap:wrap}
+  .filter-chip{padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+  .filter-chip.active,.filter-chip:hover{background:var(--card2);color:var(--text)}
+  .req-list{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+  .req-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px}
+  .req-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+  .req-type{display:inline-flex;align-items:center;gap:7px;padding:4px 12px;border-radius:99px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .req-type.parent{color:var(--gold);background:rgba(201,163,86,0.1)}
+  .req-type.student{color:var(--accent2);background:rgba(91,127,255,0.1)}
+  .req-name{font-size:16px;font-weight:700;margin-top:8px}
+  .req-time{font-size:11.5px;color:var(--text3)}
+  .req-details{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px 20px;padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px}
+  .req-detail label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:3px}
+  .req-detail span{font-size:13.5px;color:var(--text)}
+  .req-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border:none;display:inline-flex;align-items:center;gap:7px;transition:all .2s}
+  .btn-approve{background:var(--green);color:#fff}
+  .btn-approve:hover{background:#458767}
+  .btn-reject{background:transparent;border:1px solid rgba(194,86,79,0.35);color:var(--red)}
+  .btn-reject:hover{background:rgba(194,86,79,0.08)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;font-size:11.5px;font-weight:700}
+  .status-pill.approved{color:var(--green);background:rgba(78,158,120,0.1)}
+  .status-pill.rejected{color:var(--red);background:rgba(194,86,79,0.1)}
+  .credential-box{margin-top:14px;padding:16px;border-radius:10px;background:rgba(78,158,120,0.08);border:1px solid rgba(78,158,120,0.3)}
+  .credential-box .cred-title{font-size:12.5px;font-weight:700;color:#5BBD95;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .cred-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;background:var(--bg2);border-radius:7px;margin-bottom:8px;font-family:monospace;font-size:13.5px}
+  .cred-row button{background:none;border:none;color:var(--text2);cursor:pointer;font-size:15px}
+  .cred-row button:hover{color:var(--text)}
+  .cred-warn{font-size:11.5px;color:var(--text3);margin-top:6px}
+  .empty{text-align:center;padding:80px 20px;color:var(--text3)}
+  .empty i{font-size:36px;margin-bottom:12px;display:block}
+  .skeleton{height:100px;border-radius:16px;background:linear-gradient(90deg,var(--card) 25%,rgba(255,255,255,0.03) 50%,var(--card) 75%);background-size:200% 100%;animation:sh 1.5s infinite;border:1px solid var(--border)}
+  @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .toast{position:fixed;bottom:26px;right:26px;z-index:9999;padding:13px 18px;border-radius:9px;background:var(--card2);border:1px solid var(--border2);font-size:13.5px;color:var(--text);box-shadow:0 16px 40px rgba(0,0,0,0.45);transform:translateY(20px);opacity:0;transition:all .25s;pointer-events:none}
+  .toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<div id="gateWrap" class="gate" style="display:none">
+  <i class="ti ti-lock"></i>
+  <p>Admin access required. Please sign in with your admin account on the main site first.</p>
+</div>
+
+<div id="mainWrap" style="display:none">
+  <div class="page-header">
+    <a href="admin.html"><i class="ti ti-arrow-left"></i> Back to Admin</a>
+    <h1>Registration Requests</h1>
+    <p>Review incoming Parent and Student registration requests. Approving one generates login credentials automatically.</p>
+  </div>
+
+  <div class="filter-row" id="filterRow">
+    <button class="filter-chip active" data-f="pending">Pending</button>
+    <button class="filter-chip" data-f="approved">Approved</button>
+    <button class="filter-chip" data-f="rejected">Rejected</button>
+    <button class="filter-chip" data-f="all">All</button>
+  </div>
+
+  <div class="req-list" id="reqList">
+    <div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+  window.ADMIN_EMAILS = ["abhishekbasu188@gmail.com"];
+  firebase.initializeApp(window.FIREBASE_CONFIG);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let allReqs = [];
+  let activeFilter = 'pending';
+  const revealedCreds = {}; // requestId -> {portalId, password} shown after approval this session
+
+  function escHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function timeAgo(ts) {
+    if (!ts?.toDate) return 'just now';
+    const diff = Math.max(0, Date.now() - ts.toDate().getTime());
+    const m = Math.round(diff / 60000);
+    if (m < 60) return `${m}m ago`;
+    const h = Math.round(m / 60);
+    if (h < 24) return `${h}h ago`;
+    return `${Math.round(h / 24)}d ago`;
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard')).catch(() => showToast(text));
+  }
+
+  auth.onAuthStateChanged(user => {
+    if (!user || !window.ADMIN_EMAILS.includes(user.email)) {
+      document.getElementById('gateWrap').style.display = 'block';
+      document.getElementById('mainWrap').style.display = 'none';
+      return;
+    }
+    document.getElementById('gateWrap').style.display = 'none';
+    document.getElementById('mainWrap').style.display = 'block';
+    listenRequests();
+  });
+
+  function listenRequests() {
+    db.collection('registrationRequests').orderBy('requestedAt', 'desc').limit(100)
+      .onSnapshot(snap => {
+        allReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        render();
+      }, () => {
+        document.getElementById('reqList').innerHTML = `<div class="empty"><i class="ti ti-wifi-off"></i>Could not load requests.</div>`;
+      });
+  }
+
+  function detailRows(r) {
+    if (r.type === 'parent') {
+      return [
+        ['Phone', r.phone], ['Email', r.email],
+        ["Child's name", r.childName], ["Child's class", r.childClass],
+        ["Child's Student ID", r.childStudentId || '—'],
+      ];
+    }
+    return [
+      ['Class', r.studentClass], ['Roll no.', r.roll],
+      ['Phone', r.phone], ['Email', r.email],
+      ["Parent's name", r.parentName], ["Parent's email", r.parentEmail],
+    ];
+  }
+
+  function render() {
+    const filtered = activeFilter === 'all' ? allReqs : allReqs.filter(r => r.status === activeFilter);
+    const list = document.getElementById('reqList');
+    if (!filtered.length) {
+      list.innerHTML = `<div class="empty"><i class="ti ti-inbox"></i>No ${activeFilter === 'all' ? '' : activeFilter} requests.</div>`;
+      return;
+    }
+    list.innerHTML = filtered.map(r => {
+      const cred = revealedCreds[r.id];
+      const statusBadge = r.status === 'pending'
+        ? `<div class="req-actions">
+             <button class="btn btn-approve" onclick="approveRequest('${r.id}')"><i class="ti ti-check"></i> Approve & Generate ID</button>
+             <button class="btn btn-reject" onclick="rejectRequest('${r.id}')"><i class="ti ti-x"></i> Reject</button>
+           </div>`
+        : `<span class="status-pill ${r.status}"><i class="ti ${r.status === 'approved' ? 'ti-circle-check' : 'ti-circle-x'}"></i> ${escHtml(r.status)}${r.issuedId ? ` — ${escHtml(r.issuedId)}` : ''}</span>`;
+
+      const credBox = cred ? `
+        <div class="credential-box">
+          <div class="cred-title"><i class="ti ti-key"></i> Credentials generated — share these now, they won't be shown again</div>
+          <div class="cred-row"><span>${escHtml(cred.portalId)}</span><button onclick="copyText('${cred.portalId}')"><i class="ti ti-copy"></i></button></div>
+          <div class="cred-row"><span>${escHtml(cred.password)}</span><button onclick="copyText('${cred.password}')"><i class="ti ti-copy"></i></button></div>
+          <div class="cred-warn">Give this ID + password to the ${r.type} directly (call, message, or in person). It is not emailed automatically.</div>
+        </div>` : '';
+
+      return `
+      <div class="req-card">
+        <div class="req-top">
+          <div>
+            <span class="req-type ${r.type}"><i class="ti ${r.type === 'parent' ? 'ti-users' : 'ti-school'}"></i> ${escHtml(r.type)}</span>
+            <div class="req-name">${escHtml(r.name)}</div>
+          </div>
+          <span class="req-time">${timeAgo(r.requestedAt)}</span>
+        </div>
+        <div class="req-details">
+          ${detailRows(r).map(([label, value]) => `
+            <div class="req-detail"><label>${escHtml(label)}</label><span>${escHtml(value || '—')}</span></div>
+          `).join('')}
+        </div>
+        ${statusBadge}
+        ${credBox}
+      </div>`;
+    }).join('');
+  }
+
+  window.approveRequest = async function (id) {
+    const req = allReqs.find(r => r.id === id);
+    if (!req) return;
+    const btnRow = event.target.closest('.req-actions');
+    if (btnRow) btnRow.querySelectorAll('button').forEach(b => b.disabled = true);
+
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      const profile = req.type === 'parent'
+        ? { name: req.name, phone: req.phone, email: req.email, childName: req.childName, childClass: req.childClass, childStudentId: req.childStudentId }
+        : { name: req.name, studentClass: req.studentClass, roll: req.roll, phone: req.phone, email: req.email, parentName: req.parentName, parentEmail: req.parentEmail };
+
+      const res = await fetch('/api/create-portal-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ type: req.type, requestId: id, profile })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to approve');
+
+      revealedCreds[id] = { portalId: data.portalId, password: data.password };
+      showToast(`Approved — ${data.portalId} created`);
+    } catch (err) {
+      showToast(`Error: ${err.message}`);
+      if (btnRow) btnRow.querySelectorAll('button').forEach(b => b.disabled = false);
+    }
+  };
+
+  window.rejectRequest = async function (id) {
+    if (!confirm('Reject this registration request?')) return;
+    try {
+      await db.collection('registrationRequests').doc(id).update({
+        status: 'rejected', rejectedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast('Request rejected');
+    } catch (err) {
+      showToast('Could not reject — try again');
+    }
+  };
+
+  document.getElementById('filterRow').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-chip');
+    if (!btn) return;
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.f;
+    render();
+  });
+</script>
+</body>
+</html>

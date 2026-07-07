@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Login – StudyHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0E0F12;--bg2:#13141A;--card:#15161C;--card2:#1B1D25;
+    --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+    --accent:#5B7FFF;--accent2:#8FA3D6;--green:#4E9E78;--red:#C2564F;
+    --text:#ECEDF1;--text2:#9498A6;--text3:#62656F;
+  }
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+    display:flex;align-items:center;justify-content:center;padding:20px}
+  .wrap{width:100%;max-width:400px}
+  .back{display:inline-flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:13px;margin-bottom:24px}
+  .back:hover{color:var(--text)}
+  .panel{position:relative;background:linear-gradient(180deg,#15161C 0%,#101116 100%);
+    border:1px solid var(--border2);border-radius:22px;padding:40px 34px;overflow:hidden;isolation:isolate;text-align:center}
+  .panel::before{content:'';position:absolute;top:-90px;left:50%;transform:translateX(-50%);
+    width:300px;height:200px;background:radial-gradient(ellipse,rgba(91,127,255,0.2),transparent 70%);z-index:-1}
+  .icon-badge{width:56px;height:56px;border-radius:16px;background:rgba(91,127,255,0.1);border:1px solid rgba(91,127,255,0.3);
+    display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--accent2);margin:0 auto 20px}
+  h1{font-family:'Source Serif 4',serif;font-size:24px;font-weight:700;margin-bottom:8px}
+  .sub{font-size:13.5px;color:var(--text2);margin-bottom:30px}
+  .fg{margin-bottom:16px;text-align:left}
+  .fg label{display:block;font-size:12.5px;font-weight:600;color:var(--text2);margin-bottom:7px}
+  .fg input{width:100%;padding:12px 14px;background:var(--bg2);border:1px solid var(--border2);
+    border-radius:9px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;text-transform:uppercase}
+  .fg input#loginPass{text-transform:none}
+  .fg input:focus{border-color:var(--accent)}
+  .fg input::placeholder{color:var(--text3);text-transform:none}
+  .login-btn{width:100%;padding:13px;border-radius:10px;border:none;font-size:14.5px;font-weight:700;
+    cursor:pointer;font-family:inherit;background:var(--accent);color:#fff;
+    margin-top:6px;transition:all .2s}
+  .login-btn:hover{background:#4D6FE0}
+  .login-btn:disabled{opacity:.6;cursor:not-allowed}
+  .error-msg{background:rgba(194,86,79,0.1);border:1px solid rgba(194,86,79,0.25);border-radius:8px;
+    padding:10px 13px;font-size:12.5px;color:var(--red);margin-bottom:16px;display:none;text-align:left}
+  .error-msg.show{display:block}
+  .register-link{font-size:12.5px;color:var(--text3);margin-top:22px}
+  .register-link a{color:var(--accent2);text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="back"><i class="ti ti-arrow-left"></i> Back to StudyHub</a>
+  <div class="panel">
+    <div class="icon-badge"><i class="ti ti-school"></i></div>
+    <h1>Student Login</h1>
+    <p class="sub">Enter the Student ID and password issued by the admin.</p>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <form id="loginForm">
+      <div class="fg"><label>Student ID</label><input type="text" id="loginId" placeholder="STU-7734" required/></div>
+      <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="Enter your password" required/></div>
+      <button type="submit" class="login-btn" id="loginBtn">Sign In</button>
+    </form>
+    <p class="register-link">Don't have a Student ID? <a href="student-register.html">Register here</a></p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+  firebase.initializeApp(window.FIREBASE_CONFIG);
+  const auth = firebase.auth();
+  const PORTAL_DOMAIN = "portal.studyhub.internal";
+
+  function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    const idRaw = document.getElementById('loginId').value.trim().toUpperCase();
+    const pass = document.getElementById('loginPass').value;
+
+    if (!idRaw.startsWith('STU-')) {
+      showError('That doesn\'t look like a Student ID. It should look like STU-1234.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+    document.getElementById('errorMsg').classList.remove('show');
+
+    const syntheticEmail = `${idRaw.toLowerCase()}@${PORTAL_DOMAIN}`;
+    try {
+      await auth.signInWithEmailAndPassword(syntheticEmail, pass);
+      window.location.href = 'student-dashboard.html';
+    } catch (err) {
+      const map = {
+        'auth/user-not-found': 'No account found for that Student ID.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/invalid-credential': 'Incorrect Student ID or password.',
+        'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
+      };
+      showError(map[err.code] || 'Something went wrong. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  });
+</script>
+</body>
+</html>
