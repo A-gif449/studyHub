@@ -1,0 +1,14 @@
+{
+  "name": "studyhub-fetch-opportunities",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pulls job/exam/scholarship RSS feeds into Firestore for StudyHub.",
+  "main": "fetch.js",
+  "scripts": {
+    "start": "node fetch.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.1.0",
+    "rss-parser": "^3.13.0"
+  }
+}

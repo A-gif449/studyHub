@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Opportunities – StudyHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0E0F12;--card:#15161C;--card2:#1B1D25;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+    --accent:#5B7FFF;--accent2:#8FA3D6;--gold:#C9A356;--green:#4E9E78;--red:#C2564F;
+    --text:#ECEDF1;--text2:#9498A6;--text3:#62656F;
+  }
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:40px 5% 80px}
+  .page-header{max-width:900px;margin:0 auto 32px}
+  .page-header a{color:var(--text2);text-decoration:none;font-size:13px;display:inline-flex;align-items:center;gap:6px;margin-bottom:18px}
+  .page-header h1{font-family:'Source Serif 4',serif;font-size:clamp(26px,4vw,36px)}
+  .page-header p{color:var(--text2);margin-top:8px;font-size:14px}
+  .filter-row{display:flex;gap:8px;max-width:900px;margin:24px auto;flex-wrap:wrap}
+  .filter-chip{padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+  .filter-chip.active,.filter-chip:hover{background:var(--card2);color:var(--text)}
+  .opp-list{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+  .opp-card{display:flex;gap:16px;align-items:flex-start;padding:20px;border-radius:14px;background:var(--card);border:1px solid var(--border);text-decoration:none;transition:all .2s}
+  .opp-card:hover{background:var(--card2);border-color:var(--border2)}
+  .opp-icon{width:40px;height:40px;border-radius:10px;background:var(--bg);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;color:var(--accent2)}
+  .opp-body{flex:1;min-width:0}
+  .opp-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+  .opp-cat{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:3px 9px;border-radius:99px}
+  .opp-cat.Job{color:var(--accent2);background:rgba(91,127,255,0.1)}
+  .opp-cat.Exam{color:var(--gold);background:rgba(201,163,86,0.1)}
+  .opp-cat.Scholarship{color:var(--green);background:rgba(78,158,120,0.1)}
+  .opp-time{font-size:11.5px;color:var(--text3)}
+  .opp-title{font-size:14.5px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:4px}
+  .opp-source{font-size:12px;color:var(--text3)}
+  .opp-arrow{color:var(--text3);flex-shrink:0;margin-top:8px}
+  .empty{text-align:center;padding:80px 20px;color:var(--text3)}
+  .empty i{font-size:36px;margin-bottom:12px;display:block}
+  .skeleton{height:84px;border-radius:14px;background:linear-gradient(90deg,var(--card) 25%,rgba(255,255,255,0.03) 50%,var(--card) 75%);background-size:200% 100%;animation:sh 1.5s infinite;border:1px solid var(--border)}
+  @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <a href="index.html"><i class="ti ti-arrow-left"></i> Back to StudyHub</a>
+  <h1>Job & Exam Opportunities</h1>
+  <p>Automatically updated alerts — new listings appear here as soon as they're published.</p>
+</div>
+
+<div class="filter-row" id="filterRow">
+  <button class="filter-chip active" data-cat="All">All</button>
+  <button class="filter-chip" data-cat="Job">Jobs</button>
+  <button class="filter-chip" data-cat="Exam">Exams</button>
+  <button class="filter-chip" data-cat="Scholarship">Scholarships</button>
+</div>
+
+<div class="opp-list" id="oppList">
+  <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoKb5CBBnvaAbAnHWre2W3syC6LTsMlEc",
+    authDomain: "studyx-fd90c.firebaseapp.com",
+    projectId: "studyx-fd90c",
+    storageBucket: "studyx-fd90c.firebasestorage.app",
+    messagingSenderId: "520877226051",
+    appId: "1:520877226051:web:94cdfd86eb64623f5f7cf6"
+  };
+  firebase.initializeApp(window.FIREBASE_CONFIG);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const catIcon = { Job: 'ti-briefcase', Exam: 'ti-clipboard-text', Scholarship: 'ti-award' };
+  let allOpps = [];
+  let activeCat = 'All';
+
+  function escHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  function timeAgo(ts) {
+    if (!ts?.toDate) return '';
+    const diff = Math.max(0, Date.now() - ts.toDate().getTime());
+    const m = Math.round(diff / 60000);
+    if (m < 60) return `${m}m ago`;
+    const h = Math.round(m / 60);
+    if (h < 24) return `${h}h ago`;
+    return `${Math.round(h / 24)}d ago`;
+  }
+
+  function render() {
+    const filtered = activeCat === 'All' ? allOpps : allOpps.filter(o => o.category === activeCat);
+    const list = document.getElementById('oppList');
+    if (!filtered.length) {
+      list.innerHTML = `<div class="empty"><i class="ti ti-inbox"></i>No opportunities in this category yet — check back soon.</div>`;
+      return;
+    }
+    list.innerHTML = filtered.map(o => `
+      <a class="opp-card" href="${escHtml(o.link)}" target="_blank" rel="noopener">
+        <div class="opp-icon"><i class="ti ${catIcon[o.category] || 'ti-file-text'}"></i></div>
+        <div class="opp-body">
+          <div class="opp-top">
+            <span class="opp-cat ${o.category}">${escHtml(o.category)}</span>
+            <span class="opp-time">${timeAgo(o.publishedAt)}</span>
+          </div>
+          <div class="opp-title">${escHtml(o.title)}</div>
+          <div class="opp-source">${escHtml(o.source || '')}</div>
+        </div>
+        <i class="ti ti-external-link opp-arrow"></i>
+      </a>
+    `).join('');
+  }
+
+  db.collection('opportunities').orderBy('publishedAt', 'desc').limit(60)
+    .onSnapshot(snap => {
+      allOpps = snap.docs.map(d => d.data());
+      render();
+    }, () => {
+      document.getElementById('oppList').innerHTML =
+        `<div class="empty"><i class="ti ti-wifi-off"></i>Could not load opportunities.</div>`;
+    });
+
+  document.getElementById('filterRow').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-chip');
+    if (!btn) return;
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    render();
+  });
+
+  // Mark as "seen" for the bell badge on other pages
+  auth.onAuthStateChanged(user => {
+    if (!user) return;
+    db.collection('opportunitySeen').doc(user.uid).set(
+      { lastSeenAt: firebase.firestore.FieldValue.serverTimestamp() },
+      { merge: true }
+    );
+  });
+</script>
+</body>
+</html>
