@@ -15,10 +15,9 @@ const admin = require("firebase-admin");
 const crypto = require("crypto");
 
 const FEEDS = [
-  // Add feed URLs here, one per source. Example placeholders —
-  // replace/extend with sources you've vetted:
-   { url: "https://indiajoblive.com/feed", category: "Job" },
-  // { url: "https://careerpower.in/blog/feed", category: "Exam" },
+  { url: "https://news.google.com/rss/search?q=government+job+recruitment+India&hl=en-IN&gl=IN&ceid=IN:en", category: "Job" },
+  { url: "https://news.google.com/rss/search?q=exam+notification+admit+card+India&hl=en-IN&gl=IN&ceid=IN:en", category: "Exam" },
+  { url: "https://news.google.com/rss/search?q=scholarship+India+students&hl=en-IN&gl=IN&ceid=IN:en", category: "Scholarship" },
 ];
 
 const KEYWORDS = {
